@@ -1,0 +1,2131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LMSD Common Music Assessments: Tonal</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #f7f3ec;
+    --parchment: #ede7d9;
+    --navy: #1a2744;
+    --navy-mid: #2c3e6b;
+    --gold: #c8973a;
+    --gold-light: #e8b84b;
+    --green: #2d7a5f;
+    --red: #b03a2e;
+    --text: #1a1a2e;
+    --muted: #6b6b8a;
+    /* Ensemble themes */
+    --orch-bg:     #f0ecf8;
+    --orch-border: #c9bce8;
+    --orch-icon:   #6b4faa;
+    --orch-hover:  #e6dff5;
+    --band-bg:     #fdf4e3;
+    --band-border: #e8d099;
+    --band-icon:   #a07820;
+    --band-hover:  #faefd4;
+    /* Instrument colors */
+    --violin-color: #a33030;
+    --viola-color:  #2a7a6a;
+    --cello-color:  #b06a10;
+    --bass-color:   #1a5c7a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background-color: var(--cream);
+    background-image: repeating-linear-gradient(transparent, transparent 39px, #c8c0b0 39px, #c8c0b0 40px);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text);
+    padding: 20px;
+  }
+
+  .card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 8px 40px rgba(26,39,68,0.15), 0 2px 8px rgba(26,39,68,0.08);
+    max-width: 580px;
+    width: 100%;
+    overflow: hidden;
+    animation: slideUp 0.4s ease;
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: var(--navy);
+    padding: 20px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .header h1 {
+    font-family: 'Playfair Display', serif;
+    color: white;
+    font-size: 1.15rem;
+    letter-spacing: 0.02em;
+    line-height: 1.3;
+  }
+  .header h1 span {
+    display: block;
+    font-size: 0.75rem;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 400;
+    color: rgba(255,255,255,0.55);
+    letter-spacing: 0.04em;
+    margin-bottom: 2px;
+  }
+  .header-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+  .key-badge {
+    background: var(--gold);
+    color: var(--navy);
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .back-btn {
+    background: rgba(255,255,255,0.15);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 5px 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    white-space: nowrap;
+  }
+  .back-btn:hover { background: rgba(255,255,255,0.28); }
+
+  /* ── PROGRESS ── */
+  .progress-bar-wrap { background: var(--parchment); height: 6px; }
+  .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold), var(--gold-light));
+    transition: width 0.5s ease;
+  }
+
+  /* ── SHARED MENU STYLES ── */
+  .menu-body { padding: 32px 28px; animation: slideUp 0.35s ease; }
+  .menu-intro {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.35rem;
+    color: var(--navy);
+    margin-bottom: 5px;
+  }
+  .menu-sub { color: var(--muted); font-size: 0.88rem; margin-bottom: 24px; line-height: 1.5; }
+
+
+  /* ── FOLDER CARDS (home / group screens) ── */
+  .folder-cards { display: flex; flex-direction: column; gap: 12px; }
+  .folder-card {
+    display: flex; align-items: center; gap: 16px;
+    background: var(--cream); border: 2px solid var(--parchment);
+    border-radius: 14px; padding: 18px 20px;
+    cursor: pointer; transition: all 0.2s ease; text-align: left;
+  }
+  .folder-card:hover {
+    border-color: var(--navy); background: white;
+    box-shadow: 0 4px 16px rgba(26,39,68,0.12); transform: translateY(-2px);
+  }
+  .folder-card.orch { background: var(--orch-bg); border-color: var(--orch-border); }
+  .folder-card.orch:hover { background: var(--orch-hover); border-color: var(--orch-icon); }
+  .folder-card.orch .folder-icon { background: var(--orch-icon); }
+  .folder-card.orch .folder-arrow { color: var(--orch-icon); }
+  .folder-card.band { background: var(--band-bg); border-color: var(--band-border); }
+  .folder-card.band:hover { background: var(--band-hover); border-color: var(--band-icon); }
+  .folder-card.band .folder-icon { background: var(--band-icon); }
+  .folder-card.band .folder-arrow { color: var(--band-icon); }
+  .folder-icon {
+    font-size: 1.5rem; width: 50px; height: 50px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--navy); border-radius: 12px;
+  }
+  .folder-info { flex: 1; }
+  .folder-title { font-family: 'Playfair Display', serif; font-size: 1.05rem; color: var(--navy); margin-bottom: 2px; }
+  .folder-desc  { font-size: 0.8rem; color: var(--muted); }
+  .folder-arrow { color: var(--muted); font-size: 1.4rem; }
+  .folder-card:hover .folder-arrow { color: var(--navy); }
+
+  /* ── QUIZ CARDS (instrument level) ── */
+  .quiz-cards { display: flex; flex-direction: column; gap: 12px; }
+  .quiz-card {
+    display: flex; align-items: center; gap: 16px;
+    background: var(--cream); border: 2px solid var(--parchment);
+    border-radius: 14px; padding: 16px 20px;
+    cursor: pointer; transition: all 0.2s ease; text-align: left;
+  }
+  .quiz-card:hover {
+    background: white; box-shadow: 0 4px 16px rgba(26,39,68,0.12); transform: translateY(-2px);
+  }
+  .quiz-card-icon {
+    font-size: 1.6rem; width: 48px; height: 48px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--navy); border-radius: 10px; color: white;
+  }
+  /* Instrument card: tinted background + border, icon stays navy */
+  .quiz-card.violin { background: #f9f0f0; border-color: #d9b0b0; }
+  .quiz-card.violin:hover { background: #f4e3e3; border-color: var(--violin-color); }
+  .quiz-card.viola  { background: #eef6f5; border-color: #a8cdc8; }
+  .quiz-card.viola:hover  { background: #ddf0ed; border-color: var(--viola-color); }
+  .quiz-card.cello  { background: #fdf5ea; border-color: #dfc49a; }
+  .quiz-card.cello:hover  { background: #faecd5; border-color: var(--cello-color); }
+  .quiz-card.bass   { background: #eef4f8; border-color: #9bbfcf; }
+  .quiz-card.bass:hover   { background: #daeaf3; border-color: var(--bass-color); }
+  .quiz-card-title { font-family: 'Playfair Display', serif; font-size: 1rem; color: var(--navy); margin-bottom: 2px; }
+  .quiz-card-desc  { font-size: 0.78rem; color: var(--muted); }
+  .quiz-card-arrow { color: var(--muted); font-size: 1.4rem; margin-left: auto; flex-shrink: 0; }
+  .quiz-card:hover .quiz-card-arrow { color: var(--navy); }
+
+  /* ── QUIZ BODY ── */
+  .body { padding: 28px; }
+  .question-label {
+    font-size: 0.78rem; font-weight: 600; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--muted); margin-bottom: 6px;
+  }
+  .question-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem; color: var(--navy); margin-bottom: 20px;
+  }
+  .staff-container {
+    background: var(--cream);
+    border: 2px solid var(--parchment);
+    border-radius: 12px;
+    padding: 12px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 24px; min-height: 210px;
+  }
+  .staff-img { height: 180px; object-fit: contain; display: block; }
+
+  .answers-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px; margin-bottom: 20px;
+  }
+  /* 7-option layout (Q1/Q2): 4+3 */
+  .answers-grid.opts-7 .answer-btn:nth-child(5) { grid-column: 1; }
+  .answers-grid.opts-7 .answer-btn:nth-child(6) { grid-column: 2; }
+  .answers-grid.opts-7 .answer-btn:nth-child(7) { grid-column: 3; }
+  /* 9-option layout (Q3/Q4): 4 columns, C and F notes paired */
+  .answers-grid.opts-9 { grid-template-columns: repeat(4, 1fr); }
+  /* Pair cell: two small stacked buttons sharing one grid column */
+  .btn-pair {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+  }
+  .btn-pair .answer-btn {
+    padding: 14px 2px;
+    font-size: 0.78rem;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .answer-btn {
+    background: var(--parchment);
+    border: 2px solid transparent;
+    border-radius: 10px; padding: 14px 8px;
+    font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 600;
+    color: var(--navy); cursor: pointer; transition: all 0.18s ease; text-align: center;
+  }
+  .answer-btn:hover:not(:disabled) {
+    background: var(--navy); color: white; border-color: var(--navy);
+    transform: translateY(-2px); box-shadow: 0 4px 12px rgba(26,39,68,0.2);
+  }
+  .answer-btn.correct        { background: var(--green); color: white; border-color: var(--green); }
+  .answer-btn.wrong          { background: var(--red);   color: white; border-color: var(--red); }
+  .answer-btn.reveal-correct { background: var(--green); color: white; border-color: var(--green); opacity: 0.7; }
+  .answer-btn:disabled       { cursor: default; transform: none; }
+
+  .feedback {
+    min-height: 28px; font-size: 0.9rem; font-weight: 500;
+    text-align: center; margin-bottom: 4px;
+    transition: font-size 0.15s ease;
+  }
+  .feedback.correct { color: var(--green); font-size: 1.8rem; font-weight: 700; }
+  .feedback.wrong   { color: var(--red);   font-size: 1.8rem; font-weight: 700; }
+
+  .next-btn {
+    display: block; width: 100%; padding: 14px;
+    background: var(--navy); color: white; border: none; border-radius: 10px;
+    font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 600;
+    cursor: pointer; transition: background 0.2s, transform 0.15s;
+    letter-spacing: 0.03em; margin-top: 16px;
+  }
+  .next-btn:hover    { background: var(--navy-mid); transform: translateY(-1px); }
+  .next-btn:disabled { opacity: 0.4; cursor: default; transform: none; }
+
+  /* ── SCORE SCREEN ── */
+  .score-screen { padding: 36px 28px; text-align: center; animation: slideUp 0.4s ease; }
+  .score-circle {
+    width: 120px; height: 120px; border-radius: 50%; background: var(--navy);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    margin: 0 auto 24px; box-shadow: 0 8px 24px rgba(26,39,68,0.3);
+  }
+  .score-num   { font-family: 'Playfair Display', serif; font-size: 2.2rem; color: var(--gold-light); line-height: 1; }
+  .score-denom { font-size: 0.8rem; color: rgba(255,255,255,0.6); margin-top: 2px; }
+  .score-title { font-family: 'Playfair Display', serif; font-size: 1.7rem; color: var(--navy); margin-bottom: 8px; }
+  .score-sub   { color: var(--muted); font-size: 0.95rem; margin-bottom: 28px; line-height: 1.5; }
+  .results-list {
+    text-align: left; background: var(--cream); border-radius: 12px;
+    padding: 16px; margin-bottom: 16px; max-height: 240px; overflow-y: auto;
+  }
+  .result-item {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 0; border-bottom: 1px solid var(--parchment); font-size: 0.9rem;
+  }
+  .result-item:last-child { border-bottom: none; }
+  .q-label { color: var(--muted); font-size: 0.8rem; }
+  .r-note  { font-weight: 600; color: var(--navy); }
+  .r-icon  { font-size: 1rem; }
+
+  .score-btn-row { display: flex; gap: 10px; }
+  .score-time { font-size: 0.85rem; color: var(--muted); margin-bottom: 20px; letter-spacing: 0.02em; }
+  .replay-btn {
+    flex: 1; padding: 14px; background: var(--gold); color: var(--navy);
+    border: none; border-radius: 10px; font-family: 'DM Sans', sans-serif;
+    font-size: 1rem; font-weight: 700; cursor: pointer; transition: background 0.2s;
+  }
+  .replay-btn:hover { background: var(--gold-light); }
+  .menu-btn {
+    flex: 1; padding: 14px; background: var(--parchment); color: var(--navy);
+    border: none; border-radius: 10px; font-family: 'DM Sans', sans-serif;
+    font-size: 1rem; font-weight: 600; cursor: pointer; transition: background 0.2s;
+  }
+  .menu-btn:hover { background: #ddd8ce; }
+  /* ── SUBMISSION PANEL ── */
+  .submit-panel {
+    background: var(--cream); border: 2px solid var(--parchment);
+    border-radius: 12px; padding: 20px; margin-bottom: 16px; text-align: left;
+  }
+  .submit-panel-title {
+    font-family: 'Playfair Display', serif; font-size: 1rem;
+    color: var(--navy); margin-bottom: 14px;
+  }
+  .submit-field { margin-bottom: 12px; }
+  .submit-field label {
+    display: block; font-size: 0.78rem; font-weight: 600;
+    color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase;
+    margin-bottom: 5px;
+  }
+  .submit-field select,
+  .submit-field input[type="text"] {
+    width: 100%; padding: 10px 12px;
+    border: 2px solid var(--parchment); border-radius: 8px;
+    font-family: 'DM Sans', sans-serif; font-size: 0.95rem;
+    color: var(--navy); background: white;
+    transition: border-color 0.2s; outline: none;
+  }
+  .submit-field select:focus,
+  .submit-field input[type="text"]:focus { border-color: var(--navy); }
+  .submit-btn {
+    display: block; width: 100%; padding: 14px;
+    background: var(--green); color: white; border: none; border-radius: 10px;
+    font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 600;
+    cursor: pointer; transition: background 0.2s; margin-bottom: 12px;
+  }
+  .submit-btn:hover:not(:disabled) { background: #236650; }
+  .submit-btn:disabled { opacity: 0.5; cursor: default; }
+  .submit-status {
+    text-align: center; font-size: 0.9rem; font-weight: 600;
+    min-height: 22px; margin-bottom: 8px;
+  }
+  .submit-status.success { color: var(--green); }
+  .submit-status.error   { color: var(--red); }
+</style>
+</head>
+<body>
+<div class="card" id="app"></div>
+
+<script>
+// ── CONFIGURATION ───────────────────────────────────────────────
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzZG8jEYYdOLcG23rEaYl0CnZgKxfLO2DqcJcj2P9i8QpoQ33f3xLPVUZ_RTFbDtqGP/exec';
+
+// ── MULTI-KEY NOTE POOLS (Quarter 3) ────────────────────────────
+// Each entry: { noteFile, noteName (letter only), label }
+// Answers are derived at quiz-build time based on the randomly chosen key.
+
+// Key definitions: which notes get sharps
+const KEYS = {
+  C: { label: 'C Major', sharps: [],           clef: { treble: 'treble0.png', alto: 'alto0.png', bass: 'bass0.png' } },
+  G: { label: 'G Major', sharps: ['F'],        clef: { treble: 'treble1.png', alto: 'alto1.png', bass: 'bass1.png' } },
+  D: { label: 'D Major', sharps: ['F', 'C'],   clef: { treble: 'treble2.png', alto: 'alto2.png', bass: 'bass2.png' } },
+};
+const KEY_IDS = ['C', 'G', 'D'];
+
+// Display labels for buttons — adds natural sign to F and C naturals
+const DISPLAY_LABEL = { 'F': 'F♮', 'C': 'C♮' };
+function displayNote(n) { return DISPLAY_LABEL[n] || n; }
+
+function applyKey(noteName, keyId) {
+  // Returns the correct answer string given the base note name and key
+  const sharps = KEYS[keyId].sharps;
+  if (sharps.includes(noteName)) return noteName + '#';
+  return noteName;
+}
+
+// Treble clef note pool: note1=G3 on treble, G3-D5 = note1-note12
+const TREBLE_POOL = [
+  { noteFile: 'note1.png',  noteName: 'G', label: 'G3' },
+  { noteFile: 'note2.png',  noteName: 'A', label: 'A3' },
+  { noteFile: 'note3.png',  noteName: 'B', label: 'B3' },
+  { noteFile: 'note4.png',  noteName: 'C', label: 'C4', excludeInKeys: ['D'] },
+  { noteFile: 'note5.png',  noteName: 'D', label: 'D4' },
+  { noteFile: 'note6.png',  noteName: 'E', label: 'E4' },
+  { noteFile: 'note7.png',  noteName: 'F', label: 'F4' },
+  { noteFile: 'note8.png',  noteName: 'G', label: 'G4' },
+  { noteFile: 'note9.png',  noteName: 'A', label: 'A4' },
+  { noteFile: 'note10.png', noteName: 'B', label: 'B4' },
+  { noteFile: 'note11.png', noteName: 'C', label: 'C5' },
+  { noteFile: 'note12.png', noteName: 'D', label: 'D5' },
+];
+
+// Alto clef note pool: note7=G3 on alto, G3-D5 = note7-note18
+const ALTO_POOL = [
+  { noteFile: 'note7.png',  noteName: 'G', label: 'G3' },
+  { noteFile: 'note8.png',  noteName: 'A', label: 'A3' },
+  { noteFile: 'note9.png',  noteName: 'B', label: 'B3' },
+  { noteFile: 'note10.png', noteName: 'C', label: 'C4', excludeInKeys: ['D'] },
+  { noteFile: 'note11.png', noteName: 'D', label: 'D4' },
+  { noteFile: 'note12.png', noteName: 'E', label: 'E4' },
+  { noteFile: 'note13.png', noteName: 'F', label: 'F4' },
+  { noteFile: 'note14.png', noteName: 'G', label: 'G4' },
+  { noteFile: 'note15.png', noteName: 'A', label: 'A4' },
+  { noteFile: 'note16.png', noteName: 'B', label: 'B4' },
+  { noteFile: 'note17.png', noteName: 'C', label: 'C5' },
+  { noteFile: 'note18.png', noteName: 'D', label: 'D5' },
+];
+
+// Bass clef note pool: note6=G2 on bass, G2-D4 = note6-note17
+// Bass instrument uses same images but labels shifted down an octave
+const BASS_POOL = [
+  { noteFile: 'note6.png',  noteName: 'G', label: 'G2' },
+  { noteFile: 'note7.png',  noteName: 'A', label: 'A2' },
+  { noteFile: 'note8.png',  noteName: 'B', label: 'B2' },
+  { noteFile: 'note9.png',  noteName: 'C', label: 'C3', excludeInKeys: ['D'] },
+  { noteFile: 'note10.png', noteName: 'D', label: 'D3' },
+  { noteFile: 'note11.png', noteName: 'E', label: 'E3' },
+  { noteFile: 'note12.png', noteName: 'F', label: 'F3' },
+  { noteFile: 'note13.png', noteName: 'G', label: 'G3' },
+  { noteFile: 'note14.png', noteName: 'A', label: 'A3' },
+  { noteFile: 'note15.png', noteName: 'B', label: 'B3' },
+  { noteFile: 'note16.png', noteName: 'C', label: 'C4' },
+  { noteFile: 'note17.png', noteName: 'D', label: 'D4' },
+];
+
+// ── QUARTER 4 NOTE POOLS (expanded ranges) ──────────────────────
+// Violin G3-A5: treble note1=G3, A5=note16
+const TREBLE_POOL_Q4 = [
+  { noteFile: 'note1.png',  noteName: 'G', label: 'G3' },
+  { noteFile: 'note2.png',  noteName: 'A', label: 'A3' },
+  { noteFile: 'note3.png',  noteName: 'B', label: 'B3' },
+  { noteFile: 'note4.png',  noteName: 'C', label: 'C4', excludeInKeys: ['D'] },
+  { noteFile: 'note5.png',  noteName: 'D', label: 'D4' },
+  { noteFile: 'note6.png',  noteName: 'E', label: 'E4' },
+  { noteFile: 'note7.png',  noteName: 'F', label: 'F4' },
+  { noteFile: 'note8.png',  noteName: 'G', label: 'G4' },
+  { noteFile: 'note9.png',  noteName: 'A', label: 'A4' },
+  { noteFile: 'note10.png', noteName: 'B', label: 'B4' },
+  { noteFile: 'note11.png', noteName: 'C', label: 'C5' },
+  { noteFile: 'note12.png', noteName: 'D', label: 'D5' },
+  { noteFile: 'note13.png', noteName: 'E', label: 'E5' },
+  { noteFile: 'note14.png', noteName: 'F', label: 'F5' },
+  { noteFile: 'note15.png', noteName: 'G', label: 'G5' },
+  { noteFile: 'note16.png', noteName: 'A', label: 'A5' },
+];
+
+// Viola C3-D5: alto note3=C3, note18=D5
+const ALTO_POOL_Q4 = [
+  { noteFile: 'note3.png',  noteName: 'C', label: 'C3' },
+  { noteFile: 'note4.png',  noteName: 'D', label: 'D3' },
+  { noteFile: 'note5.png',  noteName: 'E', label: 'E3' },
+  { noteFile: 'note6.png',  noteName: 'F', label: 'F3', excludeInKeys: ['G', 'D'] },
+  { noteFile: 'note7.png',  noteName: 'G', label: 'G3' },
+  { noteFile: 'note8.png',  noteName: 'A', label: 'A3' },
+  { noteFile: 'note9.png',  noteName: 'B', label: 'B3' },
+  { noteFile: 'note10.png', noteName: 'C', label: 'C4', excludeInKeys: ['D'] },
+  { noteFile: 'note11.png', noteName: 'D', label: 'D4' },
+  { noteFile: 'note12.png', noteName: 'E', label: 'E4' },
+  { noteFile: 'note13.png', noteName: 'F', label: 'F4' },
+  { noteFile: 'note14.png', noteName: 'G', label: 'G4' },
+  { noteFile: 'note15.png', noteName: 'A', label: 'A4' },
+  { noteFile: 'note16.png', noteName: 'B', label: 'B4' },
+  { noteFile: 'note17.png', noteName: 'C', label: 'C5' },
+  { noteFile: 'note18.png', noteName: 'D', label: 'D5' },
+];
+
+// Cello C2-D4: bass note2=C2, note17=D4
+const BASS_POOL_Q4_CELLO = [
+  { noteFile: 'note2.png',  noteName: 'C', label: 'C2' },
+  { noteFile: 'note3.png',  noteName: 'D', label: 'D2' },
+  { noteFile: 'note4.png',  noteName: 'E', label: 'E2' },
+  { noteFile: 'note5.png',  noteName: 'F', label: 'F2', excludeInKeys: ['G', 'D'] },
+  { noteFile: 'note6.png',  noteName: 'G', label: 'G2' },
+  { noteFile: 'note7.png',  noteName: 'A', label: 'A2' },
+  { noteFile: 'note8.png',  noteName: 'B', label: 'B2' },
+  { noteFile: 'note9.png',  noteName: 'C', label: 'C3', excludeInKeys: ['D'] },
+  { noteFile: 'note10.png', noteName: 'D', label: 'D3' },
+  { noteFile: 'note11.png', noteName: 'E', label: 'E3' },
+  { noteFile: 'note12.png', noteName: 'F', label: 'F3' },
+  { noteFile: 'note13.png', noteName: 'G', label: 'G3' },
+  { noteFile: 'note14.png', noteName: 'A', label: 'A3' },
+  { noteFile: 'note15.png', noteName: 'B', label: 'B3' },
+  { noteFile: 'note16.png', noteName: 'C', label: 'C4' },
+  { noteFile: 'note17.png', noteName: 'D', label: 'D4' },
+];
+
+// Bass E1-D3 (written): image range note4=E2 image → note17=D4 image, labels -1 octave = E1-D3
+const BASS_POOL_Q4_BASS = [
+  { noteFile: 'note4.png',  noteName: 'E', label: 'E2' },
+  { noteFile: 'note5.png',  noteName: 'F', label: 'F2', excludeInKeys: ['C'] },
+  { noteFile: 'note6.png',  noteName: 'G', label: 'G2' },
+  { noteFile: 'note7.png',  noteName: 'A', label: 'A2' },
+  { noteFile: 'note8.png',  noteName: 'B', label: 'B2' },
+  { noteFile: 'note9.png',  noteName: 'C', label: 'C3' },
+  { noteFile: 'note10.png', noteName: 'D', label: 'D3' },
+  { noteFile: 'note11.png', noteName: 'E', label: 'E3' },
+  { noteFile: 'note12.png', noteName: 'F', label: 'F3' },
+  { noteFile: 'note13.png', noteName: 'G', label: 'G3' },
+  { noteFile: 'note14.png', noteName: 'A', label: 'A3' },
+  { noteFile: 'note15.png', noteName: 'B', label: 'B3' },
+  { noteFile: 'note16.png', noteName: 'C', label: 'C4' },
+  { noteFile: 'note17.png', noteName: 'D', label: 'D4' },
+];
+
+function buildMultiKeyQuiz(clefType, pool, isBassTransposed, count) {
+  // Build all (note × key) combinations, shuffle, take `count`
+  count = count || 15;
+  const all = [];
+  for (const keyId of KEY_IDS) {
+    const keyDef = KEYS[keyId];
+    const clefImg = keyDef.clef[clefType];
+    for (const note of pool) {
+      // Skip note+key combinations outside the curriculum scope
+      if (note.excludeInKeys && note.excludeInKeys.includes(keyId)) continue;
+      const answer = applyKey(note.noteName, keyId);
+      // For bass (transposed), shift label down one octave
+      let label = note.label;
+      if (isBassTransposed) {
+        label = label.replace(/\d/, n => String(parseInt(n) - 1));
+      }
+      all.push({
+        noteFile: note.noteFile,
+        clefImg,
+        clefLabel: keyDef.label,
+        keyLabel: keyDef.label,
+        answer,
+        label,
+      });
+    }
+  }
+  // Fisher-Yates shuffle then take 15
+  for (let i = all.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [all[i], all[j]] = [all[j], all[i]];
+  }
+  return all.slice(0, count);
+}
+
+
+
+// ── FINGERING QUIZ BUILDERS ───────────────────────────────────────
+// buildFixedFingeringQuiz: for single-key quarters (Q1, Q2)
+// fingerByFile: { 'note5.png': '0', ... }
+function buildFixedFingeringQuiz(pool, fingerByFile) {
+  const shuffled = [...pool];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled.map(note => ({
+    noteFile: note.noteFile,
+    answer:   fingerByFile[note.noteFile],
+    label:    note.label,
+  }));
+}
+
+// buildMultiKeyFingeringQuiz: for multi-key quarters (Q3, Q4)
+// baseFingerByFile: { 'note5.png': '0', ... } — finger when note is natural/default
+// lowTwoFiles: set of noteFiles where noteName is F or C
+//   — in those cases: if key has that note sharped → '2', else → 'Low 2'
+// lowTwoNoteName: the noteName ('F' or 'C') associated with each lowTwoFile
+function buildMultiKeyFingeringQuiz(clefType, pool, baseFingerByFile, lowTwoMap, isBassTransposed, count, lowOneMap, sharpThreeMap, sharpFourMap, sharpShiftMap) {
+  // lowTwoMap:    { noteFile: noteLetter } — violin/viola: sharped → '2', natural → 'Low 2'
+  // lowOneMap:    { noteFile: noteLetter } — violin: sharped → '1', natural → 'Low 1'
+  // sharpThreeMap:{ noteFile: noteLetter } — cello: sharped → '3', natural → '2'
+  // sharpFourMap: { noteFile: noteLetter } — bass: sharped → '4', natural → '2'
+  // sharpShiftMap:{ noteFile: noteLetter } — bass: sharped → 'Shift 2', natural → 'Shift 1'
+  lowTwoMap     = lowTwoMap     || {};
+  lowOneMap     = lowOneMap     || {};
+  sharpThreeMap = sharpThreeMap || {};
+  sharpFourMap  = sharpFourMap  || {};
+  sharpShiftMap = sharpShiftMap || {};
+  count = count || 15;
+  const all = [];
+  for (const keyId of KEY_IDS) {
+    const keyDef  = KEYS[keyId];
+    const clefImg = keyDef.clef[clefType];
+    for (const note of pool) {
+      // Skip note+key combinations outside the curriculum scope
+      if (note.excludeInKeys && note.excludeInKeys.includes(keyId)) continue;
+      let finger;
+      if (sharpShiftMap.hasOwnProperty(note.noteFile)) {
+        const noteLetter = sharpShiftMap[note.noteFile];
+        finger = keyDef.sharps.includes(noteLetter) ? 'Shift 2' : 'Shift 1';
+      } else if (sharpFourMap.hasOwnProperty(note.noteFile)) {
+        const noteLetter = sharpFourMap[note.noteFile];
+        finger = keyDef.sharps.includes(noteLetter) ? '4' : '2';
+      } else if (sharpThreeMap.hasOwnProperty(note.noteFile)) {
+        const noteLetter = sharpThreeMap[note.noteFile];
+        finger = keyDef.sharps.includes(noteLetter) ? '3' : '2';
+      } else if (lowTwoMap.hasOwnProperty(note.noteFile)) {
+        const noteLetter = lowTwoMap[note.noteFile];
+        finger = keyDef.sharps.includes(noteLetter) ? '2' : 'Low 2';
+      } else if (lowOneMap.hasOwnProperty(note.noteFile)) {
+        const noteLetter = lowOneMap[note.noteFile];
+        finger = keyDef.sharps.includes(noteLetter) ? '1' : 'Low 1';
+      } else {
+        finger = baseFingerByFile[note.noteFile];
+      }
+      let label = note.label;
+      if (isBassTransposed) {
+        label = label.replace(/\d/, n => String(parseInt(n) - 1));
+      }
+      all.push({
+        noteFile: note.noteFile,
+        clefImg,
+        clefLabel: keyDef.label,
+        keyLabel:  keyDef.label,
+        answer:    finger,
+        label,
+      });
+    }
+  }
+  for (let i = all.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [all[i], all[j]] = [all[j], all[i]];
+  }
+  return all.slice(0, count);
+}
+
+// ── VIOLIN FINGERING DATA ─────────────────────────────────────────
+// Q1: note5-note12, D Major only
+const VLN_FINGER_Q1 = {
+  'note5.png': '0',   // D4
+  'note6.png': '1',   // E4
+  'note7.png': '2',   // F#4
+  'note8.png': '3',   // G4
+  'note9.png': '0',   // A4 (open A)
+  'note10.png': '1',  // B4
+  'note11.png': '2',  // C#5
+  'note12.png': '3',  // D5
+};
+
+// Q2: note1-note12, D Major only
+const VLN_FINGER_Q2 = {
+  'note1.png': '0',   // G3 (open G)
+  'note2.png': '1',   // A3
+  'note3.png': '2',   // B3
+  'note4.png': '3',   // C#4
+  'note5.png': '0',   // D4 (open D)
+  'note6.png': '1',   // E4
+  'note7.png': '2',   // F#4
+  'note8.png': '3',   // G4
+  'note9.png': '0',   // A4 (open A)
+  'note10.png': '1',  // B4
+  'note11.png': '2',  // C#5
+  'note12.png': '3',  // D5
+};
+
+// Q3: TREBLE_POOL note1-note12, multi-key
+// Base fingers (used when not a Low 2 candidate)
+const VLN_FINGER_Q3_BASE = {
+  'note1.png':  '0',  // G3 (open G)
+  'note2.png':  '1',  // A3
+  'note3.png':  '2',  // B3
+  'note4.png':  '3',  // C4 (G string — always 3, regardless of key)
+  'note5.png':  '0',  // D4 (open D)
+  'note6.png':  '1',  // E4
+  // note7=F4: Low 2 (D string) — key-dependent
+  'note8.png':  '3',  // G4 (finger 3 on D string)
+  'note9.png':  '0',  // A4 (open A)
+  'note10.png': '1',  // B4
+  // note11=C5: Low 2 (A string) — key-dependent
+  'note12.png': '3',  // D5
+};
+// Low 2: only F4 (D string) and C5 (A string)
+const VLN_LOW2_Q3 = {
+  'note7.png':  'F',  // F4 (D string)
+  'note11.png': 'C',  // C5 (A string)
+};
+
+// Q4: TREBLE_POOL_Q4 note1-note16 (G3-A5), multi-key
+// G3-D5 same as Q3 base. E string notes (note13-16) have fixed fingerings:
+//   E5=0(open E), F5=1(F# or F♮ both finger 1 on E string), G5=2, A5=3
+// G5 is always natural — no Low 2 on E string in these keys
+const VLN_FINGER_Q4_BASE = {
+  'note1.png':  '0',  // G3 (open G)
+  'note2.png':  '1',  // A3
+  'note3.png':  '2',  // B3
+  'note4.png':  '3',  // C4 (G string — always 3)
+  'note5.png':  '0',  // D4 (open D)
+  'note6.png':  '1',  // E4
+  // note7=F4: Low 2 (D string) — key-dependent
+  'note8.png':  '3',  // G4 (finger 3 on D string)
+  'note9.png':  '0',  // A4 (open A)
+  'note10.png': '1',  // B4
+  // note11=C5: Low 2 (A string) — key-dependent
+  'note12.png': '3',  // D5
+  'note13.png': '0',  // E5 (open E string)
+  // note14=F5: Low 1 (E string) — key-dependent: F♮=Low 1, F#=1
+  'note15.png': '2',  // G5 (always 2 on E string — G is never sharped in our keys)
+  'note16.png': '3',  // A5
+};
+// Low 2: F4 (D string) and C5 (A string) only
+const VLN_LOW2_Q4 = {
+  'note7.png':  'F',  // F4 (D string)
+  'note11.png': 'C',  // C5 (A string)
+};
+// Low 1: F5 on E string
+const VLN_LOW1_Q4 = {
+  'note14.png': 'F',  // F5 (E string)
+};
+
+// ── VIOLA FINGERING DATA ──────────────────────────────────────────
+// Viola open strings: C3, G3, D4, A4 (same as violin shifted)
+// Q1: note11-note18 in alto clef = D4-D5
+const VLA_FINGER_Q1 = {
+  'note11.png': '0',  // D4
+  'note12.png': '1',  // E4
+  'note13.png': '2',  // F#4
+  'note14.png': '3',  // G4
+  'note15.png': '0',  // A4 (open A)
+  'note16.png': '1',  // B4
+  'note17.png': '2',  // C#5
+  'note18.png': '3',  // D5
+};
+
+// Q2: note7-note18 in alto clef = G3-D5
+const VLA_FINGER_Q2 = {
+  'note7.png':  '0',  // G3 (open G)
+  'note8.png':  '1',  // A3
+  'note9.png':  '2',  // B3
+  'note10.png': '3',  // C#4
+  'note11.png': '0',  // D4 (open D)
+  'note12.png': '1',  // E4
+  'note13.png': '2',  // F#4
+  'note14.png': '3',  // G4
+  'note15.png': '0',  // A4 (open A)
+  'note16.png': '1',  // B4
+  'note17.png': '2',  // C#5
+  'note18.png': '3',  // D5
+};
+
+// Q3: ALTO_POOL note7-note18, multi-key
+const VLA_FINGER_Q3_BASE = {
+  'note7.png':  '0',  // G3 (open G)
+  'note8.png':  '1',  // A3
+  'note9.png':  '2',  // B3
+  'note10.png': '3',  // C4 (G string — always 3)
+  'note11.png': '0',  // D4 (open D)
+  'note12.png': '1',  // E4
+  // note13=F4: Low 2 (D string) — key-dependent
+  'note14.png': '3',  // G4 (finger 3 on D string)
+  'note15.png': '0',  // A4 (open A)
+  'note16.png': '1',  // B4
+  // note17=C5: Low 2 (A string) — key-dependent
+  'note18.png': '3',  // D5
+};
+// Low 2: F4 (D string) and C5 (A string) only
+const VLA_LOW2_Q3 = {
+  'note13.png': 'F',  // F4 (D string)
+  'note17.png': 'C',  // C5 (A string)
+};
+
+// Q4: ALTO_POOL_Q4 note3-note18 = C3-D5, multi-key
+// F3 (C string) = 3, C4 (G string) = 3 — both fixed regardless of key
+// Low 2 applies only to: F4 (D string) and C5 (A string)
+const VLA_FINGER_Q4_BASE = {
+  'note3.png':  '0',  // C3 (open C string)
+  'note4.png':  '1',  // D3
+  'note5.png':  '2',  // E3
+  'note6.png':  '3',  // F3 (C string — always 3, not Low 2)
+  'note7.png':  '0',  // G3 (open G)
+  'note8.png':  '1',  // A3
+  'note9.png':  '2',  // B3
+  'note10.png': '3',  // C4 (G string — always 3, not Low 2)
+  'note11.png': '0',  // D4 (open D)
+  'note12.png': '1',  // E4
+  // note13=F4: Low 2 (D string) — key-dependent
+  'note14.png': '3',  // G4 (finger 3 on D string)
+  'note15.png': '0',  // A4 (open A)
+  'note16.png': '1',  // B4
+  // note17=C5: Low 2 (A string) — key-dependent
+  'note18.png': '3',  // D5
+};
+// Low 2: F4 (D string) and C5 (A string) only
+const VLA_LOW2_Q4 = {
+  'note13.png': 'F',  // F4 (D string)
+  'note17.png': 'C',  // C5 (A string)
+};
+
+
+// ── CELLO FINGERING DATA ──────────────────────────────────────────
+// Cello open strings: C2, G2, D3, A3
+// Translation from viola: 0→0, 1→1, Low2→2, 2→3, 3→4
+
+// Q1: bass note10-note17 = D3-D4, D Major only
+const CELLO_FINGER_Q1 = {
+  'note10.png': '0',  // D3 (open D)
+  'note11.png': '1',  // E3
+  'note12.png': '3',  // F#3
+  'note13.png': '4',  // G3
+  'note14.png': '0',  // A3 (open A)
+  'note15.png': '1',  // B3
+  'note16.png': '3',  // C#4
+  'note17.png': '4',  // D4
+};
+
+// Q2: bass note6-note17 = G2-D4, D Major only
+const CELLO_FINGER_Q2 = {
+  'note6.png':  '0',  // G2 (open G)
+  'note7.png':  '1',  // A2
+  'note8.png':  '3',  // B2
+  'note9.png':  '4',  // C#3
+  'note10.png': '0',  // D3 (open D)
+  'note11.png': '1',  // E3
+  'note12.png': '3',  // F#3
+  'note13.png': '4',  // G3
+  'note14.png': '0',  // A3 (open A)
+  'note15.png': '1',  // B3
+  'note16.png': '3',  // C#4
+  'note17.png': '4',  // D4
+};
+
+// Q3: BASS_POOL note6-note17 = G2-D4, multi-key
+// C3 (G string, note9) = always 4 (not Low 2)
+// Low 2 candidates: F3 (D string, note12) → 2, C4 (A string, note16) → 2
+const CELLO_FINGER_Q3_BASE = {
+  'note6.png':  '0',  // G2 (open G)
+  'note7.png':  '1',  // A2
+  'note8.png':  '3',  // B2
+  'note9.png':  '4',  // C3 (G string — always 4)
+  'note10.png': '0',  // D3 (open D)
+  'note11.png': '1',  // E3
+  // note12=F3: sharp(F#)→3, natural(F♮)→2 — handled by sharpThreeMap
+  'note13.png': '4',  // G3 (finger 4 on D string)
+  'note14.png': '0',  // A3 (open A)
+  'note15.png': '1',  // B3
+  // note16=C4: sharp(C#)→3, natural(C♮)→2 — handled by sharpThreeMap
+  'note17.png': '4',  // D4
+};
+// sharpThreeMap: sharped → '3', natural → '2' (cello never uses 'Low 2')
+const CELLO_SHARP3_Q3 = {
+  'note12.png': 'F',  // F3: F# → 3, F♮ → 2
+  'note16.png': 'C',  // C4: C# → 3, C♮ → 2
+};
+
+// Q4: BASS_POOL_Q4_CELLO note2-note17 = C2-D4, multi-key
+// F2 (C string, note5) = always 4, C3 (G string, note9) = always 4
+// Low 2 candidates: F3 (D string, note12) → 2, C4 (A string, note16) → 2
+const CELLO_FINGER_Q4_BASE = {
+  'note2.png':  '0',  // C2 (open C)
+  'note3.png':  '1',  // D2
+  'note4.png':  '3',  // E2
+  'note5.png':  '4',  // F2 (C string — always 4, only in C Major)
+  'note6.png':  '0',  // G2 (open G)
+  'note7.png':  '1',  // A2
+  'note8.png':  '3',  // B2
+  'note9.png':  '4',  // C3 (G string — always 4)
+  'note10.png': '0',  // D3 (open D)
+  'note11.png': '1',  // E3
+  // note12=F3: sharp(F#)→3, natural(F♮)→2 — handled by sharpThreeMap
+  'note13.png': '4',  // G3 (finger 4 on D string)
+  'note14.png': '0',  // A3 (open A)
+  'note15.png': '1',  // B3
+  // note16=C4: sharp(C#)→3, natural(C♮)→2 — handled by sharpThreeMap
+  'note17.png': '4',  // D4
+};
+const CELLO_SHARP3_Q4 = {
+  'note12.png': 'F',  // F3: F# → 3, F♮ → 2
+  'note16.png': 'C',  // C4: C# → 3, C♮ → 2
+};
+
+
+// ── BASS FINGERING DATA ───────────────────────────────────────────
+// Bass uses 1-2-4 system. Open strings (written): E1, A1, D2, G2
+// Shift 2 = C#3, Shift 1 = C♮3, Shift 4 = D3
+
+// Q1: bass note10-note17 = D2-D3, D Major only
+const BASS_FINGER_Q1 = {
+  'note10.png': '0',       // D2 (open D)
+  'note11.png': '1',       // E2
+  'note12.png': '4',       // F#2
+  'note13.png': '0',       // G2 (open G)
+  'note14.png': '1',       // A2
+  'note15.png': '4',       // B2
+  'note16.png': 'Shift 2', // C#3
+  'note17.png': 'Shift 4', // D3
+};
+
+// Q2: bass note6-note17 = G1-D3, D Major only
+const BASS_FINGER_Q2 = {
+  'note6.png':  '2',       // G1 (finger 2 on E string)
+  'note7.png':  '0',       // A1 (open A)
+  'note8.png':  '1',       // B1
+  'note9.png':  '4',       // C#2
+  'note10.png': '0',       // D2 (open D)
+  'note11.png': '1',       // E2
+  'note12.png': '4',       // F#2
+  'note13.png': '0',       // G2 (open G)
+  'note14.png': '1',       // A2
+  'note15.png': '4',       // B2
+  'note16.png': 'Shift 2', // C#3
+  'note17.png': 'Shift 4', // D3
+};
+
+// Q3: BASS_POOL note6-note17 = G1-D3, multi-key
+// note9  (C2):  C# (D Major) → 4,       C♮ (G/C Major) → 2   [sharpFourMap]
+// note12 (F2):  F# (D/G Major) → 4,     F♮ (C Major) → 2     [sharpFourMap]
+// note16 (C3):  C# (D Major) → Shift 2, C♮ (G/C Major) → Shift 1 [sharpShiftMap]
+const BASS_FINGER_Q3_BASE = {
+  'note6.png':  '2',       // G1 (finger 2 on E string)
+  'note7.png':  '0',       // A1 (open A)
+  'note8.png':  '1',       // B1
+  // note9=C2:  key-dependent (sharpFourMap)
+  'note10.png': '0',       // D2 (open D)
+  'note11.png': '1',       // E2
+  // note12=F2: key-dependent (sharpFourMap)
+  'note13.png': '0',       // G2 (open G)
+  'note14.png': '1',       // A2
+  'note15.png': '4',       // B2
+  // note16=C3: key-dependent (sharpShiftMap)
+  'note17.png': 'Shift 4', // D3
+};
+const BASS_SHARP4_Q3 = {
+  'note9.png':  'C',  // C2: C# → 4, C♮ → 2
+  'note12.png': 'F',  // F2: F# → 4, F♮ → 2
+};
+const BASS_SHIFT_Q3 = {
+  'note16.png': 'C',  // C3: C# → Shift 2, C♮ → Shift 1
+};
+
+// Q4: BASS_POOL_Q4_BASS note4-note17 = E1-D3, multi-key (isBassTransposed=true)
+// note5 (F1):  F# only — C Major excluded via pool excludeInKeys, always 4 when shown
+// note9 (C2):  same sharpFourMap as Q3
+// note12 (F2): same sharpFourMap as Q3
+// note16 (C3): same sharpShiftMap as Q3
+const BASS_FINGER_Q4_BASE = {
+  'note4.png':  '0',       // E1 (open E)
+  'note5.png':  '1',       // F#1 (C Major excluded via pool — always F# when shown)
+  'note6.png':  '2',       // G1 (finger 2 on E string)
+  'note7.png':  '0',       // A1 (open A)
+  'note8.png':  '1',       // B1
+  // note9=C2:  key-dependent (sharpFourMap)
+  'note10.png': '0',       // D2 (open D)
+  'note11.png': '1',       // E2
+  // note12=F2: key-dependent (sharpFourMap)
+  'note13.png': '0',       // G2 (open G)
+  'note14.png': '1',       // A2
+  'note15.png': '4',       // B2
+  // note16=C3: key-dependent (sharpShiftMap)
+  'note17.png': 'Shift 4', // D3
+};
+const BASS_SHARP4_Q4 = {
+  'note9.png':  'C',  // C2: C# → 4, C♮ → 2
+  'note12.png': 'F',  // F2: F# → 4, F♮ → 2
+};
+const BASS_SHIFT_Q4 = {
+  'note16.png': 'C',  // C3: C# → Shift 2, C♮ → Shift 1
+};
+
+// ── DATA STRUCTURE ───────────────────────────────────────────────
+const FOLDERS = [
+  {
+    id: 'q1-5th',
+    title: '5th Grade',
+    subtitle: 'Quarter 1',
+    icon: '🎻',
+    desc: '4 quizzes · Violin, Viola, Cello, Bass · D Major',
+    quizzes: [
+      {
+        id: 'violin',
+        title: 'Violin D4–D5',
+        clefLabel: 'Treble Clef · D Major',
+        clefImg: 'treble2.png',
+        icon: '𝄞',
+        desc: 'Treble clef · D Major · Notes D4 through D5',
+        totalQuestions: 8,
+        noteOptions: ['D', 'E', 'F#', 'G', 'A', 'B', 'C#'],
+        notePool: [
+          { noteFile: 'note5.png',  answer: 'D',  label: 'D4' },
+          { noteFile: 'note6.png',  answer: 'E',  label: 'E4' },
+          { noteFile: 'note7.png',  answer: 'F#', label: 'F4' },
+          { noteFile: 'note8.png',  answer: 'G',  label: 'G4' },
+          { noteFile: 'note9.png',  answer: 'A',  label: 'A4' },
+          { noteFile: 'note10.png', answer: 'B',  label: 'B4' },
+          { noteFile: 'note11.png', answer: 'C#', label: 'C5' },
+          { noteFile: 'note12.png', answer: 'D',  label: 'D5' },
+        ],
+      },
+      {
+        id: 'violin-fingering',
+        title: 'Violin Fingering D4–D5',
+        clefLabel: 'Treble Clef · D Major',
+        clefImg: 'treble2.png',
+        icon: '𝄞',
+        desc: 'Treble clef · D Major · What finger plays each note? · 8 questions',
+        totalQuestions: 8,
+        questionText: 'What finger plays this note?',
+        noteOptions: ['0', '1', '2', '3'],
+        notePool: [
+          { noteFile: 'note5.png',  answer: '0', label: 'D4' },
+          { noteFile: 'note6.png',  answer: '1', label: 'E4' },
+          { noteFile: 'note7.png',  answer: '2', label: 'F4' },
+          { noteFile: 'note8.png',  answer: '3', label: 'G4' },
+          { noteFile: 'note9.png',  answer: '0', label: 'A4' },
+          { noteFile: 'note10.png', answer: '1', label: 'B4' },
+          { noteFile: 'note11.png', answer: '2', label: 'C5' },
+          { noteFile: 'note12.png', answer: '3', label: 'D5' },
+        ],
+      },
+      {
+        id: 'viola',
+        title: 'Viola D4–D5',
+        clefLabel: 'Alto Clef · D Major',
+        clefImg: 'alto2.png',
+        icon: '𝄡',
+        desc: 'Alto clef · D Major · Notes D4 through D5',
+        totalQuestions: 8,
+        noteOptions: ['D', 'E', 'F#', 'G', 'A', 'B', 'C#'],
+        notePool: [
+          { noteFile: 'note11.png', answer: 'D',  label: 'D4' },
+          { noteFile: 'note12.png', answer: 'E',  label: 'E4' },
+          { noteFile: 'note13.png', answer: 'F#', label: 'F4' },
+          { noteFile: 'note14.png', answer: 'G',  label: 'G4' },
+          { noteFile: 'note15.png', answer: 'A',  label: 'A4' },
+          { noteFile: 'note16.png', answer: 'B',  label: 'B4' },
+          { noteFile: 'note17.png', answer: 'C#', label: 'C5' },
+          { noteFile: 'note18.png', answer: 'D',  label: 'D5' },
+        ],
+      },
+      {
+        id: 'viola-fingering',
+        title: 'Viola Fingering D4–D5',
+        clefLabel: 'Alto Clef · D Major',
+        clefImg: 'alto2.png',
+        icon: '𝄡',
+        desc: 'Alto clef · D Major · What finger plays each note? · 8 questions',
+        totalQuestions: 8,
+        questionText: 'What finger plays this note?',
+        noteOptions: ['0', '1', '2', '3'],
+        notePool: [
+          { noteFile: 'note11.png', answer: '0', label: 'D4' },
+          { noteFile: 'note12.png', answer: '1', label: 'E4' },
+          { noteFile: 'note13.png', answer: '2', label: 'F4' },
+          { noteFile: 'note14.png', answer: '3', label: 'G4' },
+          { noteFile: 'note15.png', answer: '0', label: 'A4' },
+          { noteFile: 'note16.png', answer: '1', label: 'B4' },
+          { noteFile: 'note17.png', answer: '2', label: 'C5' },
+          { noteFile: 'note18.png', answer: '3', label: 'D5' },
+        ],
+      },
+      {
+        id: 'cello',
+        title: 'Cello D3–D4',
+        clefLabel: 'Bass Clef · D Major',
+        clefImg: 'bass2.png',
+        icon: '𝄢',
+        desc: 'Bass clef · D Major · Notes D3 through D4',
+        totalQuestions: 8,
+        noteOptions: ['D', 'E', 'F#', 'G', 'A', 'B', 'C#'],
+        notePool: [
+          { noteFile: 'note10.png', answer: 'D',  label: 'D3' },
+          { noteFile: 'note11.png', answer: 'E',  label: 'E3' },
+          { noteFile: 'note12.png', answer: 'F#', label: 'F3' },
+          { noteFile: 'note13.png', answer: 'G',  label: 'G3' },
+          { noteFile: 'note14.png', answer: 'A',  label: 'A3' },
+          { noteFile: 'note15.png', answer: 'B',  label: 'B3' },
+          { noteFile: 'note16.png', answer: 'C#', label: 'C4' },
+          { noteFile: 'note17.png', answer: 'D',  label: 'D4' },
+        ],
+      },
+      {
+        id: 'cello-fingering',
+        title: 'Cello Fingering D3–D4',
+        clefLabel: 'Bass Clef · D Major',
+        clefImg: 'bass2.png',
+        icon: '𝄢',
+        desc: 'Bass clef · D Major · What finger plays each note? · 8 questions',
+        totalQuestions: 8,
+        questionText: 'What finger plays this note?',
+        noteOptions: ['0', '1', '3', '4'],
+        notePool: [
+          { noteFile: 'note10.png', answer: '0', label: 'D3' },
+          { noteFile: 'note11.png', answer: '1', label: 'E3' },
+          { noteFile: 'note12.png', answer: '3', label: 'F3' },
+          { noteFile: 'note13.png', answer: '4', label: 'G3' },
+          { noteFile: 'note14.png', answer: '0', label: 'A3' },
+          { noteFile: 'note15.png', answer: '1', label: 'B3' },
+          { noteFile: 'note16.png', answer: '3', label: 'C4' },
+          { noteFile: 'note17.png', answer: '4', label: 'D4' },
+        ],
+      },
+      {
+        id: 'bass',
+        title: 'Bass D2–D3',
+        clefLabel: 'Bass Clef · D Major',
+        clefImg: 'bass2.png',
+        icon: '𝄢',
+        desc: 'Bass clef · D Major · Notes D2 through D3 (sounds one octave lower)',
+        totalQuestions: 8,
+        noteOptions: ['D', 'E', 'F#', 'G', 'A', 'B', 'C#'],
+        notePool: [
+          { noteFile: 'note10.png', answer: 'D',  label: 'D2' },
+          { noteFile: 'note11.png', answer: 'E',  label: 'E2' },
+          { noteFile: 'note12.png', answer: 'F#', label: 'F2' },
+          { noteFile: 'note13.png', answer: 'G',  label: 'G2' },
+          { noteFile: 'note14.png', answer: 'A',  label: 'A2' },
+          { noteFile: 'note15.png', answer: 'B',  label: 'B2' },
+          { noteFile: 'note16.png', answer: 'C#', label: 'C3' },
+          { noteFile: 'note17.png', answer: 'D',  label: 'D3' },
+        ],
+      },
+      {
+        id: 'bass-fingering',
+        title: 'Bass Fingering D2–D3',
+        clefLabel: 'Bass Clef · D Major',
+        clefImg: 'bass2.png',
+        icon: '𝄢',
+        desc: 'Bass clef · D Major · What finger plays each note? · 8 questions',
+        totalQuestions: 8,
+        questionText: 'What finger plays this note?',
+        noteOptions: ['0', '1', '4', 'Shift 2', 'Shift 4'],
+        notePool: [
+          { noteFile: 'note10.png', answer: '0',       label: 'D2' },
+          { noteFile: 'note11.png', answer: '1',       label: 'E2' },
+          { noteFile: 'note12.png', answer: '4',       label: 'F2' },
+          { noteFile: 'note13.png', answer: '0',       label: 'G2' },
+          { noteFile: 'note14.png', answer: '1',       label: 'A2' },
+          { noteFile: 'note15.png', answer: '4',       label: 'B2' },
+          { noteFile: 'note16.png', answer: 'Shift 2', label: 'C3' },
+          { noteFile: 'note17.png', answer: 'Shift 4', label: 'D3' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'q2-5th',
+    title: '5th Grade',
+    subtitle: 'Quarter 2',
+    icon: '🎻',
+    desc: '4 quizzes · Violin, Viola, Cello, Bass · D Major',
+    quizzes: [
+      {
+        id: 'violin',
+        title: 'Violin G3–D5',
+        clefLabel: 'Treble Clef · D Major',
+        clefImg: 'treble2.png',
+        icon: '𝄞',
+        desc: 'Treble clef · D Major · Notes G3 through D5',
+        noteOptions: ['A', 'B', 'C#', 'D', 'E', 'F#', 'G'],
+        notePool: [
+          { noteFile: 'note1.png',  answer: 'G',  label: 'G3' },
+          { noteFile: 'note2.png',  answer: 'A',  label: 'A3' },
+          { noteFile: 'note3.png',  answer: 'B',  label: 'B3' },
+          { noteFile: 'note4.png',  answer: 'C#', label: 'C4' },
+          { noteFile: 'note5.png',  answer: 'D',  label: 'D4' },
+          { noteFile: 'note6.png',  answer: 'E',  label: 'E4' },
+          { noteFile: 'note7.png',  answer: 'F#', label: 'F4' },
+          { noteFile: 'note8.png',  answer: 'G',  label: 'G4' },
+          { noteFile: 'note9.png',  answer: 'A',  label: 'A4' },
+          { noteFile: 'note10.png', answer: 'B',  label: 'B4' },
+          { noteFile: 'note11.png', answer: 'C#', label: 'C5' },
+          { noteFile: 'note12.png', answer: 'D',  label: 'D5' },
+        ],
+      },
+      {
+        id: 'violin-fingering',
+        title: 'Violin Fingering G3–D5',
+        clefLabel: 'Treble Clef · D Major',
+        clefImg: 'treble2.png',
+        icon: '𝄞',
+        desc: 'Treble clef · D Major · What finger plays each note? · 12 questions',
+        totalQuestions: 12,
+        questionText: 'What finger plays this note?',
+        noteOptions: ['0', '1', '2', '3'],
+        buildQuiz: function() { return buildFixedFingeringQuiz(
+          [{noteFile:'note1.png',label:'G3'},{noteFile:'note2.png',label:'A3'},
+           {noteFile:'note3.png',label:'B3'},{noteFile:'note4.png',label:'C4'},
+           {noteFile:'note5.png',label:'D4'},{noteFile:'note6.png',label:'E4'},
+           {noteFile:'note7.png',label:'F4'},{noteFile:'note8.png',label:'G4'},
+           {noteFile:'note9.png',label:'A4'},{noteFile:'note10.png',label:'B4'},
+           {noteFile:'note11.png',label:'C5'},{noteFile:'note12.png',label:'D5'}],
+          VLN_FINGER_Q2); },
+      },
+      {
+        id: 'viola',
+        title: 'Viola G3–D5',
+        clefLabel: 'Alto Clef · D Major',
+        clefImg: 'alto2.png',
+        icon: '𝄡',
+        desc: 'Alto clef · D Major · Notes G3 through D5',
+        noteOptions: ['A', 'B', 'C#', 'D', 'E', 'F#', 'G'],
+        notePool: [
+          { noteFile: 'note7.png',  answer: 'G',  label: 'G3' },
+          { noteFile: 'note8.png',  answer: 'A',  label: 'A3' },
+          { noteFile: 'note9.png',  answer: 'B',  label: 'B3' },
+          { noteFile: 'note10.png', answer: 'C#', label: 'C4' },
+          { noteFile: 'note11.png', answer: 'D',  label: 'D4' },
+          { noteFile: 'note12.png', answer: 'E',  label: 'E4' },
+          { noteFile: 'note13.png', answer: 'F#', label: 'F4' },
+          { noteFile: 'note14.png', answer: 'G',  label: 'G4' },
+          { noteFile: 'note15.png', answer: 'A',  label: 'A4' },
+          { noteFile: 'note16.png', answer: 'B',  label: 'B4' },
+          { noteFile: 'note17.png', answer: 'C#', label: 'C5' },
+          { noteFile: 'note18.png', answer: 'D',  label: 'D5' },
+        ],
+      },
+      {
+        id: 'viola-fingering',
+        title: 'Viola Fingering G3–D5',
+        clefLabel: 'Alto Clef · D Major',
+        clefImg: 'alto2.png',
+        icon: '𝄡',
+        desc: 'Alto clef · D Major · What finger plays each note? · 12 questions',
+        totalQuestions: 12,
+        questionText: 'What finger plays this note?',
+        noteOptions: ['0', '1', '2', '3'],
+        buildQuiz: function() { return buildFixedFingeringQuiz(
+          [{noteFile:'note7.png',label:'G3'},{noteFile:'note8.png',label:'A3'},
+           {noteFile:'note9.png',label:'B3'},{noteFile:'note10.png',label:'C4'},
+           {noteFile:'note11.png',label:'D4'},{noteFile:'note12.png',label:'E4'},
+           {noteFile:'note13.png',label:'F4'},{noteFile:'note14.png',label:'G4'},
+           {noteFile:'note15.png',label:'A4'},{noteFile:'note16.png',label:'B4'},
+           {noteFile:'note17.png',label:'C5'},{noteFile:'note18.png',label:'D5'}],
+          VLA_FINGER_Q2); },
+      },
+      {
+        id: 'cello',
+        title: 'Cello G2–D4',
+        clefLabel: 'Bass Clef · D Major',
+        clefImg: 'bass2.png',
+        icon: '𝄢',
+        desc: 'Bass clef · D Major · Notes G2 through D4',
+        noteOptions: ['A', 'B', 'C#', 'D', 'E', 'F#', 'G'],
+        notePool: [
+          { noteFile: 'note6.png',  answer: 'G',  label: 'G2' },
+          { noteFile: 'note7.png',  answer: 'A',  label: 'A2' },
+          { noteFile: 'note8.png',  answer: 'B',  label: 'B2' },
+          { noteFile: 'note9.png',  answer: 'C#', label: 'C3' },
+          { noteFile: 'note10.png', answer: 'D',  label: 'D3' },
+          { noteFile: 'note11.png', answer: 'E',  label: 'E3' },
+          { noteFile: 'note12.png', answer: 'F#', label: 'F3' },
+          { noteFile: 'note13.png', answer: 'G',  label: 'G3' },
+          { noteFile: 'note14.png', answer: 'A',  label: 'A3' },
+          { noteFile: 'note15.png', answer: 'B',  label: 'B3' },
+          { noteFile: 'note16.png', answer: 'C#', label: 'C4' },
+          { noteFile: 'note17.png', answer: 'D',  label: 'D4' },
+        ],
+      },
+      {
+        id: 'cello-fingering',
+        title: 'Cello Fingering G2–D4',
+        clefLabel: 'Bass Clef · D Major',
+        clefImg: 'bass2.png',
+        icon: '𝄢',
+        desc: 'Bass clef · D Major · What finger plays each note? · 12 questions',
+        totalQuestions: 12,
+        questionText: 'What finger plays this note?',
+        noteOptions: ['0', '1', '3', '4'],
+        buildQuiz: function() {
+          // C3 (note9) must use G Major key sig (bass1.png); all others D Major (bass2.png)
+          var pool = [
+            {noteFile:'note6.png', label:'G2',  clefImg:'bass2.png', clefLabel:'D Major'},
+            {noteFile:'note7.png', label:'A2',  clefImg:'bass2.png', clefLabel:'D Major'},
+            {noteFile:'note8.png', label:'B2',  clefImg:'bass2.png', clefLabel:'D Major'},
+            {noteFile:'note9.png', label:'C3',  clefImg:'bass1.png', clefLabel:'G Major'},
+            {noteFile:'note10.png',label:'D3',  clefImg:'bass2.png', clefLabel:'D Major'},
+            {noteFile:'note11.png',label:'E3',  clefImg:'bass2.png', clefLabel:'D Major'},
+            {noteFile:'note12.png',label:'F3',  clefImg:'bass2.png', clefLabel:'D Major'},
+            {noteFile:'note13.png',label:'G3',  clefImg:'bass2.png', clefLabel:'D Major'},
+            {noteFile:'note14.png',label:'A3',  clefImg:'bass2.png', clefLabel:'D Major'},
+            {noteFile:'note15.png',label:'B3',  clefImg:'bass2.png', clefLabel:'D Major'},
+            {noteFile:'note16.png',label:'C4',  clefImg:'bass2.png', clefLabel:'D Major'},
+            {noteFile:'note17.png',label:'D4',  clefImg:'bass2.png', clefLabel:'D Major'},
+          ];
+          var sh = pool.slice();
+          for (var i = sh.length-1; i>0; i--) { var j=Math.floor(Math.random()*(i+1)); var t=sh[i]; sh[i]=sh[j]; sh[j]=t; }
+          return sh.map(function(n) { return {noteFile:n.noteFile,clefImg:n.clefImg,clefLabel:n.clefLabel,answer:CELLO_FINGER_Q2[n.noteFile],label:n.label}; });
+        },
+      },
+      {
+        id: 'bass',
+        title: 'Bass A1–D3',
+        clefLabel: 'Bass Clef · D Major',
+        clefImg: 'bass2.png',
+        icon: '𝄢',
+        desc: 'Bass clef · D Major · Notes A1 through D3 (sounds one octave lower)',
+        noteOptions: ['A', 'B', 'C#', 'D', 'E', 'F#', 'G'],
+        notePool: [
+          { noteFile: 'note7.png',  answer: 'A',  label: 'A1' },
+          { noteFile: 'note8.png',  answer: 'B',  label: 'B1' },
+          { noteFile: 'note9.png',  answer: 'C#', label: 'C2' },
+          { noteFile: 'note10.png', answer: 'D',  label: 'D2' },
+          { noteFile: 'note11.png', answer: 'E',  label: 'E2' },
+          { noteFile: 'note12.png', answer: 'F#', label: 'F2' },
+          { noteFile: 'note13.png', answer: 'G',  label: 'G2' },
+          { noteFile: 'note14.png', answer: 'A',  label: 'A2' },
+          { noteFile: 'note15.png', answer: 'B',  label: 'B2' },
+          { noteFile: 'note16.png', answer: 'C#', label: 'C3' },
+          { noteFile: 'note17.png', answer: 'D',  label: 'D3' },
+        ],
+      },
+      {
+        id: 'bass-fingering',
+        title: 'Bass Fingering A1–D3',
+        clefLabel: 'Bass Clef · D Major',
+        clefImg: 'bass2.png',
+        icon: '𝄢',
+        desc: 'Bass clef · D Major · What finger plays each note? · 11 questions',
+        totalQuestions: 11,
+        questionText: 'What finger plays this note?',
+        noteOptions: ['0', '1', '4', 'Shift 2', 'Shift 4'],
+        buildQuiz: function() { return buildFixedFingeringQuiz(
+          [{noteFile:'note7.png',label:'A1'},
+           {noteFile:'note8.png',label:'B1'},{noteFile:'note9.png',label:'C2'},
+           {noteFile:'note10.png',label:'D2'},{noteFile:'note11.png',label:'E2'},
+           {noteFile:'note12.png',label:'F2'},{noteFile:'note13.png',label:'G2'},
+           {noteFile:'note14.png',label:'A2'},{noteFile:'note15.png',label:'B2'},
+           {noteFile:'note16.png',label:'C3'},{noteFile:'note17.png',label:'D3'}],
+          BASS_FINGER_Q2); },
+      },
+    ],
+  },
+  {
+    id: 'q3-5th',
+    title: '5th Grade',
+    subtitle: 'Quarter 3',
+    icon: '🎻',
+    desc: '4 quizzes · Violin, Viola, Cello, Bass · C, G & D Major',
+    quizzes: [
+      {
+        id: 'violin',
+        title: 'Violin G3–D5',
+        clefLabel: 'Treble Clef · Mixed Keys',
+        icon: '𝄞',
+        desc: 'Treble clef · C, G & D Major · Notes G3 through D5 · 15 questions',
+        totalQuestions: 15,
+        noteOptions: ['A', 'B', 'C', 'C#', 'D', 'E', 'F', 'F#', 'G'],
+        buildQuiz: function() { return buildMultiKeyQuiz('treble', TREBLE_POOL); },
+      },
+      {
+        id: 'violin-fingering',
+        title: 'Violin Fingering G3–D5',
+        clefLabel: 'Treble Clef · Mixed Keys',
+        icon: '𝄞',
+        desc: 'Treble clef · C, G & D Major · What finger plays each note? · 15 questions',
+        totalQuestions: 15,
+        questionText: 'What finger plays this note?',
+        noteOptions: ['0', '1', 'Low 2', '2', '3'],
+        buildQuiz: function() { return buildMultiKeyFingeringQuiz('treble', TREBLE_POOL, VLN_FINGER_Q3_BASE, VLN_LOW2_Q3, false, 15); },
+      },
+      {
+        id: 'viola',
+        title: 'Viola G3–D5',
+        clefLabel: 'Alto Clef · Mixed Keys',
+        icon: '𝄡',
+        desc: 'Alto clef · C, G & D Major · Notes G3 through D5 · 15 questions',
+        totalQuestions: 15,
+        noteOptions: ['A', 'B', 'C', 'C#', 'D', 'E', 'F', 'F#', 'G'],
+        buildQuiz: function() { return buildMultiKeyQuiz('alto', ALTO_POOL); },
+      },
+      {
+        id: 'viola-fingering',
+        title: 'Viola Fingering G3–D5',
+        clefLabel: 'Alto Clef · Mixed Keys',
+        icon: '𝄡',
+        desc: 'Alto clef · C, G & D Major · What finger plays each note? · 15 questions',
+        totalQuestions: 15,
+        questionText: 'What finger plays this note?',
+        noteOptions: ['0', '1', 'Low 2', '2', '3'],
+        buildQuiz: function() { return buildMultiKeyFingeringQuiz('alto', ALTO_POOL, VLA_FINGER_Q3_BASE, VLA_LOW2_Q3, false, 15); },
+      },
+      {
+        id: 'cello',
+        title: 'Cello G2–D4',
+        clefLabel: 'Bass Clef · Mixed Keys',
+        icon: '𝄢',
+        desc: 'Bass clef · C, G & D Major · Notes G2 through D4 · 15 questions',
+        totalQuestions: 15,
+        noteOptions: ['A', 'B', 'C', 'C#', 'D', 'E', 'F', 'F#', 'G'],
+        buildQuiz: function() { return buildMultiKeyQuiz('bass', BASS_POOL); },
+      },
+      {
+        id: 'cello-fingering',
+        title: 'Cello Fingering G2–D4',
+        clefLabel: 'Bass Clef · Mixed Keys',
+        icon: '𝄢',
+        desc: 'Bass clef · C, G & D Major · What finger plays each note? · 15 questions',
+        totalQuestions: 15,
+        questionText: 'What finger plays this note?',
+        noteOptions: ['0', '1', '2', '3', '4'],
+        buildQuiz: function() { return buildMultiKeyFingeringQuiz('bass', BASS_POOL, CELLO_FINGER_Q3_BASE, null, false, 15, null, CELLO_SHARP3_Q3); },
+      },
+      {
+        id: 'bass',
+        title: 'Bass G1–D3',
+        clefLabel: 'Bass Clef · Mixed Keys',
+        icon: '𝄢',
+        desc: 'Bass clef · C, G & D Major · Notes G1 through D3 · 15 questions (sounds one octave lower)',
+        totalQuestions: 15,
+        noteOptions: ['A', 'B', 'C', 'C#', 'D', 'E', 'F', 'F#', 'G'],
+        buildQuiz: function() { return buildMultiKeyQuiz('bass', BASS_POOL, true); },
+      },
+      {
+        id: 'bass-fingering',
+        title: 'Bass Fingering G1–D3',
+        clefLabel: 'Bass Clef · Mixed Keys',
+        icon: '𝄢',
+        desc: 'Bass clef · C, G & D Major · What finger plays each note? · 15 questions',
+        totalQuestions: 15,
+        questionText: 'What finger plays this note?',
+        noteOptions: ['0', '1', '2', '4', 'Shift 1', 'Shift 2', 'Shift 4'],
+        buildQuiz: function() { return buildMultiKeyFingeringQuiz('bass', BASS_POOL, BASS_FINGER_Q3_BASE, null, false, 15, null, null, BASS_SHARP4_Q3, BASS_SHIFT_Q3); },
+      },
+    ],
+  },
+  {
+    id: 'q4-5th',
+    title: '5th Grade',
+    subtitle: 'Quarter 4',
+    icon: '🎻',
+    desc: '4 quizzes · Violin, Viola, Cello, Bass · C, G & D Major',
+    quizzes: [
+      {
+        id: 'violin',
+        title: 'Violin G3–A5',
+        clefLabel: 'Treble Clef · Mixed Keys',
+        icon: '𝄞',
+        desc: 'Treble clef · C, G & D Major · Notes G3 through A5 · 16 questions',
+        totalQuestions: 16,
+        noteOptions: ['A', 'B', 'C', 'C#', 'D', 'E', 'F', 'F#', 'G'],
+        buildQuiz: function() { return buildMultiKeyQuiz('treble', TREBLE_POOL_Q4, false, 16); },
+      },
+      {
+        id: 'violin-fingering',
+        title: 'Violin Fingering G3–A5',
+        clefLabel: 'Treble Clef · Mixed Keys',
+        icon: '𝄞',
+        desc: 'Treble clef · C, G & D Major · What finger plays each note? · 16 questions',
+        totalQuestions: 16,
+        questionText: 'What finger plays this note?',
+        noteOptions: ['0', '1', 'Low 1', 'Low 2', '2', '3'],
+        buildQuiz: function() { return buildMultiKeyFingeringQuiz('treble', TREBLE_POOL_Q4, VLN_FINGER_Q4_BASE, VLN_LOW2_Q4, false, 16, VLN_LOW1_Q4); },
+      },
+      {
+        id: 'viola-fingering',
+        title: 'Viola Fingering C3–D5',
+        clefLabel: 'Alto Clef · Mixed Keys',
+        icon: '𝄡',
+        desc: 'Alto clef · C, G & D Major · What finger plays each note? · 16 questions',
+        totalQuestions: 16,
+        questionText: 'What finger plays this note?',
+        noteOptions: ['0', '1', 'Low 2', '2', '3'],
+        buildQuiz: function() { return buildMultiKeyFingeringQuiz('alto', ALTO_POOL_Q4, VLA_FINGER_Q4_BASE, VLA_LOW2_Q4, false, 16); },
+      },
+      {
+        id: 'viola',
+        title: 'Viola C3–D5',
+        clefLabel: 'Alto Clef · Mixed Keys',
+        icon: '𝄡',
+        desc: 'Alto clef · C, G & D Major · Notes C3 through D5 · 16 questions',
+        totalQuestions: 16,
+        noteOptions: ['A', 'B', 'C', 'C#', 'D', 'E', 'F', 'F#', 'G'],
+        buildQuiz: function() { return buildMultiKeyQuiz('alto', ALTO_POOL_Q4, false, 16); },
+      },
+      {
+        id: 'cello',
+        title: 'Cello C2–D4',
+        clefLabel: 'Bass Clef · Mixed Keys',
+        icon: '𝄢',
+        desc: 'Bass clef · C, G & D Major · Notes C2 through D4 · 16 questions',
+        totalQuestions: 16,
+        noteOptions: ['A', 'B', 'C', 'C#', 'D', 'E', 'F', 'F#', 'G'],
+        buildQuiz: function() { return buildMultiKeyQuiz('bass', BASS_POOL_Q4_CELLO, false, 16); },
+      },
+      {
+        id: 'cello-fingering',
+        title: 'Cello Fingering C2–D4',
+        clefLabel: 'Bass Clef · Mixed Keys',
+        icon: '𝄢',
+        desc: 'Bass clef · C, G & D Major · What finger plays each note? · 16 questions',
+        totalQuestions: 16,
+        questionText: 'What finger plays this note?',
+        noteOptions: ['0', '1', '2', '3', '4'],
+        buildQuiz: function() { return buildMultiKeyFingeringQuiz('bass', BASS_POOL_Q4_CELLO, CELLO_FINGER_Q4_BASE, null, false, 16, null, CELLO_SHARP3_Q4); },
+      },
+      {
+        id: 'bass',
+        title: 'Bass E1–D3',
+        clefLabel: 'Bass Clef · Mixed Keys',
+        icon: '𝄢',
+        desc: 'Bass clef · C, G & D Major · Notes E1 through D3 · 14 questions (sounds one octave lower)',
+        totalQuestions: 14,
+        noteOptions: ['A', 'B', 'C', 'C#', 'D', 'E', 'F', 'F#', 'G'],
+        buildQuiz: function() { return buildMultiKeyQuiz('bass', BASS_POOL_Q4_BASS, true, 14); },
+      },
+      {
+        id: 'bass-fingering',
+        title: 'Bass Fingering E1–D3',
+        clefLabel: 'Bass Clef · Mixed Keys',
+        icon: '𝄢',
+        desc: 'Bass clef · C, G & D Major · What finger plays each note? · 14 questions',
+        totalQuestions: 14,
+        questionText: 'What finger plays this note?',
+        noteOptions: ['0', '1', '2', '4', 'Shift 1', 'Shift 2', 'Shift 4'],
+        buildQuiz: function() { return buildMultiKeyFingeringQuiz('bass', BASS_POOL_Q4_BASS, BASS_FINGER_Q4_BASE, null, true, 14, null, null, BASS_SHARP4_Q4, BASS_SHIFT_Q4); },
+      },
+    ],
+  },
+];
+
+// ── NAVIGATION STRUCTURE ─────────────────────────────────────────
+const ENSEMBLES = [
+  { id: 'orchestra', title: 'Orchestra', colorClass: 'orch', icon: '🎻' },
+  { id: 'band',      title: 'Band',      colorClass: 'band', icon: '🎺' },
+];
+
+const GRADES = ['5th', '6th', '7th', '8th'];
+
+const INSTRUMENTS = [
+  { id: 'violin', title: 'Violin', icon: '🎻', colorClass: 'violin',
+    quizIds: ['violin', 'violin-fingering'] },
+  { id: 'viola',  title: 'Viola',  icon: '🎻', colorClass: 'viola',
+    quizIds: ['viola', 'viola-fingering'] },
+  { id: 'cello',  title: 'Cello',  icon: '🎻', colorClass: 'cello',
+    quizIds: ['cello', 'cello-fingering'] },
+  { id: 'bass',   title: 'Bass',   icon: '🎻', colorClass: 'bass',
+    quizIds: ['bass', 'bass-fingering'] },
+];
+
+// Maps ensembleId|grade|quarter → folderId
+const FOLDER_MAP = {
+  'orchestra|5th|q1': 'q1-5th',
+  'orchestra|5th|q2': 'q2-5th',
+  'orchestra|5th|q3': 'q3-5th',
+  'orchestra|5th|q4': 'q4-5th',
+};
+
+function quizKey(ensembleId, grade, quarter) { return ensembleId + '|' + grade + '|' + quarter; }
+
+function allFolders() { return FOLDERS; }
+function getFolder(id) { return FOLDERS.find(f => f.id === id); }
+
+const DEFAULT_TOTAL = 12;
+
+function totalQ() { return (activeQuiz && activeQuiz.totalQuestions) || DEFAULT_TOTAL; }
+
+// ── STATE ────────────────────────────────────────────────────────
+let activeEnsemble = null;
+let activeGrade    = null;
+let activeInstrument = null;
+let activeFolder = null;
+let activeQuiz   = null;
+let questions    = [];
+let currentQ     = 0;
+let score        = 0;
+let answered     = false;
+let results      = [];
+let quizStartTime = null;
+let elapsed = '';
+
+// ── HELPERS ──────────────────────────────────────────────────────
+function buildRandomQuiz(pool) {
+  // Fisher-Yates shuffle — every note appears exactly once, no repeats
+  const shuffled = [...pool];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
+function getMessage(sc, total) {
+  const pct = sc / total;
+  if (pct === 1)   return "Perfect score! Outstanding musicianship! 🎶";
+  if (pct >= 0.75) return "Great work! You're reading notes well.";
+  if (pct >= 0.5)  return "Good effort! Keep practicing the staff.";
+  return "Keep practicing — you'll get there! 🎵";
+}
+
+function formatTime(ms) {
+  const totalSec = Math.round(ms / 1000);
+  const m = Math.floor(totalSec / 60);
+  const s = totalSec % 60;
+  if (m === 0) return `${s}s`;
+  return `${m}m ${s.toString().padStart(2, '0')}s`;
+}
+// ── SCREEN: HOME (choose ensemble) ──────────────────────────────
+function renderHome() {
+  setHash('');
+  activeEnsemble   = null;
+  activeGrade      = null;
+  activeInstrument = null;
+  activeFolder     = null;
+  activeQuiz       = null;
+  document.getElementById('app').innerHTML = `
+    <div class="header">
+      <h1>🎼 LMSD Common Music Assessments: Tonal</h1>
+    </div>
+    <div class="menu-body">
+      <div class="menu-intro">Quiz Library</div>
+      <div class="menu-sub">Choose an ensemble to get started.</div>
+      <div class="folder-cards">
+        ${ENSEMBLES.map(e => {
+          const gc = e.colorClass;
+          return `<div class="folder-card ${gc}" onclick="renderGrade('${e.id}')">
+            <div class="folder-icon">${e.icon}</div>
+            <div class="folder-info">
+              <div class="folder-title">${e.title}</div>
+            </div>
+            <div class="folder-arrow">›</div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+  `;
+}
+
+// ── SCREEN: GRADE ─────────────────────────────────────────────────
+function renderGrade(ensembleId) {
+  setHash(ensembleId);
+  activeEnsemble   = ENSEMBLES.find(e => e.id === ensembleId);
+  activeGrade      = null;
+  activeInstrument = null;
+  activeFolder     = null;
+  activeQuiz       = null;
+  const cc = activeEnsemble.colorClass;
+  document.getElementById('app').innerHTML = `
+    <div class="header">
+      <h1>${activeEnsemble.title}</h1>
+      <div class="header-right">
+        <button class="back-btn" onclick="renderHome()">← Back</button>
+      </div>
+    </div>
+    <div class="menu-body">
+      <div class="menu-intro">Choose a Grade</div>
+      <div class="folder-cards">
+        ${GRADES.map(grade => {
+          const hasData = ensembleId === 'orchestra' && grade === '5th';
+          return `<div class="folder-card ${cc}" onclick="renderInstrument('${ensembleId}', '${grade}')">
+            <div class="folder-icon" style="font-size:1.1rem;font-family:'DM Sans',sans-serif;font-weight:700;">${grade}</div>
+            <div class="folder-info">
+              <div class="folder-title">${grade} Grade</div>
+              <div class="folder-desc">${hasData ? '4 instruments · Quarters 1–4' : 'Coming soon'}</div>
+            </div>
+            <div class="folder-arrow">›</div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+  `;
+}
+
+// ── SCREEN: INSTRUMENT ────────────────────────────────────────────
+function renderInstrument(ensembleId, grade) {
+  setHash(ensembleId + '/' + grade);
+  activeEnsemble   = ENSEMBLES.find(e => e.id === ensembleId);
+  activeGrade      = grade;
+  activeInstrument = null;
+  activeFolder     = null;
+  activeQuiz       = null;
+  const hasData    = ensembleId === 'orchestra' && grade === '5th';
+  const cc         = activeEnsemble.colorClass;
+  document.getElementById('app').innerHTML = `
+    <div class="header">
+      <h1>
+        <span>${activeEnsemble.title}</span>
+        ${grade} Grade
+      </h1>
+      <div class="header-right">
+        <button class="back-btn" onclick="renderGrade('${ensembleId}')">← Back</button>
+      </div>
+    </div>
+    <div class="menu-body">
+      <div class="menu-intro">Choose an Instrument</div>
+      ${!hasData ? `<div style="text-align:center;padding:32px 0;color:var(--muted);font-size:0.95rem;">📋 Quizzes coming soon.</div>` : `
+      <div class="quiz-cards">
+        ${INSTRUMENTS.map(inst => {
+          const ic = inst.colorClass;
+          return `<div class="quiz-card ${ic}" onclick="renderQuarters('${ensembleId}', '${grade}', '${inst.id}')">
+            <div class="quiz-card-icon">${inst.icon}</div>
+            <div>
+              <div class="quiz-card-title">${inst.title}</div>
+              <div class="quiz-card-desc">Quarters 1–4</div>
+            </div>
+            <div class="quiz-card-arrow">›</div>
+          </div>`;
+        }).join('')}
+      </div>`}
+    </div>
+  `;
+}
+
+// ── SCREEN: QUARTERS ──────────────────────────────────────────────
+function renderQuarters(ensembleId, grade, instrumentId) {
+  setHash(ensembleId + '/' + grade + '/' + instrumentId);
+  activeEnsemble   = ENSEMBLES.find(e => e.id === ensembleId);
+  activeGrade      = grade;
+  activeInstrument = INSTRUMENTS.find(i => i.id === instrumentId);
+  activeFolder     = null;
+  activeQuiz       = null;
+  const cc  = activeEnsemble.colorClass;
+  const ic  = activeInstrument.colorClass;
+
+  const quarterDefs = [
+    { id: 'q1', label: 'Quarter 1' },
+    { id: 'q2', label: 'Quarter 2' },
+    { id: 'q3', label: 'Quarter 3' },
+    { id: 'q4', label: 'Quarter 4' },
+  ];
+
+  // Collect all (quarter × quizId) combinations for this instrument
+  const quizIds = activeInstrument.quizIds || [instrumentId];
+
+  let cardsHtml = '';
+  for (const q of quarterDefs) {
+    const key      = quizKey(ensembleId, grade, q.id);
+    const folderId = FOLDER_MAP[key];
+    const folder   = folderId ? getFolder(folderId) : null;
+
+    for (const qId of quizIds) {
+      const quiz  = folder ? folder.quizzes.find(function(qz){ return qz.id === qId; }) : null;
+      const ready = !!(folder && quiz);
+
+      // Label: "Quarter 1 – Note Names" or "Quarter 1 – Fingering"
+      const isFingerQuiz = qId.includes('fingering');
+      const typeLabel    = isFingerQuiz ? 'Fingering' : 'Note Names';
+      const cardTitle    = q.label + ' \u2013 ' + typeLabel;
+
+      const clickAttr = ready ? 'onclick="launchQuiz(\'' + folderId + '\',\'' + qId + '\')"' : '';
+      const styleAttr = ready ? '' : 'opacity:0.6;cursor:default';
+      const desc      = ready ? quiz.desc : 'Coming soon';
+      const arrow     = ready ? '\u203a' : '';
+
+      cardsHtml +=
+        '<div class="quiz-card ' + ic + '" ' + clickAttr + ' style="' + styleAttr + '">' +
+          '<div class="quiz-card-icon" style="font-size:0.72rem;font-weight:700;line-height:1.2;text-align:center;">' +
+            q.label.replace('Quarter ','Q') + '<br>' + (isFingerQuiz ? '\uD83C\uDFBB' : '\uD83C\uDFBC') +
+          '</div>' +
+          '<div>' +
+            '<div class="quiz-card-title">' + cardTitle + '</div>' +
+            '<div class="quiz-card-desc">' + desc + '</div>' +
+          '</div>' +
+          '<div class="quiz-card-arrow">' + arrow + '</div>' +
+        '</div>';
+    }
+  }
+
+  const ensTitle  = activeEnsemble.title;
+  const instTitle = activeInstrument.title;
+  document.getElementById('app').innerHTML =
+    '<div class="header">' +
+      '<h1>' +
+        '<span>' + ensTitle + ' \u00b7 ' + grade + ' Grade</span>' +
+        instTitle +
+      '</h1>' +
+      '<div class="header-right">' +
+        '<button class="back-btn" onclick="renderInstrument(\'' + ensembleId + '\',\'' + grade + '\')">\u2190 Back</button>' +
+      '</div>' +
+    '</div>' +
+    '<div class="menu-body">' +
+      '<div class="menu-intro">Choose a Quiz</div>' +
+      '<div class="quiz-cards">' + cardsHtml + '</div>' +
+    '</div>';
+}
+
+// ── LAUNCH QUIZ (replaces startQuiz entry point from menus) ───────
+function launchQuiz(folderId, quizId) {
+  activeFolder = getFolder(folderId);
+  if (activeEnsemble && activeGrade && activeInstrument) {
+    const qm   = folderId.match(/^q([0-9])/);
+    const qnum = qm ? 'q' + qm[1] : folderId;
+    const type = quizId.includes('fingering') ? 'finger' : 'notes';
+    setHash(activeEnsemble.id + '/' + activeGrade + '/' + activeInstrument.id + '/' + qnum + '/' + type);
+  }
+  startQuiz(folderId, quizId);
+}
+
+// ── SCREEN: QUIZ QUESTION ────────────────────────────────────────
+function startQuiz(folderId, quizId) {
+  activeFolder = getFolder(folderId);
+  activeQuiz   = activeFolder.quizzes.find(q => q.id === quizId);
+  questions    = activeQuiz.buildQuiz ? activeQuiz.buildQuiz() : buildRandomQuiz(activeQuiz.notePool);
+  currentQ     = 0;
+  score        = 0;
+  answered     = false;
+  results      = [];
+  quizStartTime = Date.now();
+  renderQuestion();
+}
+
+function buildAnswerButtons(opts) {
+  // For 9-option grids, pair C♮/C# and F♮/F# into shared cells
+  if (opts.length !== 9) {
+    return opts.map(n =>
+      `<button class="answer-btn" data-value="${n}" onclick="selectAnswer('${n}', this)">${displayNote(n)}</button>`
+    ).join('');
+  }
+  // Build 7 visual slots: A, B, [C♮+C#], D, E, [F♮+F#], G
+  const singles = opts.filter(n => n !== 'C' && n !== 'C#' && n !== 'F' && n !== 'F#');
+  // singles = A, B, D, E, G — inject pairs at the right positions
+  // Order: A B [C♮/C#] D E [F♮/F#] G
+  const slots = ['A', 'B', '__CF__', 'D', 'E', '__FF__', 'G'];
+  return slots.map(slot => {
+    if (slot === '__CF__') {
+      const hasCNat = opts.includes('C'), hasCsh = opts.includes('C#');
+      return `<div class="btn-pair">
+        ${hasCNat ? `<button class="answer-btn" data-value="C" onclick="selectAnswer('C', this)">${displayNote('C')}</button>` : ''}
+        ${hasCsh  ? `<button class="answer-btn" data-value="C#" onclick="selectAnswer('C#', this)">C#</button>` : ''}
+      </div>`;
+    }
+    if (slot === '__FF__') {
+      const hasFNat = opts.includes('F'), hasFsh = opts.includes('F#');
+      return `<div class="btn-pair">
+        ${hasFNat ? `<button class="answer-btn" data-value="F" onclick="selectAnswer('F', this)">${displayNote('F')}</button>` : ''}
+        ${hasFsh  ? `<button class="answer-btn" data-value="F#" onclick="selectAnswer('F#', this)">F#</button>` : ''}
+      </div>`;
+    }
+    return `<button class="answer-btn" data-value="${slot}" onclick="selectAnswer('${slot}', this)">${slot}</button>`;
+  }).join('');
+}
+
+function renderQuestion() {
+  const q = questions[currentQ];
+  const progress = (currentQ / totalQ()) * 100;
+  const isLast = currentQ === totalQ() - 1;
+
+  // For Q3 multi-key quizzes, each question carries its own key/clef image & answer
+  const clefImg   = q.clefImg   || activeQuiz.clefImg;
+  const clefLabel = q.clefLabel || activeQuiz.clefLabel;
+  const opts      = activeQuiz.noteOptions;
+  const gridClass = opts.length === 9 ? 'answers-grid opts-9' : 'answers-grid opts-7';
+
+  document.getElementById('app').innerHTML = `
+    <div class="header">
+      <h1>
+        <span>${activeFolder.title} – ${activeFolder.subtitle}</span>
+        ${activeQuiz.title}
+      </h1>
+      <div class="header-right">
+        <span class="key-badge">${clefLabel}</span>
+        <button class="back-btn" onclick="renderQuarters(activeEnsemble.id, activeGrade, activeInstrument.id)">✕ Exit</button>
+      </div>
+    </div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar" style="width:${progress}%"></div>
+    </div>
+    <div class="body">
+      <div class="question-label">Question ${currentQ + 1} of ${totalQ()}</div>
+      <div class="question-text">${activeQuiz.questionText || 'What note is shown on the staff?'}</div>
+
+      <div class="staff-container">
+        <img src="${clefImg}" class="staff-img" alt="Clef" />
+        <img src="${q.noteFile}" class="staff-img" alt="Note on staff" />
+      </div>
+
+      <div class="${gridClass}">
+        ${buildAnswerButtons(opts)}
+      </div>
+
+      <div class="feedback" id="feedback"></div>
+    </div>
+  `;
+}
+
+function selectAnswer(chosen, btn) {
+  if (answered) return;
+  answered = true;
+
+  const q = questions[currentQ];
+  const correct = chosen === q.answer;
+  if (correct) score++;
+
+  results.push({ label: q.label, keyLabel: q.keyLabel || null, chosen, correct, correctAnswer: q.answer });
+
+  document.querySelectorAll('.answer-btn').forEach(b => {
+    b.disabled = true;
+    if (b.dataset && b.dataset.value === q.answer && !correct) b.classList.add('reveal-correct');
+  });
+
+  if (correct) {
+    btn.classList.add('correct');
+    document.getElementById('feedback').textContent = '✓ Correct!';
+    document.getElementById('feedback').className = 'feedback correct';
+  } else {
+    btn.classList.add('wrong');
+    document.getElementById('feedback').textContent = `✗ The correct answer is ${q.answer}.`;
+    document.getElementById('feedback').className = 'feedback wrong';
+  }
+
+  setTimeout(nextQuestion, 1000);
+}
+
+function nextQuestion() {
+  currentQ++;
+  answered = false;
+  currentQ < totalQ() ? renderQuestion() : renderScore();
+}
+
+// ── SCREEN: SCORE ────────────────────────────────────────────────
+// Returns note label with accidental applied based on key signature
+// e.g. noteWithKey('F4', 'G Major') → 'F#4'
+//      noteWithKey('C5', 'D Major') → 'C#5'
+//      noteWithKey('B3', 'G Major') → 'B3'
+// keyLabel may be a full key name ('D Major') or null — if null, falls back
+// to extracting the key from activeQuiz.clefLabel ('Treble Clef · D Major')
+function noteWithKey(label, keyLabel) {
+  // Resolve key name: use per-question keyLabel, or extract from quiz clefLabel
+  let keyName = keyLabel;
+  if (!keyName && activeQuiz && activeQuiz.clefLabel) {
+    const parts = activeQuiz.clefLabel.split('·');
+    keyName = parts[parts.length - 1].trim();
+  }
+  if (!keyName) return label;
+  const keyEntry = Object.values(KEYS).find(k => k.label === keyName);
+  if (!keyEntry) return label;
+  const match = label.match(/^([A-G])(\d)$/);
+  if (!match) return label;
+  const noteLetter = match[1];
+  const octave     = match[2];
+  if (keyEntry.sharps.includes(noteLetter)) {
+    return noteLetter + '#' + octave;
+  }
+  return label;
+}
+
+function submitScore() {
+  const school    = document.getElementById('school-select').value.trim();
+  const firstName = document.getElementById('first-name').value.trim();
+  const lastName  = document.getElementById('last-name').value.trim();
+  const studentId = document.getElementById('student-id').value.trim();
+  const statusEl  = document.getElementById('submit-status');
+  const btn       = document.getElementById('submit-btn');
+
+  // Final validation guard
+  if (!school || !firstName || !lastName || !/^[0-9]+$/.test(studentId)) {
+    statusEl.textContent = 'Please fill in all fields before submitting.';
+    statusEl.className = 'submit-status error';
+    return;
+  }
+
+  btn.disabled = true;
+  statusEl.textContent = 'Submitting…';
+  statusEl.className = 'submit-status';
+
+  const missedList = results
+    .filter(r => !r.correct)
+    .map(r => noteWithKey(r.label, r.keyLabel) + (r.keyLabel ? ' (' + r.keyLabel + ')' : ''))
+    .join(', ') || 'None';
+
+  const payload = {
+    school:     school,
+    firstName:  firstName,
+    lastName:   lastName,
+    studentId:  studentId,
+    grade:      activeGrade    || '',
+    ensemble:   activeEnsemble ? activeEnsemble.title : '',
+    instrument: activeQuiz.title.split(' ')[0],
+    quarter:    activeFolder.subtitle,
+    score:      score + '/' + totalQ(),
+    time:       elapsed,
+    missed:     missedList,
+  };
+
+  fetch(APPS_SCRIPT_URL, {
+    method: 'POST',
+    body:   JSON.stringify(payload),
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.result === 'success') {
+      statusEl.textContent = '✓ Score submitted successfully!';
+      statusEl.className = 'submit-status success';
+      btn.textContent = '✓ Submitted';
+    } else {
+      throw new Error('Unexpected response');
+    }
+  })
+  .catch(() => {
+    statusEl.textContent = '✗ Submission failed. Please try again.';
+    statusEl.className = 'submit-status error';
+    btn.disabled = false;
+  });
+}
+
+function renderScore() {
+  elapsed = formatTime(Date.now() - quizStartTime);
+  document.getElementById('app').innerHTML = `
+    <div class="header">
+      <h1>
+        <span>${activeEnsemble ? activeEnsemble.title + ' · ' : ''}${activeGrade ? activeGrade + ' Grade · ' : ''}${activeFolder.subtitle}</span>
+        ${activeQuiz.title}
+      </h1>
+      <span class="key-badge">${activeQuiz.clefLabel}</span>
+    </div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar" style="width:100%"></div>
+    </div>
+    <div class="score-screen">
+      <div class="score-circle">
+        <div class="score-num">${score}</div>
+        <div class="score-denom">out of ${totalQ()}</div>
+      </div>
+      <div class="score-title">${getMessage(score, totalQ()).split('!')[0]}!</div>
+      <div class="score-sub">
+        ${score === totalQ()
+          ? `Perfect! Every note identified correctly.`
+          : `You got ${score} out of ${totalQ()} notes correct.`}
+      </div>
+      <div class="score-time">⏱ Completed in ${elapsed}</div>
+
+      <div class="results-list">
+        ${results.map((r, i) => `
+          <div class="result-item">
+            <div>
+              <div class="q-label">Q${i + 1} · ${noteWithKey(r.label, r.keyLabel)}${r.keyLabel ? ' · ' + r.keyLabel : ''}</div>
+              <div class="r-note">${r.correct
+                ? r.chosen
+                : `You chose: ${r.chosen} &nbsp;→&nbsp; <span style="color:var(--green)">${r.correctAnswer}</span>`
+              }</div>
+            </div>
+            <div class="r-icon">${r.correct ? '✅' : '❌'}</div>
+          </div>
+        `).join('')}
+      </div>
+
+      <div class="submit-panel">
+        <div class="submit-panel-title">Submit Your Score</div>
+        <div class="submit-field">
+          <label for="school-select">School</label>
+          <select id="school-select" onchange="checkSubmitReady()">
+            <option value="">— Select your school —</option>
+            <option value="Bala Cynwyd">Bala Cynwyd</option>
+            <option value="Black Rock">Black Rock</option>
+            <option value="Welsh Valley">Welsh Valley</option>
+          </select>
+        </div>
+        <div style="display:flex;gap:10px;">
+          <div class="submit-field" style="flex:1">
+            <label for="first-name">First Name</label>
+            <input type="text" id="first-name" maxlength="50" placeholder="First name" oninput="checkSubmitReady()" />
+          </div>
+          <div class="submit-field" style="flex:1">
+            <label for="last-name">Last Name</label>
+            <input type="text" id="last-name" maxlength="50" placeholder="Last name" oninput="checkSubmitReady()" />
+          </div>
+        </div>
+        <div class="submit-field">
+          <label for="student-id">Student ID <span style="font-weight:400;text-transform:none">(numbers only)</span></label>
+          <input type="text" id="student-id" inputmode="numeric" maxlength="10" placeholder="Enter your student ID" oninput="checkSubmitReady()" />
+        </div>
+        <div class="submit-status" id="submit-status"></div>
+        <button class="submit-btn" id="submit-btn" onclick="submitScore()" disabled>📝 Submit Score to Teacher</button>
+      </div>
+
+      <div class="score-btn-row">
+        <button class="replay-btn" onclick="launchQuiz('${activeFolder.id}', '${activeQuiz.id}')">Try Again</button>
+        <button class="menu-btn"   onclick="renderQuarters(activeEnsemble.id, activeGrade, activeInstrument.id)">← Quiz List</button>
+      </div>
+    </div>
+  `;
+
+  // Enforce numbers-only on student ID field
+  document.getElementById('student-id').addEventListener('input', function() {
+    this.value = this.value.replace(/[^0-9]/g, '');
+  });
+}
+
+function checkSubmitReady() {
+  const school  = document.getElementById('school-select').value.trim();
+  const first   = document.getElementById('first-name').value.trim();
+  const last    = document.getElementById('last-name').value.trim();
+  const id      = document.getElementById('student-id').value.trim();
+  const btn     = document.getElementById('submit-btn');
+  if (btn) btn.disabled = !(school && first && last && /^[0-9]+$/.test(id));
+}
+
+// ── HASH ROUTING ─────────────────────────────────────────────────
+function setHash(hash) {
+  window._settingHash = true;
+  window.location.hash = hash ? '#' + hash : '#';
+  setTimeout(function() { window._settingHash = false; }, 50);
+}
+
+function navigateToHash(hash) {
+  hash = hash.replace(/^#\/?/, '');
+  if (!hash) { renderHome(); return; }
+  var parts       = hash.split('/');
+  var ensembleId  = parts[0];
+  var grade       = parts[1];
+  var instrumentId= parts[2];
+  var quarter     = parts[3];
+  var type        = parts[4];
+
+  var ensemble = ENSEMBLES.find(function(e) { return e.id === ensembleId; });
+  if (!ensemble) { renderHome(); return; }
+  if (!grade) { renderGrade(ensembleId); return; }
+  if (!GRADES.includes(grade)) { renderGrade(ensembleId); return; }
+  if (!instrumentId) { renderInstrument(ensembleId, grade); return; }
+  var instrument = INSTRUMENTS.find(function(i) { return i.id === instrumentId; });
+  if (!instrument) { renderInstrument(ensembleId, grade); return; }
+  if (!quarter || !type) { renderQuarters(ensembleId, grade, instrumentId); return; }
+
+  var key      = quizKey(ensembleId, grade, quarter);
+  var folderId = FOLDER_MAP[key];
+  if (!folderId) { renderQuarters(ensembleId, grade, instrumentId); return; }
+  var folder = getFolder(folderId);
+  if (!folder) { renderQuarters(ensembleId, grade, instrumentId); return; }
+
+  var quizId = (type === 'finger') ? instrumentId + '-fingering' : instrumentId;
+  var quiz   = folder.quizzes.find(function(q) { return q.id === quizId; });
+  if (!quiz) { renderQuarters(ensembleId, grade, instrumentId); return; }
+
+  activeEnsemble   = ensemble;
+  activeGrade      = grade;
+  activeInstrument = instrument;
+  launchQuiz(folderId, quizId);
+}
+
+window.addEventListener('hashchange', function() {
+  if (window._settingHash) return;
+  navigateToHash(window.location.hash);
+});
+
+// ── INIT ─────────────────────────────────────────────────────────
+if (window.location.hash && window.location.hash !== '#') {
+  navigateToHash(window.location.hash);
+} else {
+  renderHome();
+}
+</script>
+</body>
+</html>
