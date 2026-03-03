@@ -1926,12 +1926,12 @@ function submitScore() {
   const school    = document.getElementById('school-select').value.trim();
   const firstName = document.getElementById('first-name').value.trim();
   const lastName  = document.getElementById('last-name').value.trim();
-  const studentId = document.getElementById('student-id').value.trim();
+  const studentNum = document.getElementById('student-num').value.trim();
   const statusEl  = document.getElementById('submit-status');
   const btn       = document.getElementById('submit-btn');
 
   // Final validation guard
-  if (!school || !firstName || !lastName || !/^[0-9]+$/.test(studentId)) {
+  if (!school || !firstName || !lastName || !/^[0-9]{5}$/.test(studentNum)) {
     statusEl.textContent = 'Please fill in all fields before submitting.';
     statusEl.className = 'submit-status error';
     return;
@@ -1950,11 +1950,11 @@ function submitScore() {
     school:     school,
     firstName:  firstName,
     lastName:   lastName,
-    studentId:  studentId,
+    studentNumber: studentNum,
     grade:      activeGrade    || '',
     ensemble:   activeEnsemble ? activeEnsemble.title : '',
     instrument: activeQuiz.title.split(' ')[0],
-    quarter:    activeFolder.subtitle,
+    quiz: activeFolder.subtitle.replace('Quarter ', 'Q') + ' ' + (activeQuiz.id.includes('fingering') ? 'Fingering' : 'Note Names'),
     score:      score + '/' + totalQ(),
     time:       elapsed,
     missed:     missedList,
@@ -2044,8 +2044,15 @@ function renderScore() {
           </div>
         </div>
         <div class="submit-field">
-          <label for="student-id">Student ID <span style="font-weight:400;text-transform:none">(numbers only)</span></label>
-          <input type="text" id="student-id" inputmode="numeric" maxlength="10" placeholder="Enter your student ID" oninput="checkSubmitReady()" />
+          <label for="student-num">Email</label>
+          <div style="display:flex;align-items:center;gap:0;font-size:1rem;">
+            <span style="white-space:nowrap;padding:8px 6px 8px 10px;background:#f0f0f0;border:1.5px solid #ccc;border-right:none;border-radius:6px 0 0 6px;color:#555;">s0</span>
+            <input type="text" id="student-num" inputmode="numeric" maxlength="5"
+              placeholder="00000"
+              oninput="checkSubmitReady()"
+              style="width:80px;border-radius:0;border-left:none;border-right:none;text-align:center;font-size:1rem;" />
+            <span style="white-space:nowrap;padding:8px 10px 8px 6px;background:#f0f0f0;border:1.5px solid #ccc;border-left:none;border-radius:0 6px 6px 0;color:#555;">@students.lmsd.org</span>
+          </div>
         </div>
         <div class="submit-status" id="submit-status"></div>
         <button class="submit-btn" id="submit-btn" onclick="submitScore()" disabled>📝 Submit Score to Teacher</button>
@@ -2058,9 +2065,10 @@ function renderScore() {
     </div>
   `;
 
-  // Enforce numbers-only on student ID field
-  document.getElementById('student-id').addEventListener('input', function() {
-    this.value = this.value.replace(/[^0-9]/g, '');
+  // Enforce numbers-only, max 5 digits on student number field
+  document.getElementById('student-num').addEventListener('input', function() {
+    this.value = this.value.replace(/[^0-9]/g, '').slice(0, 5);
+    checkSubmitReady();
   });
 }
 
@@ -2068,9 +2076,9 @@ function checkSubmitReady() {
   const school  = document.getElementById('school-select').value.trim();
   const first   = document.getElementById('first-name').value.trim();
   const last    = document.getElementById('last-name').value.trim();
-  const id      = document.getElementById('student-id').value.trim();
+  const num     = document.getElementById('student-num').value.trim();
   const btn     = document.getElementById('submit-btn');
-  if (btn) btn.disabled = !(school && first && last && /^[0-9]+$/.test(id));
+  if (btn) btn.disabled = !(school && first && last && /^[0-9]{5}$/.test(num));
 }
 
 // ── HASH ROUTING ─────────────────────────────────────────────────
