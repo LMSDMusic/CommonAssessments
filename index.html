@@ -238,6 +238,16 @@
     min-width: 0;
   }
 
+  /* Fingering layout: all buttons in one row, compact */
+  .answers-grid.opts-finger {
+    grid-template-columns: repeat(var(--finger-cols), 1fr);
+    gap: 6px;
+  }
+  .answers-grid.opts-finger .answer-btn {
+    padding: 10px 4px;
+    font-size: 0.78rem;
+  }
+
   .answer-btn {
     background: var(--parchment);
     border: 2px solid transparent;
@@ -719,13 +729,14 @@ const VLN_FINGER_Q4_BASE = {
   'note12.png': '3',  // D5
   'note13.png': '0',  // E5 (open E string)
   // note14=F5: Low 1 (E string) — key-dependent: F♮=Low 1, F#=1
-  'note15.png': '2',  // G5 (always 2 on E string — G is never sharped in our keys)
+  // note15=G5: Low 2 (E string) — G is never sharped, always Low 2
   'note16.png': '3',  // A5
 };
 // Low 2: F4 (D string) and C5 (A string) only
 const VLN_LOW2_Q4 = {
   'note7.png':  'F',  // F4 (D string)
   'note11.png': 'C',  // C5 (A string)
+  'note15.png': 'G',  // G5 (E string — always natural, always Low 2)
 };
 // Low 1: F5 on E string
 const VLN_LOW1_Q4 = {
@@ -1195,14 +1206,25 @@ const FOLDERS = [
         totalQuestions: 12,
         questionText: 'What finger plays this note?',
         noteOptions: ['0', '1', '2', '3'],
-        buildQuiz: function() { return buildFixedFingeringQuiz(
-          [{noteFile:'note1.png',label:'G3'},{noteFile:'note2.png',label:'A3'},
-           {noteFile:'note3.png',label:'B3'},{noteFile:'note4.png',label:'C4'},
-           {noteFile:'note5.png',label:'D4'},{noteFile:'note6.png',label:'E4'},
-           {noteFile:'note7.png',label:'F4'},{noteFile:'note8.png',label:'G4'},
-           {noteFile:'note9.png',label:'A4'},{noteFile:'note10.png',label:'B4'},
-           {noteFile:'note11.png',label:'C5'},{noteFile:'note12.png',label:'D5'}],
-          VLN_FINGER_Q2); },
+        buildQuiz: function() {
+          var pool = [
+            {noteFile:'note1.png', label:'G3', clefImg:'treble2.png', clefLabel:'D Major'},
+            {noteFile:'note2.png', label:'A3', clefImg:'treble2.png', clefLabel:'D Major'},
+            {noteFile:'note3.png', label:'B3', clefImg:'treble2.png', clefLabel:'D Major'},
+            {noteFile:'note4.png', label:'C4', clefImg:'treble1.png', clefLabel:'G Major'},
+            {noteFile:'note5.png', label:'D4', clefImg:'treble2.png', clefLabel:'D Major'},
+            {noteFile:'note6.png', label:'E4', clefImg:'treble2.png', clefLabel:'D Major'},
+            {noteFile:'note7.png', label:'F4', clefImg:'treble2.png', clefLabel:'D Major'},
+            {noteFile:'note8.png', label:'G4', clefImg:'treble2.png', clefLabel:'D Major'},
+            {noteFile:'note9.png', label:'A4', clefImg:'treble2.png', clefLabel:'D Major'},
+            {noteFile:'note10.png',label:'B4', clefImg:'treble2.png', clefLabel:'D Major'},
+            {noteFile:'note11.png',label:'C5', clefImg:'treble2.png', clefLabel:'D Major'},
+            {noteFile:'note12.png',label:'D5', clefImg:'treble2.png', clefLabel:'D Major'},
+          ];
+          var sh = pool.slice();
+          for (var i=sh.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=sh[i];sh[i]=sh[j];sh[j]=t;}
+          return sh.map(function(n){return {noteFile:n.noteFile,clefImg:n.clefImg,clefLabel:n.clefLabel,answer:VLN_FINGER_Q2[n.noteFile],label:n.label};});
+        },
       },
       {
         id: 'viola',
@@ -1237,14 +1259,25 @@ const FOLDERS = [
         totalQuestions: 12,
         questionText: 'What finger plays this note?',
         noteOptions: ['0', '1', '2', '3'],
-        buildQuiz: function() { return buildFixedFingeringQuiz(
-          [{noteFile:'note7.png',label:'G3'},{noteFile:'note8.png',label:'A3'},
-           {noteFile:'note9.png',label:'B3'},{noteFile:'note10.png',label:'C4'},
-           {noteFile:'note11.png',label:'D4'},{noteFile:'note12.png',label:'E4'},
-           {noteFile:'note13.png',label:'F4'},{noteFile:'note14.png',label:'G4'},
-           {noteFile:'note15.png',label:'A4'},{noteFile:'note16.png',label:'B4'},
-           {noteFile:'note17.png',label:'C5'},{noteFile:'note18.png',label:'D5'}],
-          VLA_FINGER_Q2); },
+        buildQuiz: function() {
+          var pool = [
+            {noteFile:'note7.png', label:'G3', clefImg:'alto2.png', clefLabel:'D Major'},
+            {noteFile:'note8.png', label:'A3', clefImg:'alto2.png', clefLabel:'D Major'},
+            {noteFile:'note9.png', label:'B3', clefImg:'alto2.png', clefLabel:'D Major'},
+            {noteFile:'note10.png',label:'C4', clefImg:'alto1.png', clefLabel:'G Major'},
+            {noteFile:'note11.png',label:'D4', clefImg:'alto2.png', clefLabel:'D Major'},
+            {noteFile:'note12.png',label:'E4', clefImg:'alto2.png', clefLabel:'D Major'},
+            {noteFile:'note13.png',label:'F4', clefImg:'alto2.png', clefLabel:'D Major'},
+            {noteFile:'note14.png',label:'G4', clefImg:'alto2.png', clefLabel:'D Major'},
+            {noteFile:'note15.png',label:'A4', clefImg:'alto2.png', clefLabel:'D Major'},
+            {noteFile:'note16.png',label:'B4', clefImg:'alto2.png', clefLabel:'D Major'},
+            {noteFile:'note17.png',label:'C5', clefImg:'alto2.png', clefLabel:'D Major'},
+            {noteFile:'note18.png',label:'D5', clefImg:'alto2.png', clefLabel:'D Major'},
+          ];
+          var sh = pool.slice();
+          for (var i=sh.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=sh[i];sh[i]=sh[j];sh[j]=t;}
+          return sh.map(function(n){return {noteFile:n.noteFile,clefImg:n.clefImg,clefLabel:n.clefLabel,answer:VLA_FINGER_Q2[n.noteFile],label:n.label};});
+        },
       },
       {
         id: 'cello',
@@ -1461,7 +1494,7 @@ const FOLDERS = [
         desc: 'Treble clef · C, G & D Major · What finger plays each note? · 16 questions',
         totalQuestions: 16,
         questionText: 'What finger plays this note?',
-        noteOptions: ['0', '1', 'Low 1', 'Low 2', '2', '3'],
+        noteOptions: ['0', 'Low 1', '1', 'Low 2', '2', '3'],
         buildQuiz: function() { return buildMultiKeyFingeringQuiz('treble', TREBLE_POOL_Q4, VLN_FINGER_Q4_BASE, VLN_LOW2_Q4, false, 16, VLN_LOW1_Q4); },
       },
       {
@@ -2651,6 +2684,14 @@ function buildAnswerButtons(opts) {
     letterMap[letter].push(n);
   });
 
+  // If no opts appear in NOTE_ORDER (e.g. fingering: '0','1','Low 2'), render as-is
+  var isNoteQuiz = opts.some(function(n) { return NOTE_ORDER.includes(n); });
+  if (!isNoteQuiz) {
+    return opts.map(function(n) {
+      return '<button class="answer-btn" data-value="' + n + '" onclick="selectAnswer(\'' + n + '\', this)">' + n + '</button>';
+    }).join('');
+  }
+
   // Build ordered slots, collapsing pairs into one slot
   var seen = {};
   var slots = [];
@@ -2686,7 +2727,10 @@ function renderQuestion() {
   const clefImg   = q.clefImg   || activeQuiz.clefImg;
   const clefLabel = q.clefLabel || activeQuiz.clefLabel;
   const opts      = activeQuiz.noteOptions;
-  const gridClass = opts.length === 9 ? 'answers-grid opts-9' : 'answers-grid opts-7';
+  const isFingerGrid = opts.some(function(o) { return ['0','1','2','3','4','Low 1','Low 2','Shift 1','Shift 2','Shift 4'].includes(o); });
+  const gridClass = isFingerGrid
+    ? 'answers-grid opts-finger'
+    : opts.length === 9 ? 'answers-grid opts-9' : 'answers-grid opts-7';
 
   // First question: build full HTML
   if (currentQ === 0 || !document.getElementById('staff-clef')) {
@@ -2713,7 +2757,7 @@ function renderQuestion() {
           <img src="${q.noteFile}" id="staff-note" class="staff-img" alt="Note on staff" />
         </div>
 
-        <div class="${gridClass}" id="answers-grid">
+        <div class="${gridClass}" id="answers-grid" style="${isFingerGrid ? '--finger-cols:' + opts.length : ''}">
           ${buildAnswerButtons(opts)}
         </div>
 
@@ -2739,6 +2783,7 @@ function renderQuestion() {
 
   const grid = document.getElementById('answers-grid');
   grid.className = gridClass;
+  if (isFingerGrid) grid.style.setProperty('--finger-cols', opts.length);
   grid.innerHTML = buildAnswerButtons(opts);
 }
 
