@@ -255,12 +255,11 @@
   .answer-btn:disabled       { cursor: default; transform: none; }
 
   .feedback {
-    min-height: 28px; font-size: 0.9rem; font-weight: 500;
-    text-align: center; margin-bottom: 4px;
-    transition: font-size 0.15s ease;
+    min-height: 36px; font-size: 1.1rem; font-weight: 700;
+    text-align: center; margin-bottom: 4px; line-height: 36px;
   }
-  .feedback.correct { color: var(--green); font-size: 1.8rem; font-weight: 700; }
-  .feedback.wrong   { color: var(--red);   font-size: 1.8rem; font-weight: 700; }
+  .feedback.correct { color: var(--green); }
+  .feedback.wrong   { color: var(--red); }
 
   .next-btn {
     display: block; width: 100%; padding: 14px;
@@ -311,6 +310,28 @@
   }
   .menu-btn:hover { background: #ddd8ce; }
   /* ── SUBMISSION PANEL ── */
+  .saved-student {
+    background: #f0f7ff; border: 1.5px solid #b3d4f5; border-radius: 8px;
+    padding: 10px 14px; margin-bottom: 12px;
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  }
+  .saved-student-name { font-weight: 600; color: var(--navy); font-size: 0.95rem; }
+  .saved-student-sub  { font-size: 0.78rem; color: var(--muted); margin-top: 1px; }
+  .not-you-btn {
+    background: none; border: 1.5px solid #b3d4f5; border-radius: 6px;
+    color: var(--navy); font-size: 0.78rem; font-weight: 600;
+    padding: 4px 10px; cursor: pointer; white-space: nowrap; flex-shrink: 0;
+  }
+  .not-you-btn:hover { background: #ddeeff; }
+  .chor      { --ens-color: #6a3d9a; }
+  .chor-inst { --inst-color: #6a3d9a; }
+  .quiz-card.chor-inst { background: #f5f0fb; border-color: #c9aeed; }
+  .quiz-card.chor-inst:hover { background: #ede5f7; border-color: #6a3d9a; }
+  .folder-card.chor { background: #f5f0fb; border-color: #c9aeed; }
+  .folder-card.chor:hover { background: #ede5f7; border-color: #6a3d9a; }
+  .band-inst { --inst-color: #c75000; --inst-light: #fff3ed; }
+  .quiz-card.band-inst { background: #fff3ed; border-color: #f0b99a; }
+  .quiz-card.band-inst:hover { background: #ffe8d6; border-color: #c75000; }
   .submit-panel {
     background: var(--cream); border: 2px solid var(--parchment);
     border-radius: 12px; padding: 20px; margin-bottom: 16px; text-align: left;
@@ -362,22 +383,25 @@ const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzZG8jEYYdOLcG2
 // Each entry: { noteFile, noteName (letter only), label }
 // Answers are derived at quiz-build time based on the randomly chosen key.
 
-// Key definitions: which notes get sharps
+// Key definitions: sharps[] and flats[] per key
 const KEYS = {
-  C: { label: 'C Major', sharps: [],           clef: { treble: 'treble0.png', alto: 'alto0.png', bass: 'bass0.png' } },
-  G: { label: 'G Major', sharps: ['F'],        clef: { treble: 'treble1.png', alto: 'alto1.png', bass: 'bass1.png' } },
-  D: { label: 'D Major', sharps: ['F', 'C'],   clef: { treble: 'treble2.png', alto: 'alto2.png', bass: 'bass2.png' } },
+  C:  { label: 'C Major',  sharps: [],           flats: [],        clef: { treble: 'treble0.png',  alto: 'alto0.png',  bass: 'bass0.png'  } },
+  G:  { label: 'G Major',  sharps: ['F'],         flats: [],        clef: { treble: 'treble1.png',  alto: 'alto1.png',  bass: 'bass1.png'  } },
+  D:  { label: 'D Major',  sharps: ['F', 'C'],    flats: [],        clef: { treble: 'treble2.png',  alto: 'alto2.png',  bass: 'bass2.png'  } },
+  F:  { label: 'F Major',  sharps: [],            flats: ['B'],     clef: { treble: 'treble-1.png', alto: 'alto-1.png', bass: 'bass-1.png' } },
+  Bb: { label: 'B♭ Major', sharps: [],            flats: ['B','E'],     clef: { treble: 'treble-2.png', alto: 'alto-2.png', bass: 'bass-2.png' } },
+  Eb: { label: 'E♭ Major', sharps: [],            flats: ['B','E','A'], clef: { treble: 'treble-3.png', alto: 'alto-3.png', bass: 'bass-3.png' } },
 };
 const KEY_IDS = ['C', 'G', 'D'];
 
-// Display labels for buttons — adds natural sign to F and C naturals
-const DISPLAY_LABEL = { 'F': 'F♮', 'C': 'C♮' };
+// Display labels for buttons — adds natural sign to F and C naturals in sharp keys
+const DISPLAY_LABEL = { 'B♭': 'B♭', 'E♭': 'E♭' };
 function displayNote(n) { return DISPLAY_LABEL[n] || n; }
 
 function applyKey(noteName, keyId) {
-  // Returns the correct answer string given the base note name and key
-  const sharps = KEYS[keyId].sharps;
-  if (sharps.includes(noteName)) return noteName + '#';
+  const key = KEYS[keyId];
+  if (key.sharps.includes(noteName)) return noteName + '#';
+  if (key.flats.includes(noteName))  return noteName + '♭';
   return noteName;
 }
 
@@ -1505,25 +1529,848 @@ const FOLDERS = [
       },
     ],
   },
+  // ── BAND Q1 ──────────────────────────────────────────────────────
+  {
+    id: 'band-q1-5th',
+    title: '5th Grade Band',
+    subtitle: 'Quarter 1',
+    icon: '🎺',
+    desc: '10 quizzes · All Band Instruments · Q1 Note Names',
+    quizzes: [
+      {
+        id: 'flute',
+        title: 'Flute B♭4–F5',
+        clefLabel: 'Treble Clef · B♭ Major',
+        clefImg: 'treble-2.png',
+        icon: '🎵',
+        desc: 'Treble clef · B♭ Major · Notes B♭4 through F5',
+        totalQuestions: 5,
+        noteOptions: ['B♭', 'C', 'D', 'E♭', 'F'],
+        notePool: [
+          { noteFile: 'note10.png', answer: 'B♭', label: 'B♭4' },
+          { noteFile: 'note11.png', answer: 'C',  label: 'C5'  },
+          { noteFile: 'note12.png', answer: 'D',  label: 'D5'  },
+          { noteFile: 'note13.png', answer: 'E♭', label: 'E♭5' },
+          { noteFile: 'note14.png', answer: 'F',  label: 'F5'  },
+        ],
+      },
+      {
+        id: 'clarinet',
+        title: 'Clarinet C4–G4',
+        clefLabel: 'Treble Clef · C Major',
+        clefImg: 'treble0.png',
+        icon: '🎵',
+        desc: 'Treble clef · C Major · Notes C4 through G4',
+        totalQuestions: 5,
+        noteOptions: ['C', 'D', 'E', 'F', 'G'],
+        notePool: [
+          { noteFile: 'note4.png', answer: 'C', label: 'C4' },
+          { noteFile: 'note5.png', answer: 'D', label: 'D4' },
+          { noteFile: 'note6.png', answer: 'E', label: 'E4' },
+          { noteFile: 'note7.png', answer: 'F', label: 'F4' },
+          { noteFile: 'note8.png', answer: 'G', label: 'G4' },
+        ],
+      },
+      {
+        id: 'alto-sax',
+        title: 'Alto Sax G4–D5',
+        clefLabel: 'Treble Clef · G Major',
+        clefImg: 'treble1.png',
+        icon: '🎵',
+        desc: 'Treble clef · G Major · Notes G4 through D5',
+        totalQuestions: 5,
+        noteOptions: ['G', 'A', 'B', 'C', 'D'],
+        notePool: [
+          { noteFile: 'note8.png',  answer: 'G', label: 'G4' },
+          { noteFile: 'note9.png',  answer: 'A', label: 'A4' },
+          { noteFile: 'note10.png', answer: 'B', label: 'B4' },
+          { noteFile: 'note11.png', answer: 'C', label: 'C5' },
+          { noteFile: 'note12.png', answer: 'D', label: 'D5' },
+        ],
+      },
+      {
+        id: 'french-horn',
+        title: 'French Horn F4–C5',
+        clefLabel: 'Treble Clef · F Major',
+        clefImg: 'treble-1.png',
+        icon: '🎺',
+        desc: 'Treble clef · F Major · Notes F4 through C5',
+        totalQuestions: 5,
+        noteOptions: ['F', 'G', 'A', 'B♭', 'C'],
+        notePool: [
+          { noteFile: 'note7.png',  answer: 'F',  label: 'F4'  },
+          { noteFile: 'note8.png',  answer: 'G',  label: 'G4'  },
+          { noteFile: 'note9.png',  answer: 'A',  label: 'A4'  },
+          { noteFile: 'note10.png', answer: 'B♭', label: 'B♭4' },
+          { noteFile: 'note11.png', answer: 'C',  label: 'C5'  },
+        ],
+      },
+      {
+        id: 'trumpet',
+        title: 'Trumpet C4–G4',
+        clefLabel: 'Treble Clef · C Major',
+        clefImg: 'treble0.png',
+        icon: '🎺',
+        desc: 'Treble clef · C Major · Notes C4 through G4',
+        totalQuestions: 5,
+        noteOptions: ['C', 'D', 'E', 'F', 'G'],
+        notePool: [
+          { noteFile: 'note4.png', answer: 'C', label: 'C4' },
+          { noteFile: 'note5.png', answer: 'D', label: 'D4' },
+          { noteFile: 'note6.png', answer: 'E', label: 'E4' },
+          { noteFile: 'note7.png', answer: 'F', label: 'F4' },
+          { noteFile: 'note8.png', answer: 'G', label: 'G4' },
+        ],
+      },
+      {
+        id: 'trombone',
+        title: 'Trombone B♭2–F3',
+        clefLabel: 'Bass Clef · B♭ Major',
+        clefImg: 'bass-2.png',
+        icon: '🎺',
+        desc: 'Bass clef · B♭ Major · Notes B♭2 through F3',
+        totalQuestions: 5,
+        noteOptions: ['B♭', 'C', 'D', 'E♭', 'F'],
+        notePool: [
+          { noteFile: 'note8.png',  answer: 'B♭', label: 'B♭2' },
+          { noteFile: 'note9.png',  answer: 'C',  label: 'C3'  },
+          { noteFile: 'note10.png', answer: 'D',  label: 'D3'  },
+          { noteFile: 'note11.png', answer: 'E♭', label: 'E♭3' },
+          { noteFile: 'note12.png', answer: 'F',  label: 'F3'  },
+        ],
+      },
+      {
+        id: 'baritone',
+        title: 'Baritone B♭4–F5',
+        clefLabel: 'Treble Clef · B♭ Major',
+        clefImg: 'treble-2.png',
+        icon: '🎺',
+        desc: 'Treble clef · B♭ Major · Notes B♭4 through F5',
+        totalQuestions: 5,
+        noteOptions: ['B♭', 'C', 'D', 'E♭', 'F'],
+        notePool: [
+          { noteFile: 'note10.png', answer: 'B♭', label: 'B♭4' },
+          { noteFile: 'note11.png', answer: 'C',  label: 'C5'  },
+          { noteFile: 'note12.png', answer: 'D',  label: 'D5'  },
+          { noteFile: 'note13.png', answer: 'E♭', label: 'E♭5' },
+          { noteFile: 'note14.png', answer: 'F',  label: 'F5'  },
+        ],
+      },
+      {
+        id: 'tuba',
+        title: 'Tuba B♭1–F2',
+        clefLabel: 'Bass Clef · B♭ Major',
+        clefImg: 'bass-2.png',
+        icon: '🎺',
+        desc: 'Bass clef · B♭ Major · Notes B♭1 through F2',
+        totalQuestions: 5,
+        noteOptions: ['B♭', 'C', 'D', 'E♭', 'F'],
+        notePool: [
+          { noteFile: 'note1.png', answer: 'B♭', label: 'B♭1' },
+          { noteFile: 'note2.png', answer: 'C',  label: 'C2'  },
+          { noteFile: 'note3.png', answer: 'D',  label: 'D2'  },
+          { noteFile: 'note4.png', answer: 'E♭', label: 'E♭2' },
+          { noteFile: 'note5.png', answer: 'F',  label: 'F2'  },
+        ],
+      },
+      {
+        id: 'mallets-high',
+        title: 'Mallet Percussion High B♭4–F5',
+        clefLabel: 'Treble Clef · B♭ Major',
+        clefImg: 'treble-2.png',
+        icon: '🥁',
+        desc: 'Treble clef · B♭ Major · Notes B♭4 through F5',
+        totalQuestions: 5,
+        noteOptions: ['B♭', 'C', 'D', 'E♭', 'F'],
+        notePool: [
+          { noteFile: 'note10.png', answer: 'B♭', label: 'B♭4' },
+          { noteFile: 'note11.png', answer: 'C',  label: 'C5'  },
+          { noteFile: 'note12.png', answer: 'D',  label: 'D5'  },
+          { noteFile: 'note13.png', answer: 'E♭', label: 'E♭5' },
+          { noteFile: 'note14.png', answer: 'F',  label: 'F5'  },
+        ],
+      },
+      {
+        id: 'mallets-low',
+        title: 'Mallet Percussion Low B♭3–F4',
+        clefLabel: 'Treble Clef · B♭ Major',
+        clefImg: 'treble-2.png',
+        icon: '🥁',
+        desc: 'Treble clef · B♭ Major · Notes B♭3 through F4',
+        totalQuestions: 5,
+        noteOptions: ['B♭', 'C', 'D', 'E♭', 'F'],
+        notePool: [
+          { noteFile: 'note6.png', answer: 'B♭', label: 'B♭3' },
+          { noteFile: 'note7.png', answer: 'C',  label: 'C4'  },
+          { noteFile: 'note8.png', answer: 'D',  label: 'D4'  },
+          { noteFile: 'note9.png', answer: 'E♭', label: 'E♭4' },
+          { noteFile: 'note10.png',answer: 'F',  label: 'F4'  },
+        ],
+      },
+    ],
+  },
+
+  // ── CHORUS Q1 ─────────────────────────────────────────────
+  {
+    id: 'chorus-q1-5th',
+    title: '5th Grade Chorus',
+    subtitle: 'Quarter 1',
+    icon: '🎤',
+    desc: '1 quiz · Voice · Treble Clef · C Major',
+    quizzes: [
+      {
+        id: 'chorus-voice',
+        title: 'Voice C4–C5',
+        clefLabel: 'Treble Clef · C Major',
+        clefImg: 'treble0.png',
+        icon: '🎤',
+        desc: 'Treble clef · C Major · Notes C4 through C5',
+        totalQuestions: 8,
+        noteOptions: ['C', 'D', 'E', 'F', 'G', 'A', 'B'],
+        notePool: [
+          { noteFile: 'note4.png',  answer: 'C', label: 'C4' },
+          { noteFile: 'note5.png',  answer: 'D', label: 'D4' },
+          { noteFile: 'note6.png',  answer: 'E', label: 'E4' },
+          { noteFile: 'note7.png',  answer: 'F', label: 'F4' },
+          { noteFile: 'note8.png',  answer: 'G', label: 'G4' },
+          { noteFile: 'note9.png',  answer: 'A', label: 'A4' },
+          { noteFile: 'note10.png', answer: 'B', label: 'B4' },
+          { noteFile: 'note11.png', answer: 'C', label: 'C5' },
+        ],
+      },
+    ],
+  },
+
+  // ── BAND Q2 ─────────────────────────────────────────────
+  {
+    id: 'band-q2-5th',
+    title: '5th Grade Band',
+    subtitle: 'Quarter 2',
+    icon: '🎺',
+    desc: '1 quiz · Flute · B♭ Major',
+    quizzes: [
+      {
+        id: 'flute',
+        title: 'Flute B♭4–G5',
+        clefLabel: 'Treble Clef · B♭ Major',
+        clefImg: 'treble-2.png',
+        icon: '🎵',
+        desc: 'Treble clef · B♭ Major · Notes B♭4 through G5',
+        totalQuestions: 6,
+        noteOptions: ['B♭', 'C', 'D', 'E♭', 'F', 'G'],
+        notePool: [
+          { noteFile: 'note10.png', answer: 'B♭', label: 'B♭4' },
+          { noteFile: 'note11.png', answer: 'C',       label: 'C5'       },
+          { noteFile: 'note12.png', answer: 'D',       label: 'D5'       },
+          { noteFile: 'note13.png', answer: 'E♭', label: 'E♭5' },
+          { noteFile: 'note14.png', answer: 'F',       label: 'F5'       },
+          { noteFile: 'note15.png', answer: 'G',       label: 'G5'       },
+        ],
+      },
+      {
+        id: 'clarinet',
+        title: 'Clarinet C4–A4',
+        clefLabel: 'Treble Clef · C Major',
+        clefImg: 'treble0.png',
+        icon: '🎵',
+        desc: 'Treble clef · C Major · Notes C4 through A4',
+        totalQuestions: 6,
+        noteOptions: ['C', 'D', 'E', 'F', 'G', 'A'],
+        notePool: [
+          { noteFile: 'note4.png', answer: 'C', label: 'C4' },
+          { noteFile: 'note5.png', answer: 'D', label: 'D4' },
+          { noteFile: 'note6.png', answer: 'E', label: 'E4' },
+          { noteFile: 'note7.png', answer: 'F', label: 'F4' },
+          { noteFile: 'note8.png', answer: 'G', label: 'G4' },
+          { noteFile: 'note9.png', answer: 'A', label: 'A4' },
+        ],
+      },
+      {
+        id: 'alto-sax',
+        title: 'Alto Sax G4–E5',
+        clefLabel: 'Treble Clef · G Major',
+        clefImg: 'treble1.png',
+        icon: '🎵',
+        desc: 'Treble clef · G Major · Notes G4 through E5',
+        totalQuestions: 6,
+        noteOptions: ['G', 'A', 'B', 'C', 'D', 'E'],
+        notePool: [
+          { noteFile: 'note8.png',  answer: 'G', label: 'G4' },
+          { noteFile: 'note9.png',  answer: 'A', label: 'A4' },
+          { noteFile: 'note10.png', answer: 'B', label: 'B4' },
+          { noteFile: 'note11.png', answer: 'C', label: 'C5' },
+          { noteFile: 'note12.png', answer: 'D', label: 'D5' },
+          { noteFile: 'note13.png', answer: 'E', label: 'E5' },
+        ],
+      },
+      {
+        id: 'french-horn',
+        title: 'French Horn F4–D5',
+        clefLabel: 'Treble Clef · F Major',
+        clefImg: 'treble-1.png',
+        icon: '🎺',
+        desc: 'Treble clef · F Major · Notes F4 through D5',
+        totalQuestions: 6,
+        noteOptions: ['F', 'G', 'A', 'B♭', 'C', 'D'],
+        notePool: [
+          { noteFile: 'note7.png',  answer: 'F',       label: 'F4'       },
+          { noteFile: 'note8.png',  answer: 'G',       label: 'G4'       },
+          { noteFile: 'note9.png',  answer: 'A',       label: 'A4'       },
+          { noteFile: 'note10.png', answer: 'B♭', label: 'B♭4' },
+          { noteFile: 'note11.png', answer: 'C',       label: 'C5'       },
+          { noteFile: 'note12.png', answer: 'D',       label: 'D5'       },
+        ],
+      },
+      {
+        id: 'trumpet',
+        title: 'Trumpet C4–A4',
+        clefLabel: 'Treble Clef · C Major',
+        clefImg: 'treble0.png',
+        icon: '🎺',
+        desc: 'Treble clef · C Major · Notes C4 through A4',
+        totalQuestions: 6,
+        noteOptions: ['C', 'D', 'E', 'F', 'G', 'A'],
+        notePool: [
+          { noteFile: 'note4.png', answer: 'C', label: 'C4' },
+          { noteFile: 'note5.png', answer: 'D', label: 'D4' },
+          { noteFile: 'note6.png', answer: 'E', label: 'E4' },
+          { noteFile: 'note7.png', answer: 'F', label: 'F4' },
+          { noteFile: 'note8.png', answer: 'G', label: 'G4' },
+          { noteFile: 'note9.png', answer: 'A', label: 'A4' },
+        ],
+      },
+      {
+        id: 'trombone',
+        title: 'Trombone B♭2–G3',
+        clefLabel: 'Bass Clef · B♭ Major',
+        clefImg: 'bass-2.png',
+        icon: '🎺',
+        desc: 'Bass clef · B♭ Major · Notes B♭2 through G3',
+        totalQuestions: 6,
+        noteOptions: ['B♭', 'C', 'D', 'E♭', 'F', 'G'],
+        notePool: [
+          { noteFile: 'note8.png',  answer: 'B♭', label: 'B♭2' },
+          { noteFile: 'note9.png',  answer: 'C',       label: 'C3'       },
+          { noteFile: 'note10.png', answer: 'D',       label: 'D3'       },
+          { noteFile: 'note11.png', answer: 'E♭', label: 'E♭3' },
+          { noteFile: 'note12.png', answer: 'F',       label: 'F3'       },
+          { noteFile: 'note13.png', answer: 'G',       label: 'G3'       },
+        ],
+      },
+      {
+        id: 'baritone',
+        title: 'Baritone B♭4–G5',
+        clefLabel: 'Treble Clef · B♭ Major',
+        clefImg: 'treble-2.png',
+        icon: '🎺',
+        desc: 'Treble clef · B♭ Major · Notes B♭4 through G5',
+        totalQuestions: 6,
+        noteOptions: ['B♭', 'C', 'D', 'E♭', 'F', 'G'],
+        notePool: [
+          { noteFile: 'note10.png', answer: 'B♭', label: 'B♭4' },
+          { noteFile: 'note11.png', answer: 'C',       label: 'C5'       },
+          { noteFile: 'note12.png', answer: 'D',       label: 'D5'       },
+          { noteFile: 'note13.png', answer: 'E♭', label: 'E♭5' },
+          { noteFile: 'note14.png', answer: 'F',       label: 'F5'       },
+          { noteFile: 'note15.png', answer: 'G',       label: 'G5'       },
+        ],
+      },
+      {
+        id: 'tuba',
+        title: 'Tuba B♭1–G2',
+        clefLabel: 'Bass Clef · B♭ Major',
+        clefImg: 'bass-2.png',
+        icon: '🎺',
+        desc: 'Bass clef · B♭ Major · Notes B♭1 through G2',
+        totalQuestions: 6,
+        noteOptions: ['B♭', 'C', 'D', 'E♭', 'F', 'G'],
+        notePool: [
+          { noteFile: 'note1.png', answer: 'B♭', label: 'B♭1' },
+          { noteFile: 'note2.png', answer: 'C',       label: 'C2'       },
+          { noteFile: 'note3.png', answer: 'D',       label: 'D2'       },
+          { noteFile: 'note4.png', answer: 'E♭', label: 'E♭2' },
+          { noteFile: 'note5.png', answer: 'F',       label: 'F2'       },
+          { noteFile: 'note6.png', answer: 'G',       label: 'G2'       },
+        ],
+      },
+      {
+        id: 'mallets-high',
+        title: 'Mallet Percussion High B♭4–G5',
+        clefLabel: 'Treble Clef · B♭ Major',
+        clefImg: 'treble-2.png',
+        icon: '🥁',
+        desc: 'Treble clef · B♭ Major · Notes B♭4 through G5',
+        totalQuestions: 6,
+        noteOptions: ['B♭', 'C', 'D', 'E♭', 'F', 'G'],
+        notePool: [
+          { noteFile: 'note10.png', answer: 'B♭', label: 'B♭4' },
+          { noteFile: 'note11.png', answer: 'C',       label: 'C5'       },
+          { noteFile: 'note12.png', answer: 'D',       label: 'D5'       },
+          { noteFile: 'note13.png', answer: 'E♭', label: 'E♭5' },
+          { noteFile: 'note14.png', answer: 'F',       label: 'F5'       },
+          { noteFile: 'note15.png', answer: 'G',       label: 'G5'       },
+        ],
+      },
+      {
+        id: 'mallets-low',
+        title: 'Mallet Percussion Low B♭3–G4',
+        clefLabel: 'Treble Clef · B♭ Major',
+        clefImg: 'treble-2.png',
+        icon: '🥁',
+        desc: 'Treble clef · B♭ Major · Notes B♭3 through G4',
+        totalQuestions: 6,
+        noteOptions: ['B♭', 'C', 'D', 'E♭', 'F', 'G'],
+        notePool: [
+          { noteFile: 'note6.png',  answer: 'B♭', label: 'B♭3' },
+          { noteFile: 'note7.png',  answer: 'C',       label: 'C4'       },
+          { noteFile: 'note8.png',  answer: 'D',       label: 'D4'       },
+          { noteFile: 'note9.png',  answer: 'E♭', label: 'E♭4' },
+          { noteFile: 'note10.png', answer: 'F',       label: 'F4'       },
+          { noteFile: 'note11.png', answer: 'G',       label: 'G4'       },
+        ],
+      },
+    ],
+  },
+
+  // ── BAND Q3 ─────────────────────────────────────────────
+  {
+    id: 'band-q3-5th',
+    title: '5th Grade Band',
+    subtitle: 'Quarter 3',
+    icon: '🎺',
+    desc: '1 quiz · Flute · B♭/E♭ Major',
+    quizzes: [
+      {
+        id: 'flute',
+        title: 'Flute A♭4–A5',
+        clefLabel: 'Treble Clef · B♭/E♭ Major',
+        clefImg: 'treble-2.png',
+        icon: '🎵',
+        desc: 'Treble clef · B♭/E♭ Major · Notes A♭4 through A5',
+        totalQuestions: 10,
+        noteOptions: ['A♭', 'A', 'B♭', 'C', 'D', 'E♭', 'F', 'G'],
+        buildQuiz: function() {
+          // Notes with fixed key
+          var fixed = [
+            { noteFile: 'note9.png',  answer: 'A♭', label: 'A♭4', clefImg: 'treble-3.png', clefLabel: 'E♭ Major' },
+            { noteFile: 'note9.png',  answer: 'A',       label: 'A4',       clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+            { noteFile: 'note16.png', answer: 'A♭', label: 'A♭5', clefImg: 'treble-3.png', clefLabel: 'E♭ Major' },
+            { noteFile: 'note16.png', answer: 'A',       label: 'A5',       clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          ];
+          // Notes that can use either key (random per note)
+          var shared = [
+            { noteFile: 'note10.png', answer: 'B♭', label: 'B♭4' },
+            { noteFile: 'note11.png', answer: 'C',       label: 'C5'       },
+            { noteFile: 'note12.png', answer: 'D',       label: 'D5'       },
+            { noteFile: 'note13.png', answer: 'E♭', label: 'E♭5' },
+            { noteFile: 'note14.png', answer: 'F',       label: 'F5'       },
+            { noteFile: 'note15.png', answer: 'G',       label: 'G5'       },
+          ];
+          var keys = [
+            { img: 'treble-2.png', label: 'B♭ Major' },
+            { img: 'treble-3.png', label: 'E♭ Major' },
+          ];
+          // Assign random key to each shared note
+          var pool = fixed.concat(shared.map(function(n) {
+            var k = keys[Math.floor(Math.random() * 2)];
+            return Object.assign({}, n, { clefImg: k.img, clefLabel: k.label });
+          }));
+          // Shuffle
+          for (var i = pool.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var tmp = pool[i]; pool[i] = pool[j]; pool[j] = tmp;
+          }
+          return pool;
+        },
+      },
+      {
+        id: 'clarinet',
+        title: 'Clarinet B♭3–B4',
+        clefLabel: 'Treble Clef · C/F Major',
+        clefImg: 'treble0.png',
+        icon: '🎵',
+        desc: 'Treble clef · C/F Major · Notes B♭3 through B4',
+        totalQuestions: 10,
+        noteOptions: ['B♭', 'B', 'C', 'D', 'E', 'F', 'G', 'A'],
+        buildQuiz: function() {
+          var fixed = [
+            { noteFile: 'note3.png', answer: 'B♭', label: 'B♭3', clefImg: 'treble-1.png', clefLabel: 'F Major' },
+            { noteFile: 'note3.png', answer: 'B', label: 'B3', clefImg: 'treble0.png', clefLabel: 'C Major' },
+            { noteFile: 'note10.png', answer: 'B♭', label: 'B♭4', clefImg: 'treble-1.png', clefLabel: 'F Major' },
+            { noteFile: 'note10.png', answer: 'B', label: 'B4', clefImg: 'treble0.png', clefLabel: 'C Major' },
+          ];
+          var shared = [
+            { noteFile: 'note4.png', answer: 'C', label: 'C4' },
+            { noteFile: 'note5.png', answer: 'D', label: 'D4' },
+            { noteFile: 'note6.png', answer: 'E', label: 'E4' },
+            { noteFile: 'note7.png', answer: 'F', label: 'F4' },
+            { noteFile: 'note8.png', answer: 'G', label: 'G4' },
+            { noteFile: 'note9.png', answer: 'A', label: 'A4' },
+          ];
+          var keys = [
+            { img: 'treble-1.png', label: 'F Major' },
+            { img: 'treble0.png', label: 'C Major' },
+          ];
+          var pool = fixed.concat(shared.map(function(n) {
+            var k = keys[Math.floor(Math.random() * 2)];
+            return Object.assign({}, n, { clefImg: k.img, clefLabel: k.label });
+          }));
+          for (var i = pool.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var tmp = pool[i]; pool[i] = pool[j]; pool[j] = tmp;
+          }
+          return pool;
+        },
+      },
+      {
+        id: 'alto-sax',
+        title: 'Alto Sax F4–F#5',
+        clefLabel: 'Treble Clef · G/C Major',
+        clefImg: 'treble1.png',
+        icon: '🎵',
+        desc: 'Treble clef · G/C Major · Notes F4 through F#5',
+        totalQuestions: 10,
+        noteOptions: ['F', 'F#', 'G', 'A', 'B', 'C', 'D', 'E'],
+        buildQuiz: function() {
+          var fixed = [
+            { noteFile: 'note7.png', answer: 'F', label: 'F4', clefImg: 'treble0.png', clefLabel: 'C Major' },
+            { noteFile: 'note7.png', answer: 'F#', label: 'F#4', clefImg: 'treble1.png', clefLabel: 'G Major' },
+            { noteFile: 'note14.png', answer: 'F', label: 'F5', clefImg: 'treble0.png', clefLabel: 'C Major' },
+            { noteFile: 'note14.png', answer: 'F#', label: 'F#5', clefImg: 'treble1.png', clefLabel: 'G Major' },
+          ];
+          var shared = [
+            { noteFile: 'note8.png', answer: 'G', label: 'G4' },
+            { noteFile: 'note9.png', answer: 'A', label: 'A4' },
+            { noteFile: 'note10.png', answer: 'B', label: 'B4' },
+            { noteFile: 'note11.png', answer: 'C', label: 'C5' },
+            { noteFile: 'note12.png', answer: 'D', label: 'D5' },
+            { noteFile: 'note13.png', answer: 'E', label: 'E5' },
+          ];
+          var keys = [
+            { img: 'treble1.png', label: 'G Major' },
+            { img: 'treble0.png', label: 'C Major' },
+          ];
+          var pool = fixed.concat(shared.map(function(n) {
+            var k = keys[Math.floor(Math.random() * 2)];
+            return Object.assign({}, n, { clefImg: k.img, clefLabel: k.label });
+          }));
+          for (var i = pool.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var tmp = pool[i]; pool[i] = pool[j]; pool[j] = tmp;
+          }
+          return pool;
+        },
+      },
+      {
+        id: 'french-horn',
+        title: 'French Horn E♭4–E5',
+        clefLabel: 'Treble Clef · B♭/F Major',
+        clefImg: 'treble-2.png',
+        icon: '🎺',
+        desc: 'Treble clef · B♭/F Major · Notes E♭4 through E5',
+        totalQuestions: 10,
+        noteOptions: ['E♭', 'E', 'F', 'G', 'A', 'B♭', 'C', 'D'],
+        buildQuiz: function() {
+          var fixed = [
+            { noteFile: 'note6.png', answer: 'E♭', label: 'E♭4', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+            { noteFile: 'note6.png', answer: 'E', label: 'E4', clefImg: 'treble-1.png', clefLabel: 'F Major' },
+            { noteFile: 'note13.png', answer: 'E♭', label: 'E♭5', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+            { noteFile: 'note13.png', answer: 'E', label: 'E5', clefImg: 'treble-1.png', clefLabel: 'F Major' },
+          ];
+          var shared = [
+            { noteFile: 'note7.png', answer: 'F', label: 'F4' },
+            { noteFile: 'note8.png', answer: 'G', label: 'G4' },
+            { noteFile: 'note9.png', answer: 'A', label: 'A4' },
+            { noteFile: 'note10.png', answer: 'B♭', label: 'B♭4' },
+            { noteFile: 'note11.png', answer: 'C', label: 'C5' },
+            { noteFile: 'note12.png', answer: 'D', label: 'D5' },
+          ];
+          var keys = [
+            { img: 'treble-2.png', label: 'B♭ Major' },
+            { img: 'treble-1.png', label: 'F Major' },
+          ];
+          var pool = fixed.concat(shared.map(function(n) {
+            var k = keys[Math.floor(Math.random() * 2)];
+            return Object.assign({}, n, { clefImg: k.img, clefLabel: k.label });
+          }));
+          for (var i = pool.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var tmp = pool[i]; pool[i] = pool[j]; pool[j] = tmp;
+          }
+          return pool;
+        },
+      },
+      {
+        id: 'trumpet',
+        title: 'Trumpet B♭3–B4',
+        clefLabel: 'Treble Clef · C/F Major',
+        clefImg: 'treble0.png',
+        icon: '🎺',
+        desc: 'Treble clef · C/F Major · Notes B♭3 through B4',
+        totalQuestions: 10,
+        noteOptions: ['B♭', 'B', 'C', 'D', 'E', 'F', 'G', 'A'],
+        buildQuiz: function() {
+          var fixed = [
+            { noteFile: 'note3.png', answer: 'B♭', label: 'B♭3', clefImg: 'treble-1.png', clefLabel: 'F Major' },
+            { noteFile: 'note3.png', answer: 'B', label: 'B3', clefImg: 'treble0.png', clefLabel: 'C Major' },
+            { noteFile: 'note10.png', answer: 'B♭', label: 'B♭4', clefImg: 'treble-1.png', clefLabel: 'F Major' },
+            { noteFile: 'note10.png', answer: 'B', label: 'B4', clefImg: 'treble0.png', clefLabel: 'C Major' },
+          ];
+          var shared = [
+            { noteFile: 'note4.png', answer: 'C', label: 'C4' },
+            { noteFile: 'note5.png', answer: 'D', label: 'D4' },
+            { noteFile: 'note6.png', answer: 'E', label: 'E4' },
+            { noteFile: 'note7.png', answer: 'F', label: 'F4' },
+            { noteFile: 'note8.png', answer: 'G', label: 'G4' },
+            { noteFile: 'note9.png', answer: 'A', label: 'A4' },
+          ];
+          var keys = [
+            { img: 'treble-1.png', label: 'F Major' },
+            { img: 'treble0.png', label: 'C Major' },
+          ];
+          var pool = fixed.concat(shared.map(function(n) {
+            var k = keys[Math.floor(Math.random() * 2)];
+            return Object.assign({}, n, { clefImg: k.img, clefLabel: k.label });
+          }));
+          for (var i = pool.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var tmp = pool[i]; pool[i] = pool[j]; pool[j] = tmp;
+          }
+          return pool;
+        },
+      },
+      {
+        id: 'trombone',
+        title: 'Trombone A♭2–A3',
+        clefLabel: 'Bass Clef · B♭/E♭ Major',
+        clefImg: 'bass-2.png',
+        icon: '🎺',
+        desc: 'Bass clef · B♭/E♭ Major · Notes A♭2 through A3',
+        totalQuestions: 10,
+        noteOptions: ['A♭', 'A', 'B♭', 'C', 'D', 'E♭', 'F', 'G'],
+        buildQuiz: function() {
+          var fixed = [
+            { noteFile: 'note7.png', answer: 'A♭', label: 'A♭2', clefImg: 'bass-3.png', clefLabel: 'E♭ Major' },
+            { noteFile: 'note7.png', answer: 'A', label: 'A2', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+            { noteFile: 'note14.png', answer: 'A♭', label: 'A♭3', clefImg: 'bass-3.png', clefLabel: 'E♭ Major' },
+            { noteFile: 'note14.png', answer: 'A', label: 'A3', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+          ];
+          var shared = [
+            { noteFile: 'note8.png', answer: 'B♭', label: 'B♭2' },
+            { noteFile: 'note9.png', answer: 'C', label: 'C3' },
+            { noteFile: 'note10.png', answer: 'D', label: 'D3' },
+            { noteFile: 'note11.png', answer: 'E♭', label: 'E♭3' },
+            { noteFile: 'note12.png', answer: 'F', label: 'F3' },
+            { noteFile: 'note13.png', answer: 'G', label: 'G3' },
+          ];
+          var keys = [
+            { img: 'bass-2.png', label: 'B♭ Major' },
+            { img: 'bass-3.png', label: 'E♭ Major' },
+          ];
+          var pool = fixed.concat(shared.map(function(n) {
+            var k = keys[Math.floor(Math.random() * 2)];
+            return Object.assign({}, n, { clefImg: k.img, clefLabel: k.label });
+          }));
+          for (var i = pool.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var tmp = pool[i]; pool[i] = pool[j]; pool[j] = tmp;
+          }
+          return pool;
+        },
+      },
+      {
+        id: 'baritone',
+        title: 'Baritone A♭4–A5',
+        clefLabel: 'Treble Clef · B♭/E♭ Major',
+        clefImg: 'treble-2.png',
+        icon: '🎺',
+        desc: 'Treble clef · B♭/E♭ Major · Notes A♭4 through A5',
+        totalQuestions: 10,
+        noteOptions: ['A♭', 'A', 'B♭', 'C', 'D', 'E♭', 'F', 'G'],
+        buildQuiz: function() {
+          var fixed = [
+            { noteFile: 'note9.png', answer: 'A♭', label: 'A♭4', clefImg: 'treble-3.png', clefLabel: 'E♭ Major' },
+            { noteFile: 'note9.png', answer: 'A', label: 'A4', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+            { noteFile: 'note16.png', answer: 'A♭', label: 'A♭5', clefImg: 'treble-3.png', clefLabel: 'E♭ Major' },
+            { noteFile: 'note16.png', answer: 'A', label: 'A5', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          ];
+          var shared = [
+            { noteFile: 'note10.png', answer: 'B♭', label: 'B♭4' },
+            { noteFile: 'note11.png', answer: 'C', label: 'C5' },
+            { noteFile: 'note12.png', answer: 'D', label: 'D5' },
+            { noteFile: 'note13.png', answer: 'E♭', label: 'E♭5' },
+            { noteFile: 'note14.png', answer: 'F', label: 'F5' },
+            { noteFile: 'note15.png', answer: 'G', label: 'G5' },
+          ];
+          var keys = [
+            { img: 'treble-3.png', label: 'E♭ Major' },
+            { img: 'treble-2.png', label: 'B♭ Major' },
+          ];
+          var pool = fixed.concat(shared.map(function(n) {
+            var k = keys[Math.floor(Math.random() * 2)];
+            return Object.assign({}, n, { clefImg: k.img, clefLabel: k.label });
+          }));
+          for (var i = pool.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var tmp = pool[i]; pool[i] = pool[j]; pool[j] = tmp;
+          }
+          return pool;
+        },
+      },
+      {
+        id: 'tuba',
+        title: 'Tuba A♭1–A2',
+        clefLabel: 'Bass Clef · B♭/E♭ Major',
+        clefImg: 'bass-2.png',
+        icon: '🎺',
+        desc: 'Bass clef · B♭/E♭ Major · Notes A♭1 through A2',
+        totalQuestions: 10,
+        noteOptions: ['A♭','A','B♭','C','D','E♭','F','G'],
+        buildQuiz: function() {
+          var fixed = [
+            { noteFile: 'note0.png', answer: 'A♭', label: 'A♭1', clefImg: 'bass-3.png', clefLabel: 'E♭ Major' },
+            { noteFile: 'note0.png', answer: 'A',       label: 'A1',       clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+            { noteFile: 'note7.png', answer: 'A♭', label: 'A♭2', clefImg: 'bass-3.png', clefLabel: 'E♭ Major' },
+            { noteFile: 'note7.png', answer: 'A',       label: 'A2',       clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+          ];
+          var shared = [
+            { noteFile: 'note1.png', answer: 'B♭', label: 'B♭1' },
+            { noteFile: 'note2.png', answer: 'C',       label: 'C2'       },
+            { noteFile: 'note3.png', answer: 'D',       label: 'D2'       },
+            { noteFile: 'note4.png', answer: 'E♭', label: 'E♭2' },
+            { noteFile: 'note5.png', answer: 'F',       label: 'F2'       },
+            { noteFile: 'note6.png', answer: 'G',       label: 'G2'       },
+          ];
+          var keys = [
+            { img: 'bass-2.png', label: 'B♭ Major' },
+            { img: 'bass-3.png', label: 'E♭ Major' },
+          ];
+          var pool = fixed.concat(shared.map(function(n) {
+            var k = keys[Math.floor(Math.random() * 2)];
+            return Object.assign({}, n, { clefImg: k.img, clefLabel: k.label });
+          }));
+          for (var i = pool.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var tmp = pool[i]; pool[i] = pool[j]; pool[j] = tmp;
+          }
+          return pool;
+        },
+      },
+      {
+        id: 'mallets-high',
+        title: 'Mallet Percussion High A♭4–A5',
+        clefLabel: 'Treble Clef · B♭/E♭ Major',
+        clefImg: 'treble-2.png',
+        icon: '🥁',
+        desc: 'Treble clef · B♭/E♭ Major · Notes A♭4 through A5',
+        totalQuestions: 10,
+        noteOptions: ['A♭','A','B♭','C','D','E♭','F','G'],
+        buildQuiz: function() {
+          var fixed = [
+            { noteFile: 'note9.png', answer: 'A♭', label: 'A♭4', clefImg: 'treble-3.png', clefLabel: 'E♭ Major' },
+            { noteFile: 'note9.png', answer: 'A', label: 'A4', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+            { noteFile: 'note16.png', answer: 'A♭', label: 'A♭5', clefImg: 'treble-3.png', clefLabel: 'E♭ Major' },
+            { noteFile: 'note16.png', answer: 'A', label: 'A5', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          ];
+          var shared = [
+            { noteFile: 'note10.png', answer: 'B♭', label: 'B♭4' },
+            { noteFile: 'note11.png', answer: 'C', label: 'C5' },
+            { noteFile: 'note12.png', answer: 'D', label: 'D5' },
+            { noteFile: 'note13.png', answer: 'E♭', label: 'E♭5' },
+            { noteFile: 'note14.png', answer: 'F', label: 'F5' },
+            { noteFile: 'note15.png', answer: 'G', label: 'G5' },
+          ];
+          var keys = [
+            { img: 'treble-2.png', label: 'B♭ Major' },
+            { img: 'treble-3.png', label: 'E♭ Major' },
+          ];
+          var pool = fixed.concat(shared.map(function(n) {
+            var k = keys[Math.floor(Math.random() * 2)];
+            return Object.assign({}, n, { clefImg: k.img, clefLabel: k.label });
+          }));
+          for (var i = pool.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var tmp = pool[i]; pool[i] = pool[j]; pool[j] = tmp;
+          }
+          return pool;
+        },
+      },
+      {
+        id: 'mallets-low',
+        title: 'Mallet Percussion Low A♭3–A4',
+        clefLabel: 'Treble Clef · B♭/E♭ Major',
+        clefImg: 'treble-2.png',
+        icon: '🥁',
+        desc: 'Treble clef · B♭/E♭ Major · Notes A♭3 through A4',
+        totalQuestions: 10,
+        noteOptions: ['A♭','A','B♭','C','D','E♭','F','G'],
+        buildQuiz: function() {
+          var fixed = [
+            { noteFile: 'note2.png', answer: 'A♭', label: 'A♭3', clefImg: 'treble-3.png', clefLabel: 'E♭ Major' },
+            { noteFile: 'note2.png', answer: 'A', label: 'A3', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+            { noteFile: 'note9.png', answer: 'A♭', label: 'A♭4', clefImg: 'treble-3.png', clefLabel: 'E♭ Major' },
+            { noteFile: 'note9.png', answer: 'A', label: 'A4', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          ];
+          var shared = [
+            { noteFile: 'note3.png', answer: 'B♭', label: 'B♭3' },
+            { noteFile: 'note4.png', answer: 'C', label: 'C4' },
+            { noteFile: 'note5.png', answer: 'D', label: 'D4' },
+            { noteFile: 'note6.png', answer: 'E♭', label: 'E♭4' },
+            { noteFile: 'note7.png', answer: 'F', label: 'F4' },
+            { noteFile: 'note8.png', answer: 'G', label: 'G4' },
+          ];
+          var keys = [
+            { img: 'treble-2.png', label: 'B♭ Major' },
+            { img: 'treble-3.png', label: 'E♭ Major' },
+          ];
+          var pool = fixed.concat(shared.map(function(n) {
+            var k = keys[Math.floor(Math.random() * 2)];
+            return Object.assign({}, n, { clefImg: k.img, clefLabel: k.label });
+          }));
+          for (var i = pool.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var tmp = pool[i]; pool[i] = pool[j]; pool[j] = tmp;
+          }
+          return pool;
+        },
+      },
+    ],
+  },
+
 ];
 
-// ── NAVIGATION STRUCTURE ─────────────────────────────────────────
+// ── NAVIGATION STRUCTURE ───────────────────────────────────────────
 const ENSEMBLES = [
   { id: 'orchestra', title: 'Orchestra', colorClass: 'orch', icon: '🎻' },
   { id: 'band',      title: 'Band',      colorClass: 'band', icon: '🎺' },
+  { id: 'chorus',    title: 'Chorus',    colorClass: 'chor', icon: '🎤' },
 ];
 
 const GRADES = ['5th', '6th', '7th', '8th'];
 
 const INSTRUMENTS = [
-  { id: 'violin', title: 'Violin', icon: '🎻', colorClass: 'violin',
+  // Orchestra
+  { id: 'violin',       title: 'Violin',       icon: '🎻', colorClass: 'violin', ensembleId: 'orchestra',
     quizIds: ['violin', 'violin-fingering'] },
-  { id: 'viola',  title: 'Viola',  icon: '🎻', colorClass: 'viola',
+  { id: 'viola',        title: 'Viola',        icon: '🎻', colorClass: 'viola',  ensembleId: 'orchestra',
     quizIds: ['viola', 'viola-fingering'] },
-  { id: 'cello',  title: 'Cello',  icon: '🎻', colorClass: 'cello',
+  { id: 'cello',        title: 'Cello',        icon: '🎻', colorClass: 'cello',  ensembleId: 'orchestra',
     quizIds: ['cello', 'cello-fingering'] },
-  { id: 'bass',   title: 'Bass',   icon: '🎻', colorClass: 'bass',
+  { id: 'bass',         title: 'Bass',         icon: '🎻', colorClass: 'bass',   ensembleId: 'orchestra',
     quizIds: ['bass', 'bass-fingering'] },
+  // Band
+  { id: 'flute',        title: 'Flute',        icon: '🎵', colorClass: 'band-inst', ensembleId: 'band', quizIds: ['flute'] },
+  { id: 'clarinet',     title: 'Clarinet',     icon: '🎵', colorClass: 'band-inst', ensembleId: 'band', quizIds: ['clarinet'] },
+  { id: 'alto-sax',     title: 'Alto Sax',     icon: '🎵', colorClass: 'band-inst', ensembleId: 'band', quizIds: ['alto-sax'] },
+  { id: 'french-horn',  title: 'French Horn',  icon: '🎺', colorClass: 'band-inst', ensembleId: 'band', quizIds: ['french-horn'] },
+  { id: 'trumpet',      title: 'Trumpet',      icon: '🎺', colorClass: 'band-inst', ensembleId: 'band', quizIds: ['trumpet'] },
+  { id: 'trombone',     title: 'Trombone',     icon: '🎺', colorClass: 'band-inst', ensembleId: 'band', quizIds: ['trombone'] },
+  { id: 'baritone',     title: 'Baritone',     icon: '🎺', colorClass: 'band-inst', ensembleId: 'band', quizIds: ['baritone'] },
+  { id: 'tuba',         title: 'Tuba',         icon: '🎺', colorClass: 'band-inst', ensembleId: 'band', quizIds: ['tuba'] },
+  { id: 'mallets-high', title: 'Mallet Percussion High', icon: '🥁', colorClass: 'band-inst', ensembleId: 'band', quizIds: ['mallets-high'] },
+  { id: 'mallets-low',  title: 'Mallet Percussion Low',  icon: '🥁', colorClass: 'band-inst', ensembleId: 'band', quizIds: ['mallets-low'] },
+  // Chorus
+  { id: 'chorus-voice', title: 'Voice', icon: '🎤', colorClass: 'chor-inst', ensembleId: 'chorus', quizIds: ['chorus-voice'] },
 ];
 
 // Maps ensembleId|grade|quarter → folderId
@@ -1532,6 +2379,10 @@ const FOLDER_MAP = {
   'orchestra|5th|q2': 'q2-5th',
   'orchestra|5th|q3': 'q3-5th',
   'orchestra|5th|q4': 'q4-5th',
+  'band|5th|q1':      'band-q1-5th',
+  'band|5th|q2':      'band-q2-5th',
+  'band|5th|q3':      'band-q3-5th',
+  'chorus|5th|q1':    'chorus-q1-5th',
 };
 
 function quizKey(ensembleId, grade, quarter) { return ensembleId + '|' + grade + '|' + quarter; }
@@ -1634,12 +2485,12 @@ function renderGrade(ensembleId) {
       <div class="menu-intro">Choose a Grade</div>
       <div class="folder-cards">
         ${GRADES.map(grade => {
-          const hasData = ensembleId === 'orchestra' && grade === '5th';
+          const hasData = (ensembleId === 'orchestra' && grade === '5th') || (ensembleId === 'band' && grade === '5th') || (ensembleId === 'chorus' && grade === '5th');
           return `<div class="folder-card ${cc}" onclick="renderInstrument('${ensembleId}', '${grade}')">
             <div class="folder-icon" style="font-size:1.1rem;font-family:'DM Sans',sans-serif;font-weight:700;">${grade}</div>
             <div class="folder-info">
               <div class="folder-title">${grade} Grade</div>
-              <div class="folder-desc">${hasData ? '4 instruments · Quarters 1–4' : 'Coming soon'}</div>
+              <div class="folder-desc">${!hasData ? 'Coming soon' : ensembleId === 'orchestra' ? '4 instruments · Quarters 1–4' : ensembleId === 'band' ? '10 instruments · Quarters 1–3' : '1 quiz · Treble Clef · C Major'}</div>
             </div>
             <div class="folder-arrow">›</div>
           </div>`;
@@ -1657,7 +2508,7 @@ function renderInstrument(ensembleId, grade) {
   activeInstrument = null;
   activeFolder     = null;
   activeQuiz       = null;
-  const hasData    = ensembleId === 'orchestra' && grade === '5th';
+  const hasData    = (ensembleId === 'orchestra' && grade === '5th') || (ensembleId === 'band' && grade === '5th') || (ensembleId === 'chorus' && grade === '5th');
   const cc         = activeEnsemble.colorClass;
   document.getElementById('app').innerHTML = `
     <div class="header">
@@ -1673,7 +2524,7 @@ function renderInstrument(ensembleId, grade) {
       <div class="menu-intro">Choose an Instrument</div>
       ${!hasData ? `<div style="text-align:center;padding:32px 0;color:var(--muted);font-size:0.95rem;">📋 Quizzes coming soon.</div>` : `
       <div class="quiz-cards">
-        ${INSTRUMENTS.map(inst => {
+        ${INSTRUMENTS.filter(inst => inst.ensembleId === ensembleId).map(inst => {
           const ic = inst.colorClass;
           return `<div class="quiz-card ${ic}" onclick="renderQuarters('${ensembleId}', '${grade}', '${inst.id}')">
             <div class="quiz-card-icon">${inst.icon}</div>
@@ -1766,7 +2617,7 @@ function renderQuarters(ensembleId, grade, instrumentId) {
 function launchQuiz(folderId, quizId) {
   activeFolder = getFolder(folderId);
   if (activeEnsemble && activeGrade && activeInstrument) {
-    const qm   = folderId.match(/^q([0-9])/);
+    const qm   = folderId.match(/q([0-9])/);
     const qnum = qm ? 'q' + qm[1] : folderId;
     const type = quizId.includes('fingering') ? 'finger' : 'notes';
     setHash(activeEnsemble.id + '/' + activeGrade + '/' + activeInstrument.id + '/' + qnum + '/' + type);
@@ -1788,77 +2639,107 @@ function startQuiz(folderId, quizId) {
 }
 
 function buildAnswerButtons(opts) {
-  // For 9-option grids, pair C♮/C# and F♮/F# into shared cells
-  if (opts.length !== 9) {
-    return opts.map(n =>
-      `<button class="answer-btn" data-value="${n}" onclick="selectAnswer('${n}', this)">${displayNote(n)}</button>`
-    ).join('');
-  }
-  // Build 7 visual slots: A, B, [C♮+C#], D, E, [F♮+F#], G
-  const singles = opts.filter(n => n !== 'C' && n !== 'C#' && n !== 'F' && n !== 'F#');
-  // singles = A, B, D, E, G — inject pairs at the right positions
-  // Order: A B [C♮/C#] D E [F♮/F#] G
-  const slots = ['A', 'B', '__CF__', 'D', 'E', '__FF__', 'G'];
-  return slots.map(slot => {
-    if (slot === '__CF__') {
-      const hasCNat = opts.includes('C'), hasCsh = opts.includes('C#');
-      return `<div class="btn-pair">
-        ${hasCNat ? `<button class="answer-btn" data-value="C" onclick="selectAnswer('C', this)">${displayNote('C')}</button>` : ''}
-        ${hasCsh  ? `<button class="answer-btn" data-value="C#" onclick="selectAnswer('C#', this)">C#</button>` : ''}
-      </div>`;
+  // Detect pairs: any letter appearing as both flat+natural or natural+sharp
+  // renders as a half-size btn-pair. Works for any option count.
+  const NOTE_ORDER = ['A♭','A','B♭','B','C','C#','D','E♭','E','F','F#','G'];
+
+  // Group variants by letter
+  const letterMap = {};
+  opts.forEach(function(n) {
+    var letter = n.replace(/[♭#]/g, '');
+    if (!letterMap[letter]) letterMap[letter] = [];
+    letterMap[letter].push(n);
+  });
+
+  // Build ordered slots, collapsing pairs into one slot
+  var seen = {};
+  var slots = [];
+  NOTE_ORDER.forEach(function(n) {
+    if (!opts.includes(n)) return;
+    var letter = n.replace(/[♭#]/g, '');
+    if (seen[letter]) return;
+    seen[letter] = true;
+    slots.push(letterMap[letter]);
+  });
+
+  return slots.map(function(variants) {
+    if (variants.length === 1) {
+      var n = variants[0];
+      return '<button class="answer-btn" data-value="' + n + '" onclick="selectAnswer(\'' + n + '\', this)">' + displayNote(n) + '</button>';
     }
-    if (slot === '__FF__') {
-      const hasFNat = opts.includes('F'), hasFsh = opts.includes('F#');
-      return `<div class="btn-pair">
-        ${hasFNat ? `<button class="answer-btn" data-value="F" onclick="selectAnswer('F', this)">${displayNote('F')}</button>` : ''}
-        ${hasFsh  ? `<button class="answer-btn" data-value="F#" onclick="selectAnswer('F#', this)">F#</button>` : ''}
-      </div>`;
-    }
-    return `<button class="answer-btn" data-value="${slot}" onclick="selectAnswer('${slot}', this)">${slot}</button>`;
+    // Sort: flat first, then natural, then sharp
+    var sorted = variants.slice().sort(function(a, b) {
+      if (a.includes('♭')) return -1;
+      if (b.includes('♭')) return 1;
+      if (b.includes('#')) return -1;
+      return 1;
+    });
+    return '<div class="btn-pair">' + sorted.map(function(n) {
+      return '<button class="answer-btn" data-value="' + n + '" onclick="selectAnswer(\'' + n + '\', this)">' + displayNote(n) + '</button>';
+    }).join('') + '</div>';
   }).join('');
 }
 
 function renderQuestion() {
-  const q = questions[currentQ];
+  const q        = questions[currentQ];
   const progress = (currentQ / totalQ()) * 100;
-  const isLast = currentQ === totalQ() - 1;
-
-  // For Q3 multi-key quizzes, each question carries its own key/clef image & answer
   const clefImg   = q.clefImg   || activeQuiz.clefImg;
   const clefLabel = q.clefLabel || activeQuiz.clefLabel;
   const opts      = activeQuiz.noteOptions;
   const gridClass = opts.length === 9 ? 'answers-grid opts-9' : 'answers-grid opts-7';
 
-  document.getElementById('app').innerHTML = `
-    <div class="header">
-      <h1>
-        <span>${activeFolder.title} – ${activeFolder.subtitle}</span>
-        ${activeQuiz.title}
-      </h1>
-      <div class="header-right">
-        <span class="key-badge">${clefLabel}</span>
-        <button class="back-btn" onclick="renderQuarters(activeEnsemble.id, activeGrade, activeInstrument.id)">✕ Exit</button>
+  // First question: build full HTML
+  if (currentQ === 0 || !document.getElementById('staff-clef')) {
+    document.getElementById('app').innerHTML = `
+      <div class="header">
+        <h1>
+          <span>${activeFolder.title} – ${activeFolder.subtitle}</span>
+          ${activeQuiz.title}
+        </h1>
+        <div class="header-right">
+          <span class="key-badge" id="key-badge">${clefLabel}</span>
+          <button class="back-btn" onclick="renderQuarters(activeEnsemble.id, activeGrade, activeInstrument.id)">✕ Exit</button>
+        </div>
       </div>
-    </div>
-    <div class="progress-bar-wrap">
-      <div class="progress-bar" style="width:${progress}%"></div>
-    </div>
-    <div class="body">
-      <div class="question-label">Question ${currentQ + 1} of ${totalQ()}</div>
-      <div class="question-text">${activeQuiz.questionText || 'What note is shown on the staff?'}</div>
-
-      <div class="staff-container">
-        <img src="${clefImg}" class="staff-img" alt="Clef" />
-        <img src="${q.noteFile}" class="staff-img" alt="Note on staff" />
+      <div class="progress-bar-wrap">
+        <div class="progress-bar" id="progress-bar" style="width:${progress}%"></div>
       </div>
+      <div class="body">
+        <div class="question-label" id="question-label">Question ${currentQ + 1} of ${totalQ()}</div>
+        <div class="question-text">${activeQuiz.questionText || 'What note is shown on the staff?'}</div>
 
-      <div class="${gridClass}">
-        ${buildAnswerButtons(opts)}
+        <div class="staff-container">
+          <img src="${clefImg}" id="staff-clef" class="staff-img" alt="Clef" />
+          <img src="${q.noteFile}" id="staff-note" class="staff-img" alt="Note on staff" />
+        </div>
+
+        <div class="${gridClass}" id="answers-grid">
+          ${buildAnswerButtons(opts)}
+        </div>
+
+        <div class="feedback" id="feedback"></div>
       </div>
+    `;
+    return;
+  }
 
-      <div class="feedback" id="feedback"></div>
-    </div>
-  `;
+  // Subsequent questions: update only what changes, leaving clef img in place
+  document.getElementById('progress-bar').style.width  = progress + '%';
+  document.getElementById('question-label').textContent = 'Question ' + (currentQ + 1) + ' of ' + totalQ();
+  document.getElementById('key-badge').textContent      = clefLabel;
+  document.getElementById('feedback').textContent       = '';
+  document.getElementById('feedback').className         = 'feedback';
+
+  // Only update clef src if it actually changed (prevents flicker on same-key questions)
+  const clefEl = document.getElementById('staff-clef');
+  if (clefEl.src !== clefImg && !clefEl.src.endsWith('/' + clefImg)) {
+    clefEl.src = clefImg;
+  }
+  document.getElementById('staff-note').src = q.noteFile;
+
+  const grid = document.getElementById('answers-grid');
+  grid.className = gridClass;
+  grid.innerHTML = buildAnswerButtons(opts);
 }
 
 function selectAnswer(chosen, btn) {
@@ -1916,17 +2797,17 @@ function noteWithKey(label, keyLabel) {
   if (!match) return label;
   const noteLetter = match[1];
   const octave     = match[2];
-  if (keyEntry.sharps.includes(noteLetter)) {
-    return noteLetter + '#' + octave;
-  }
+  if (keyEntry.sharps.includes(noteLetter)) return noteLetter + '#' + octave;
+  if (keyEntry.flats.includes(noteLetter))  return noteLetter + '♭' + octave;
   return label;
 }
 
 function submitScore() {
-  const school    = document.getElementById('school-select').value.trim();
-  const firstName = document.getElementById('first-name').value.trim();
-  const lastName  = document.getElementById('last-name').value.trim();
-  const studentNum = document.getElementById('student-num').value.trim();
+  const saved = loadStudentInfo();
+  const school     = saved ? saved.school     : document.getElementById('school-select').value.trim();
+  const firstName  = saved ? saved.firstName  : document.getElementById('first-name').value.trim();
+  const lastName   = saved ? saved.lastName   : document.getElementById('last-name').value.trim();
+  const studentNum = saved ? saved.studentNum : document.getElementById('student-num').value.trim();
   const statusEl  = document.getElementById('submit-status');
   const btn       = document.getElementById('submit-btn');
 
@@ -1967,6 +2848,7 @@ function submitScore() {
   .then(r => r.json())
   .then(data => {
     if (data.result === 'success') {
+      saveStudentInfo(school, firstName, lastName, studentNum);
       statusEl.textContent = '✓ Score submitted successfully!';
       statusEl.className = 'submit-status success';
       btn.textContent = '✓ Submitted';
@@ -1995,6 +2877,13 @@ function renderScore() {
       <div class="progress-bar" style="width:100%"></div>
     </div>
     <div class="score-screen">
+      <div class="submit-panel" id="submit-panel">
+        <div class="submit-panel-title">Submit Your Score</div>
+        <div id="student-form-area"></div>
+        <div class="submit-status" id="submit-status"></div>
+        <button class="submit-btn" id="submit-btn" onclick="submitScore()" disabled>📝 Submit Score to Teacher</button>
+      </div>
+
       <div class="score-circle">
         <div class="score-num">${score}</div>
         <div class="score-denom">out of ${totalQ()}</div>
@@ -2022,42 +2911,6 @@ function renderScore() {
         `).join('')}
       </div>
 
-      <div class="submit-panel">
-        <div class="submit-panel-title">Submit Your Score</div>
-        <div class="submit-field">
-          <label for="school-select">School</label>
-          <select id="school-select" onchange="checkSubmitReady()">
-            <option value="">— Select your school —</option>
-            <option value="Bala Cynwyd">Bala Cynwyd</option>
-            <option value="Black Rock">Black Rock</option>
-            <option value="Welsh Valley">Welsh Valley</option>
-          </select>
-        </div>
-        <div style="display:flex;gap:10px;">
-          <div class="submit-field" style="flex:1">
-            <label for="first-name">First Name</label>
-            <input type="text" id="first-name" maxlength="50" placeholder="First name" oninput="checkSubmitReady()" />
-          </div>
-          <div class="submit-field" style="flex:1">
-            <label for="last-name">Last Name</label>
-            <input type="text" id="last-name" maxlength="50" placeholder="Last name" oninput="checkSubmitReady()" />
-          </div>
-        </div>
-        <div class="submit-field">
-          <label for="student-num">Email</label>
-          <div style="display:flex;align-items:center;gap:0;font-size:1rem;">
-            <span style="white-space:nowrap;padding:8px 6px 8px 10px;background:#f0f0f0;border:1.5px solid #ccc;border-right:none;border-radius:6px 0 0 6px;color:#555;">s0</span>
-            <input type="text" id="student-num" inputmode="numeric" maxlength="5"
-              placeholder="00000"
-              oninput="checkSubmitReady()"
-              style="width:80px;border-radius:0;border-left:none;border-right:none;text-align:center;font-size:1rem;" />
-            <span style="white-space:nowrap;padding:8px 10px 8px 6px;background:#f0f0f0;border:1.5px solid #ccc;border-left:none;border-radius:0 6px 6px 0;color:#555;">@students.lmsd.org</span>
-          </div>
-        </div>
-        <div class="submit-status" id="submit-status"></div>
-        <button class="submit-btn" id="submit-btn" onclick="submitScore()" disabled>📝 Submit Score to Teacher</button>
-      </div>
-
       <div class="score-btn-row">
         <button class="replay-btn" onclick="launchQuiz('${activeFolder.id}', '${activeQuiz.id}')">Try Again</button>
         <button class="menu-btn"   onclick="renderQuarters(activeEnsemble.id, activeGrade, activeInstrument.id)">← Quiz List</button>
@@ -2065,11 +2918,87 @@ function renderScore() {
     </div>
   `;
 
-  // Enforce numbers-only, max 5 digits on student number field
-  document.getElementById('student-num').addEventListener('input', function() {
-    this.value = this.value.replace(/[^0-9]/g, '').slice(0, 5);
-    checkSubmitReady();
-  });
+  // Populate the student form area based on localStorage
+  const saved = loadStudentInfo();
+  const formArea = document.getElementById('student-form-area');
+
+  if (saved) {
+    // Show saved student banner — no form fields needed
+    formArea.innerHTML = `
+      <div class="saved-student">
+        <div>
+          <div class="saved-student-name">${saved.firstName} ${saved.lastName}</div>
+          <div class="saved-student-sub">${saved.school} &nbsp;·&nbsp; s0${saved.studentNum}@students.lmsd.org</div>
+        </div>
+        <button class="not-you-btn" onclick="clearStudentInfo()">Not you?</button>
+      </div>`;
+    // Submit button enabled immediately since all info is known
+    const btn = document.getElementById('submit-btn');
+    if (btn) btn.disabled = false;
+  } else {
+    // Show full form
+    formArea.innerHTML = `
+      <div class="submit-field">
+        <label for="school-select">School</label>
+        <select id="school-select" onchange="checkSubmitReady()">
+          <option value="">— Select your school —</option>
+          <option value="Bala Cynwyd">Bala Cynwyd</option>
+          <option value="Black Rock">Black Rock</option>
+          <option value="Welsh Valley">Welsh Valley</option>
+        </select>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <div class="submit-field" style="flex:1">
+          <label for="first-name">First Name</label>
+          <input type="text" id="first-name" maxlength="50" placeholder="First name" oninput="checkSubmitReady()" />
+        </div>
+        <div class="submit-field" style="flex:1">
+          <label for="last-name">Last Name</label>
+          <input type="text" id="last-name" maxlength="50" placeholder="Last name" oninput="checkSubmitReady()" />
+        </div>
+      </div>
+      <div class="submit-field">
+        <label for="student-num">Email</label>
+        <div style="display:flex;align-items:center;gap:0;font-size:1rem;">
+          <span style="white-space:nowrap;padding:8px 6px 8px 10px;background:#f0f0f0;border:1.5px solid #ccc;border-right:none;border-radius:6px 0 0 6px;color:#555;">s0</span>
+          <input type="text" id="student-num" inputmode="numeric" maxlength="5"
+            placeholder="00000" oninput="checkSubmitReady()"
+            style="width:80px;border-radius:0;border-left:none;border-right:none;text-align:center;font-size:1rem;" />
+          <span style="white-space:nowrap;padding:8px 10px 8px 6px;background:#f0f0f0;border:1.5px solid #ccc;border-left:none;border-radius:0 6px 6px 0;color:#555;">@students.lmsd.org</span>
+        </div>
+      </div>`;
+
+    // Enforce numbers-only, max 5 digits
+    const numField = document.getElementById('student-num');
+    if (numField) {
+      numField.addEventListener('input', function() {
+        this.value = this.value.replace(/[^0-9]/g, '').slice(0, 5);
+        checkSubmitReady();
+      });
+    }
+  }
+}
+
+// ── STUDENT INFO PERSISTENCE ─────────────────────────────────────
+function loadStudentInfo() {
+  try {
+    const raw = localStorage.getItem('lmsd_student');
+    return raw ? JSON.parse(raw) : null;
+  } catch(e) { return null; }
+}
+
+function saveStudentInfo(school, firstName, lastName, studentNum) {
+  try {
+    localStorage.setItem('lmsd_student', JSON.stringify(
+      { school, firstName, lastName, studentNum }
+    ));
+  } catch(e) {}
+}
+
+function clearStudentInfo() {
+  try { localStorage.removeItem('lmsd_student'); } catch(e) {}
+  // Re-render score screen so the full form appears
+  renderScore();
 }
 
 function checkSubmitReady() {
