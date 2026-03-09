@@ -415,6 +415,80 @@ function applyKey(noteName, keyId) {
   return noteName;
 }
 
+// ── Q3 NOTE QUIZ FIXED POOLS (14 questions each, one per unique answer) ──────
+const Q3_TREBLE_POOL = [
+  { noteFile: 'note1.png', answer: 'G', label: 'G3', clefImg: 'treble0.png', clefLabel: 'C Major' },
+  { noteFile: 'note2.png', answer: 'A', label: 'A3', clefImg: 'treble0.png', clefLabel: 'C Major' },
+  { noteFile: 'note3.png', answer: 'B', label: 'B3', clefImg: 'treble0.png', clefLabel: 'C Major' },
+  { noteFile: 'note4.png', answer: 'C', label: 'C4', clefImg: 'treble0.png', clefLabel: 'C Major' },
+  { noteFile: 'note4.png', answer: 'C#', label: 'C4', clefImg: 'treble2.png', clefLabel: 'D Major' },
+  { noteFile: 'note5.png', answer: 'D', label: 'D4', clefImg: 'treble1.png', clefLabel: 'G Major' },
+  { noteFile: 'note6.png', answer: 'E', label: 'E4', clefImg: 'treble0.png', clefLabel: 'C Major' },
+  { noteFile: 'note7.png', answer: 'F', label: 'F4', clefImg: 'treble0.png', clefLabel: 'C Major' },
+  { noteFile: 'note7.png', answer: 'F#', label: 'F4', clefImg: 'treble1.png', clefLabel: 'G Major' },
+  { noteFile: 'note8.png', answer: 'G', label: 'G4', clefImg: 'treble2.png', clefLabel: 'D Major' },
+  { noteFile: 'note9.png', answer: 'A', label: 'A4', clefImg: 'treble1.png', clefLabel: 'G Major' },
+  { noteFile: 'note10.png', answer: 'B', label: 'B4', clefImg: 'treble0.png', clefLabel: 'C Major' },
+  { noteFile: 'note11.png', answer: 'C', label: 'C5', clefImg: 'treble1.png', clefLabel: 'G Major' },
+  { noteFile: 'note12.png', answer: 'D', label: 'D5', clefImg: 'treble2.png', clefLabel: 'D Major' }
+];
+const Q3_ALTO_POOL = [
+  { noteFile: 'note7.png', answer: 'G', label: 'G3', clefImg: 'alto0.png', clefLabel: 'C Major' },
+  { noteFile: 'note8.png', answer: 'A', label: 'A3', clefImg: 'alto0.png', clefLabel: 'C Major' },
+  { noteFile: 'note9.png', answer: 'B', label: 'B3', clefImg: 'alto0.png', clefLabel: 'C Major' },
+  { noteFile: 'note10.png', answer: 'C', label: 'C4', clefImg: 'alto0.png', clefLabel: 'C Major' },
+  { noteFile: 'note10.png', answer: 'C#', label: 'C4', clefImg: 'alto2.png', clefLabel: 'D Major' },
+  { noteFile: 'note11.png', answer: 'D', label: 'D4', clefImg: 'alto1.png', clefLabel: 'G Major' },
+  { noteFile: 'note12.png', answer: 'E', label: 'E4', clefImg: 'alto0.png', clefLabel: 'C Major' },
+  { noteFile: 'note13.png', answer: 'F', label: 'F4', clefImg: 'alto0.png', clefLabel: 'C Major' },
+  { noteFile: 'note13.png', answer: 'F#', label: 'F4', clefImg: 'alto1.png', clefLabel: 'G Major' },
+  { noteFile: 'note14.png', answer: 'G', label: 'G4', clefImg: 'alto2.png', clefLabel: 'D Major' },
+  { noteFile: 'note15.png', answer: 'A', label: 'A4', clefImg: 'alto1.png', clefLabel: 'G Major' },
+  { noteFile: 'note16.png', answer: 'B', label: 'B4', clefImg: 'alto0.png', clefLabel: 'C Major' },
+  { noteFile: 'note17.png', answer: 'C', label: 'C5', clefImg: 'alto1.png', clefLabel: 'G Major' },
+  { noteFile: 'note18.png', answer: 'D', label: 'D5', clefImg: 'alto2.png', clefLabel: 'D Major' }
+];
+const Q3_BASS_CELLO_POOL = [
+  { noteFile: 'note6.png', answer: 'G', label: 'G2', clefImg: 'bass0.png', clefLabel: 'C Major' },
+  { noteFile: 'note7.png', answer: 'A', label: 'A2', clefImg: 'bass0.png', clefLabel: 'C Major' },
+  { noteFile: 'note8.png', answer: 'B', label: 'B2', clefImg: 'bass0.png', clefLabel: 'C Major' },
+  { noteFile: 'note9.png', answer: 'C', label: 'C3', clefImg: 'bass0.png', clefLabel: 'C Major' },
+  { noteFile: 'note9.png', answer: 'C#', label: 'C3', clefImg: 'bass2.png', clefLabel: 'D Major' },
+  { noteFile: 'note10.png', answer: 'D', label: 'D3', clefImg: 'bass1.png', clefLabel: 'G Major' },
+  { noteFile: 'note11.png', answer: 'E', label: 'E3', clefImg: 'bass0.png', clefLabel: 'C Major' },
+  { noteFile: 'note12.png', answer: 'F', label: 'F3', clefImg: 'bass0.png', clefLabel: 'C Major' },
+  { noteFile: 'note12.png', answer: 'F#', label: 'F3', clefImg: 'bass1.png', clefLabel: 'G Major' },
+  { noteFile: 'note13.png', answer: 'G', label: 'G3', clefImg: 'bass2.png', clefLabel: 'D Major' },
+  { noteFile: 'note14.png', answer: 'A', label: 'A3', clefImg: 'bass1.png', clefLabel: 'G Major' },
+  { noteFile: 'note15.png', answer: 'B', label: 'B3', clefImg: 'bass0.png', clefLabel: 'C Major' },
+  { noteFile: 'note16.png', answer: 'C', label: 'C4', clefImg: 'bass1.png', clefLabel: 'G Major' },
+  { noteFile: 'note17.png', answer: 'D', label: 'D4', clefImg: 'bass2.png', clefLabel: 'D Major' }
+];
+const Q3_BASS_BASS_POOL = [
+  { noteFile: 'note6.png', answer: 'G', label: 'G1', clefImg: 'bass0.png', clefLabel: 'C Major' },
+  { noteFile: 'note7.png', answer: 'A', label: 'A1', clefImg: 'bass0.png', clefLabel: 'C Major' },
+  { noteFile: 'note8.png', answer: 'B', label: 'B1', clefImg: 'bass0.png', clefLabel: 'C Major' },
+  { noteFile: 'note9.png', answer: 'C', label: 'C2', clefImg: 'bass0.png', clefLabel: 'C Major' },
+  { noteFile: 'note9.png', answer: 'C#', label: 'C2', clefImg: 'bass2.png', clefLabel: 'D Major' },
+  { noteFile: 'note10.png', answer: 'D', label: 'D2', clefImg: 'bass1.png', clefLabel: 'G Major' },
+  { noteFile: 'note11.png', answer: 'E', label: 'E2', clefImg: 'bass0.png', clefLabel: 'C Major' },
+  { noteFile: 'note12.png', answer: 'F', label: 'F2', clefImg: 'bass0.png', clefLabel: 'C Major' },
+  { noteFile: 'note12.png', answer: 'F#', label: 'F2', clefImg: 'bass1.png', clefLabel: 'G Major' },
+  { noteFile: 'note13.png', answer: 'G', label: 'G2', clefImg: 'bass2.png', clefLabel: 'D Major' },
+  { noteFile: 'note14.png', answer: 'A', label: 'A2', clefImg: 'bass1.png', clefLabel: 'G Major' },
+  { noteFile: 'note15.png', answer: 'B', label: 'B2', clefImg: 'bass0.png', clefLabel: 'C Major' },
+  { noteFile: 'note16.png', answer: 'C', label: 'C3', clefImg: 'bass1.png', clefLabel: 'G Major' },
+  { noteFile: 'note17.png', answer: 'D', label: 'D3', clefImg: 'bass2.png', clefLabel: 'D Major' }
+];
+function buildQ3NoteQuiz(pool) {
+  var sh = pool.slice();
+  for (var i = sh.length-1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i+1));
+    var t = sh[i]; sh[i] = sh[j]; sh[j] = t;
+  }
+  return sh;
+}
+
 // Treble clef note pool: note1=G3 on treble, G3-D5 = note1-note12
 const TREBLE_POOL = [
   { noteFile: 'note1.png',  noteName: 'G', label: 'G3' },
@@ -1381,17 +1455,17 @@ const FOLDERS = [
     title: '5th Grade',
     subtitle: 'Quarter 3',
     icon: '🎻',
-    desc: '4 quizzes · Violin, Viola, Cello, Bass · C, G & D Major',
+    desc: '4 quizzes · Violin, Viola, Cello, Bass · C, G & D Major · 14 questions each',
     quizzes: [
       {
         id: 'violin',
         title: 'Violin G3–D5',
         clefLabel: 'Treble Clef · Mixed Keys',
         icon: '𝄞',
-        desc: 'Treble clef · C, G & D Major · Notes G3 through D5 · 15 questions',
-        totalQuestions: 15,
+        desc: 'Treble clef · C, G & D Major · Notes G3 through D5 · 14 questions',
+        totalQuestions: 14,
         noteOptions: ['A', 'B', 'C', 'C#', 'D', 'E', 'F', 'F#', 'G'],
-        buildQuiz: function() { return buildMultiKeyQuiz('treble', TREBLE_POOL); },
+        buildQuiz: function() { return buildQ3NoteQuiz(Q3_TREBLE_POOL); },
       },
       {
         id: 'violin-fingering',
@@ -1409,10 +1483,10 @@ const FOLDERS = [
         title: 'Viola G3–D5',
         clefLabel: 'Alto Clef · Mixed Keys',
         icon: '𝄡',
-        desc: 'Alto clef · C, G & D Major · Notes G3 through D5 · 15 questions',
-        totalQuestions: 15,
+        desc: 'Alto clef · C, G & D Major · Notes G3 through D5 · 14 questions',
+        totalQuestions: 14,
         noteOptions: ['A', 'B', 'C', 'C#', 'D', 'E', 'F', 'F#', 'G'],
-        buildQuiz: function() { return buildMultiKeyQuiz('alto', ALTO_POOL); },
+        buildQuiz: function() { return buildQ3NoteQuiz(Q3_ALTO_POOL); },
       },
       {
         id: 'viola-fingering',
@@ -1430,10 +1504,10 @@ const FOLDERS = [
         title: 'Cello G2–D4',
         clefLabel: 'Bass Clef · Mixed Keys',
         icon: '𝄢',
-        desc: 'Bass clef · C, G & D Major · Notes G2 through D4 · 15 questions',
-        totalQuestions: 15,
+        desc: 'Bass clef · C, G & D Major · Notes G2 through D4 · 14 questions',
+        totalQuestions: 14,
         noteOptions: ['A', 'B', 'C', 'C#', 'D', 'E', 'F', 'F#', 'G'],
-        buildQuiz: function() { return buildMultiKeyQuiz('bass', BASS_POOL); },
+        buildQuiz: function() { return buildQ3NoteQuiz(Q3_BASS_CELLO_POOL); },
       },
       {
         id: 'cello-fingering',
@@ -1451,10 +1525,10 @@ const FOLDERS = [
         title: 'Bass G1–D3',
         clefLabel: 'Bass Clef · Mixed Keys',
         icon: '𝄢',
-        desc: 'Bass clef · C, G & D Major · Notes G1 through D3 · 15 questions (sounds one octave lower)',
-        totalQuestions: 15,
+        desc: 'Bass clef · C, G & D Major · Notes G1 through D3 · 14 questions (sounds one octave lower)',
+        totalQuestions: 14,
         noteOptions: ['A', 'B', 'C', 'C#', 'D', 'E', 'F', 'F#', 'G'],
-        buildQuiz: function() { return buildMultiKeyQuiz('bass', BASS_POOL, true); },
+        buildQuiz: function() { return buildQ3NoteQuiz(Q3_BASS_BASS_POOL); },
       },
       {
         id: 'bass-fingering',
@@ -2370,6 +2444,427 @@ const FOLDERS = [
     ],
   },
 
+  // ── BAND Q4 ─────────────────────────────────────────────
+  {
+    id: 'band-q4-5th',
+    title: '5th Grade Band',
+    subtitle: 'Quarter 4',
+    icon: '🎺',
+    desc: '2 quizzes · Flute & Clarinet · Multi-key',
+    quizzes: [
+      {
+        id: 'flute',
+        title: 'Flute A♭4–B♭5',
+        clefLabel: 'Treble Clef · B♭/E♭/F Major',
+        clefImg: 'treble-2.png',
+        icon: '🎵',
+        desc: 'Treble clef · B♭/E♭/F Major · Notes A♭4 through B♭5',
+        totalQuestions: 12,
+        noteOptions: ['A♭','A','B♭','C','D','E♭','E','F','G'],
+        buildQuiz: function() {
+          var kBb = { img: 'treble-2.png', label: 'B♭ Major' };
+          var kEb = { img: 'treble-3.png', label: 'E♭ Major' };
+          var kF  = { img: 'treble-1.png', label: 'F Major' };
+          var r = function(keys) { return keys[Math.floor(Math.random()*keys.length)]; };
+          var fixed = [
+            { noteFile: 'note9.png',  answer: 'A♭', label: 'A♭4', clefImg: kEb.img, clefLabel: kEb.label },
+            { noteFile: 'note9.png',  answer: 'A',       label: 'A4',       clefImg: kBb.img, clefLabel: kBb.label },
+            { noteFile: 'note13.png', answer: 'E',       label: 'E5',       clefImg: kF.img,  clefLabel: kF.label  },
+            { noteFile: 'note16.png', answer: 'A♭', label: 'A♭5', clefImg: kEb.img, clefLabel: kEb.label },
+            { noteFile: 'note16.png', answer: 'A',       label: 'A5',       clefImg: kBb.img, clefLabel: kBb.label },
+          ];
+          var shared = [
+            { noteFile: 'note10.png', answer: 'B♭', label: 'B♭4', keys: [kBb,kEb,kF] },
+            { noteFile: 'note11.png', answer: 'C',       label: 'C5',       keys: [kBb,kEb,kF] },
+            { noteFile: 'note12.png', answer: 'D',       label: 'D5',       keys: [kBb,kEb,kF] },
+            { noteFile: 'note13.png', answer: 'E♭', label: 'E♭5', keys: [kBb,kEb]     },
+            { noteFile: 'note14.png', answer: 'F',       label: 'F5',       keys: [kBb,kEb,kF] },
+            { noteFile: 'note15.png', answer: 'G',       label: 'G5',       keys: [kBb,kEb,kF] },
+            { noteFile: 'note17.png', answer: 'B♭', label: 'B♭5', keys: [kBb,kEb,kF] },
+          ];
+          var pool = fixed.concat(shared.map(function(n) {
+            var k = r(n.keys);
+            return { noteFile: n.noteFile, answer: n.answer, label: n.label, clefImg: k.img, clefLabel: k.label };
+          }));
+          for (var i=pool.length-1;i>0;i--) {
+            var j=Math.floor(Math.random()*(i+1));
+            var t=pool[i]; pool[i]=pool[j]; pool[j]=t;
+          }
+          return pool;
+        },
+      },
+      {
+        id: 'clarinet',
+        title: 'Clarinet B♭3–C5',
+        clefLabel: 'Treble Clef · C/F/G Major',
+        clefImg: 'treble0.png',
+        icon: '🎵',
+        desc: 'Treble clef · C/F/G Major · Notes B♭3 through C5',
+        totalQuestions: 12,
+        noteOptions: ['B♭','B','C','D','E','F','F#','G','A'],
+        buildQuiz: function() {
+          var kC = { img: 'treble0.png',  label: 'C Major' };
+          var kF = { img: 'treble-1.png', label: 'F Major' };
+          var kG = { img: 'treble1.png',  label: 'G Major' };
+          var r = function(keys) { return keys[Math.floor(Math.random()*keys.length)]; };
+          var fixed = [
+            { noteFile: 'note3.png',  answer: 'B♭', label: 'B♭3', clefImg: kF.img, clefLabel: kF.label },
+            { noteFile: 'note10.png', answer: 'B♭', label: 'B♭4', clefImg: kF.img, clefLabel: kF.label },
+            { noteFile: 'note7.png',  answer: 'F#',      label: 'F#4',      clefImg: kG.img, clefLabel: kG.label },
+          ];
+          var shared = [
+            { noteFile: 'note3.png',  answer: 'B',  label: 'B3',  keys: [kC,kG]     },
+            { noteFile: 'note4.png',  answer: 'C',  label: 'C4',  keys: [kC,kF,kG]  },
+            { noteFile: 'note5.png',  answer: 'D',  label: 'D4',  keys: [kC,kF,kG]  },
+            { noteFile: 'note6.png',  answer: 'E',  label: 'E4',  keys: [kC,kF,kG]  },
+            { noteFile: 'note7.png',  answer: 'F',  label: 'F4',  keys: [kC,kF]     },
+            { noteFile: 'note8.png',  answer: 'G',  label: 'G4',  keys: [kC,kF,kG]  },
+            { noteFile: 'note9.png',  answer: 'A',  label: 'A4',  keys: [kC,kF,kG]  },
+            { noteFile: 'note10.png', answer: 'B',  label: 'B4',  keys: [kC,kG]     },
+            { noteFile: 'note11.png', answer: 'C',  label: 'C5',  keys: [kC,kF,kG]  },
+          ];
+          var pool = fixed.concat(shared.map(function(n) {
+            var k = r(n.keys);
+            return { noteFile: n.noteFile, answer: n.answer, label: n.label, clefImg: k.img, clefLabel: k.label };
+          }));
+          for (var i=pool.length-1;i>0;i--) {
+            var j=Math.floor(Math.random()*(i+1));
+            var t=pool[i]; pool[i]=pool[j]; pool[j]=t;
+          }
+          return pool;
+        },
+      },
+      {
+        id: 'alto-sax',
+        title: 'Alto Sax F4–G5',
+        clefLabel: 'Treble Clef · G/C/D Major',
+        clefImg: 'treble1.png',
+        icon: '🎵',
+        desc: 'Treble clef · G/C/D Major · Notes F4 through G5',
+        totalQuestions: 12,
+        noteOptions: ['F', 'F#', 'G', 'A', 'B', 'C', 'C#', 'D', 'E'],
+        buildQuiz: function() {
+          var kC = { img: 'treble0.png',  label: 'C Major' };
+          var kG = { img: 'treble1.png',  label: 'G Major' };
+          var kD = { img: 'treble2.png',  label: 'D Major' };
+          var r = function(keys) { return keys[Math.floor(Math.random()*keys.length)]; };
+          var fixed = [
+            { noteFile: 'note7.png',  answer: 'F',   label: 'F4',   clefImg: kC.img, clefLabel: kC.label },
+            { noteFile: 'note7.png',  answer: 'F#',  label: 'F#4',  clefImg: r([kG,kD]).img, clefLabel: r([kG,kD]).label },
+            { noteFile: 'note11.png', answer: 'C',   label: 'C5',   clefImg: r([kC,kG]).img, clefLabel: r([kC,kG]).label },
+            { noteFile: 'note11.png', answer: 'C#',  label: 'C#5',  clefImg: kD.img, clefLabel: kD.label },
+            { noteFile: 'note14.png', answer: 'F',   label: 'F5',   clefImg: kC.img, clefLabel: kC.label },
+            { noteFile: 'note14.png', answer: 'F#',  label: 'F#5',  clefImg: r([kG,kD]).img, clefLabel: r([kG,kD]).label },
+          ];
+          var shared = [
+            { noteFile: 'note8.png',  answer: 'G', label: 'G4', keys: [kG,kC,kD] },
+            { noteFile: 'note9.png',  answer: 'A', label: 'A4', keys: [kG,kC,kD] },
+            { noteFile: 'note10.png', answer: 'B', label: 'B4', keys: [kG,kC,kD] },
+            { noteFile: 'note12.png', answer: 'D', label: 'D5', keys: [kG,kC,kD] },
+            { noteFile: 'note13.png', answer: 'E', label: 'E5', keys: [kG,kC,kD] },
+            { noteFile: 'note15.png', answer: 'G', label: 'G5', keys: [kG,kC,kD] },
+          ];
+          var pool = fixed.concat(shared.map(function(n) {
+            var k = r(n.keys);
+            return { noteFile: n.noteFile, answer: n.answer, label: n.label, clefImg: k.img, clefLabel: k.label };
+          }));
+          for (var i=pool.length-1;i>0;i--) {
+            var j=Math.floor(Math.random()*(i+1));
+            var t=pool[i]; pool[i]=pool[j]; pool[j]=t;
+          }
+          return pool;
+        },
+      },
+      {
+        id: 'french-horn',
+        title: 'French Horn E♭4–F5',
+        clefLabel: 'Treble Clef · B♭/F/C Major',
+        clefImg: 'treble-2.png',
+        icon: '🎺',
+        desc: 'Treble clef · B♭/F/C Major · Notes E♭4 through F5',
+        totalQuestions: 12,
+        noteOptions: ['E♭', 'E', 'F', 'G', 'A', 'B♭', 'B', 'C', 'D'],
+        buildQuiz: function() {
+          var kBb = { img: 'treble-2.png', label: 'B♭ Major' };
+          var kF  = { img: 'treble-1.png', label: 'F Major' };
+          var kC  = { img: 'treble0.png',  label: 'C Major' };
+          var r = function(keys) { return keys[Math.floor(Math.random()*keys.length)]; };
+          var fixed = [
+            { noteFile: 'note6.png',  answer: 'E♭', label: 'E♭4', clefImg: kBb.img, clefLabel: kBb.label },
+            { noteFile: 'note6.png',  answer: 'E',       label: 'E4',       clefImg: r([kF,kC]).img,  clefLabel: r([kF,kC]).label  },
+            { noteFile: 'note10.png', answer: 'B♭', label: 'B♭4', clefImg: r([kBb,kF]).img, clefLabel: r([kBb,kF]).label },
+            { noteFile: 'note10.png', answer: 'B',       label: 'B4',       clefImg: kC.img,  clefLabel: kC.label  },
+            { noteFile: 'note13.png', answer: 'E♭', label: 'E♭5', clefImg: kBb.img, clefLabel: kBb.label },
+            { noteFile: 'note13.png', answer: 'E',       label: 'E5',       clefImg: r([kF,kC]).img,  clefLabel: r([kF,kC]).label  },
+          ];
+          var shared = [
+            { noteFile: 'note7.png',  answer: 'F', label: 'F4', keys: [kBb,kF,kC] },
+            { noteFile: 'note8.png',  answer: 'G', label: 'G4', keys: [kBb,kF,kC] },
+            { noteFile: 'note9.png',  answer: 'A', label: 'A4', keys: [kBb,kF,kC] },
+            { noteFile: 'note11.png', answer: 'C', label: 'C5', keys: [kBb,kF,kC] },
+            { noteFile: 'note12.png', answer: 'D', label: 'D5', keys: [kBb,kF,kC] },
+            { noteFile: 'note14.png', answer: 'F', label: 'F5', keys: [kBb,kF,kC] },
+          ];
+          var pool = fixed.concat(shared.map(function(n) {
+            var k = r(n.keys);
+            return { noteFile: n.noteFile, answer: n.answer, label: n.label, clefImg: k.img, clefLabel: k.label };
+          }));
+          for (var i=pool.length-1;i>0;i--) {
+            var j=Math.floor(Math.random()*(i+1));
+            var t=pool[i]; pool[i]=pool[j]; pool[j]=t;
+          }
+          return pool;
+        },
+      },
+      {
+        id: 'trumpet',
+        title: 'Trumpet B♭3–C5',
+        clefLabel: 'Treble Clef · C/F/G Major',
+        clefImg: 'treble0.png',
+        icon: '🎺',
+        desc: 'Treble clef · C/F/G Major · Notes B♭3 through C5',
+        totalQuestions: 12,
+        noteOptions: ['B♭', 'B', 'C', 'D', 'E', 'F', 'F#', 'G', 'A'],
+        buildQuiz: function() {
+          var kC = { img: 'treble0.png',  label: 'C Major' };
+          var kF = { img: 'treble-1.png', label: 'F Major' };
+          var kG = { img: 'treble1.png',  label: 'G Major' };
+          var r = function(keys) { return keys[Math.floor(Math.random()*keys.length)]; };
+          var fixed = [
+            { noteFile: 'note3.png',  answer: 'B♭', label: 'B♭3', clefImg: kF.img, clefLabel: kF.label },
+            { noteFile: 'note10.png', answer: 'B♭', label: 'B♭4', clefImg: kF.img, clefLabel: kF.label },
+            { noteFile: 'note7.png',  answer: 'F#',      label: 'F#4',      clefImg: kG.img, clefLabel: kG.label },
+          ];
+          var shared = [
+            { noteFile: 'note3.png',  answer: 'B',  label: 'B3',  keys: [kC,kG]    },
+            { noteFile: 'note4.png',  answer: 'C',  label: 'C4',  keys: [kC,kF,kG] },
+            { noteFile: 'note5.png',  answer: 'D',  label: 'D4',  keys: [kC,kF,kG] },
+            { noteFile: 'note6.png',  answer: 'E',  label: 'E4',  keys: [kC,kF,kG] },
+            { noteFile: 'note7.png',  answer: 'F',  label: 'F4',  keys: [kC,kF]    },
+            { noteFile: 'note8.png',  answer: 'G',  label: 'G4',  keys: [kC,kF,kG] },
+            { noteFile: 'note9.png',  answer: 'A',  label: 'A4',  keys: [kC,kF,kG] },
+            { noteFile: 'note10.png', answer: 'B',  label: 'B4',  keys: [kC,kG]    },
+            { noteFile: 'note11.png', answer: 'C',  label: 'C5',  keys: [kC,kF,kG] },
+          ];
+          var pool = fixed.concat(shared.map(function(n) {
+            var k = r(n.keys);
+            return { noteFile: n.noteFile, answer: n.answer, label: n.label, clefImg: k.img, clefLabel: k.label };
+          }));
+          for (var i=pool.length-1;i>0;i--) {
+            var j=Math.floor(Math.random()*(i+1));
+            var t=pool[i]; pool[i]=pool[j]; pool[j]=t;
+          }
+          return pool;
+        },
+      },
+      {
+        id: 'trombone',
+        title: 'Trombone A♭2–B♭3',
+        clefLabel: 'Bass Clef · B♭/E♭/F Major',
+        clefImg: 'bass-2.png',
+        icon: '🎺',
+        desc: 'Bass clef · B♭/E♭/F Major · Notes A♭2 through B♭3',
+        totalQuestions: 12,
+        noteOptions: ['A♭', 'A', 'B♭', 'C', 'D', 'E♭', 'E', 'F', 'G'],
+        buildQuiz: function() {
+          var kBb = { img: 'bass-2.png', label: 'B♭ Major' };
+          var kEb = { img: 'bass-3.png', label: 'E♭ Major' };
+          var kF  = { img: 'bass-1.png',  label: 'F Major' };
+          var r = function(keys) { return keys[Math.floor(Math.random()*keys.length)]; };
+          var fixed = [
+            { noteFile: 'note7.png', answer: 'A♭', label: 'A♭2', clefImg: kEb.img, clefLabel: kEb.label },
+            { noteFile: 'note7.png',  answer: 'A',       label: 'A2',  clefImg: kBb.img, clefLabel: kBb.label },
+            { noteFile: 'note11.png',  answer: 'E',       label: 'E3',     clefImg: kF.img,  clefLabel: kF.label  },
+            { noteFile: 'note14.png', answer: 'A♭', label: 'A♭3', clefImg: kEb.img, clefLabel: kEb.label },
+            { noteFile: 'note14.png',  answer: 'A',       label: 'A3',  clefImg: kBb.img, clefLabel: kBb.label },
+          ];
+          var shared = [
+            { noteFile: 'note8.png', answer: 'B♭', label: 'B♭2', keys: [kBb,kEb,kF] },
+            { noteFile: 'note9.png',  answer: 'C',       label: 'C3',     keys: [kBb,kEb,kF] },
+            { noteFile: 'note10.png',  answer: 'D',       label: 'D3',     keys: [kBb,kEb,kF] },
+            { noteFile: 'note11.png', answer: 'E♭', label: 'E♭3',    keys: [kBb,kEb]    },
+            { noteFile: 'note12.png',  answer: 'F',       label: 'F3',     keys: [kBb,kEb,kF] },
+            { noteFile: 'note13.png',  answer: 'G',       label: 'G3',     keys: [kBb,kEb,kF] },
+            { noteFile: 'note15.png', answer: 'B♭', label: 'B♭3', keys: [kBb,kEb,kF] },
+          ];
+          var pool = fixed.concat(shared.map(function(n) {
+            var k = r(n.keys);
+            return { noteFile: n.noteFile, answer: n.answer, label: n.label, clefImg: k.img, clefLabel: k.label };
+          }));
+          for (var i=pool.length-1;i>0;i--) {
+            var j=Math.floor(Math.random()*(i+1));
+            var t=pool[i]; pool[i]=pool[j]; pool[j]=t;
+          }
+          return pool;
+        },
+      },
+      {
+        id: 'baritone',
+        title: 'Baritone A♭4–B♭5',
+        clefLabel: 'Treble Clef · B♭/E♭/F Major',
+        clefImg: 'treble-2.png',
+        icon: '🎺',
+        desc: 'Treble clef · B♭/E♭/F Major · Notes A♭4 through B♭5',
+        totalQuestions: 12,
+        noteOptions: ['A♭', 'A', 'B♭', 'C', 'D', 'E♭', 'E', 'F', 'G'],
+        buildQuiz: function() {
+          var kBb = { img: 'treble-2.png', label: 'B♭ Major' };
+          var kEb = { img: 'treble-3.png', label: 'E♭ Major' };
+          var kF  = { img: 'treble-1.png',  label: 'F Major' };
+          var r = function(keys) { return keys[Math.floor(Math.random()*keys.length)]; };
+          var fixed = [
+            { noteFile: 'note9.png', answer: 'A♭', label: 'A♭4', clefImg: kEb.img, clefLabel: kEb.label },
+            { noteFile: 'note9.png',  answer: 'A',       label: 'A4',  clefImg: kBb.img, clefLabel: kBb.label },
+            { noteFile: 'note13.png',  answer: 'E',       label: 'E5',     clefImg: kF.img,  clefLabel: kF.label  },
+            { noteFile: 'note16.png', answer: 'A♭', label: 'A♭5', clefImg: kEb.img, clefLabel: kEb.label },
+            { noteFile: 'note16.png',  answer: 'A',       label: 'A5',  clefImg: kBb.img, clefLabel: kBb.label },
+          ];
+          var shared = [
+            { noteFile: 'note10.png', answer: 'B♭', label: 'B♭4', keys: [kBb,kEb,kF] },
+            { noteFile: 'note11.png',  answer: 'C',       label: 'C5',     keys: [kBb,kEb,kF] },
+            { noteFile: 'note12.png',  answer: 'D',       label: 'D5',     keys: [kBb,kEb,kF] },
+            { noteFile: 'note13.png', answer: 'E♭', label: 'E♭5',    keys: [kBb,kEb]    },
+            { noteFile: 'note14.png',  answer: 'F',       label: 'F5',     keys: [kBb,kEb,kF] },
+            { noteFile: 'note15.png',  answer: 'G',       label: 'G5',     keys: [kBb,kEb,kF] },
+            { noteFile: 'note17.png', answer: 'B♭', label: 'B♭5', keys: [kBb,kEb,kF] },
+          ];
+          var pool = fixed.concat(shared.map(function(n) {
+            var k = r(n.keys);
+            return { noteFile: n.noteFile, answer: n.answer, label: n.label, clefImg: k.img, clefLabel: k.label };
+          }));
+          for (var i=pool.length-1;i>0;i--) {
+            var j=Math.floor(Math.random()*(i+1));
+            var t=pool[i]; pool[i]=pool[j]; pool[j]=t;
+          }
+          return pool;
+        },
+      },
+      {
+        id: 'tuba',
+        title: 'Tuba A♭1–B♭2',
+        clefLabel: 'Bass Clef · B♭/E♭/F Major',
+        clefImg: 'bass-2.png',
+        icon: '🎺',
+        desc: 'Bass clef · B♭/E♭/F Major · Notes A♭1 through B♭2',
+        totalQuestions: 12,
+        noteOptions: ['A♭', 'A', 'B♭', 'C', 'D', 'E♭', 'E', 'F', 'G'],
+        buildQuiz: function() {
+          var kBb = { img: 'bass-2.png', label: 'B♭ Major' };
+          var kEb = { img: 'bass-3.png', label: 'E♭ Major' };
+          var kF  = { img: 'bass-1.png',  label: 'F Major' };
+          var r = function(keys) { return keys[Math.floor(Math.random()*keys.length)]; };
+          var fixed = [
+            { noteFile: 'note0.png', answer: 'A♭', label: 'A♭1', clefImg: kEb.img, clefLabel: kEb.label },
+            { noteFile: 'note0.png',  answer: 'A',       label: 'A1',  clefImg: kBb.img, clefLabel: kBb.label },
+            { noteFile: 'note4.png',  answer: 'E',       label: 'E2',     clefImg: kF.img,  clefLabel: kF.label  },
+            { noteFile: 'note7.png', answer: 'A♭', label: 'A♭2', clefImg: kEb.img, clefLabel: kEb.label },
+            { noteFile: 'note7.png',  answer: 'A',       label: 'A2',  clefImg: kBb.img, clefLabel: kBb.label },
+          ];
+          var shared = [
+            { noteFile: 'note1.png', answer: 'B♭', label: 'B♭1', keys: [kBb,kEb,kF] },
+            { noteFile: 'note2.png',  answer: 'C',       label: 'C2',     keys: [kBb,kEb,kF] },
+            { noteFile: 'note3.png',  answer: 'D',       label: 'D2',     keys: [kBb,kEb,kF] },
+            { noteFile: 'note4.png', answer: 'E♭', label: 'E♭2',    keys: [kBb,kEb]    },
+            { noteFile: 'note5.png',  answer: 'F',       label: 'F2',     keys: [kBb,kEb,kF] },
+            { noteFile: 'note6.png',  answer: 'G',       label: 'G2',     keys: [kBb,kEb,kF] },
+            { noteFile: 'note8.png', answer: 'B♭', label: 'B♭2', keys: [kBb,kEb,kF] },
+          ];
+          var pool = fixed.concat(shared.map(function(n) {
+            var k = r(n.keys);
+            return { noteFile: n.noteFile, answer: n.answer, label: n.label, clefImg: k.img, clefLabel: k.label };
+          }));
+          for (var i=pool.length-1;i>0;i--) {
+            var j=Math.floor(Math.random()*(i+1));
+            var t=pool[i]; pool[i]=pool[j]; pool[j]=t;
+          }
+          return pool;
+        },
+      },
+      {
+        id: 'mallets-high',
+        title: 'Mallet Percussion High A♭4–B♭5',
+        clefLabel: 'Treble Clef · B♭/E♭/F Major',
+        clefImg: 'treble-2.png',
+        icon: '🥁',
+        desc: 'Treble clef · B♭/E♭/F Major · Notes A♭4 through B♭5',
+        totalQuestions: 12,
+        noteOptions: ['A♭', 'A', 'B♭', 'C', 'D', 'E♭', 'E', 'F', 'G'],
+        buildQuiz: function() {
+          var kBb = { img: 'treble-2.png', label: 'B♭ Major' };
+          var kEb = { img: 'treble-3.png', label: 'E♭ Major' };
+          var kF  = { img: 'treble-1.png',  label: 'F Major' };
+          var r = function(keys) { return keys[Math.floor(Math.random()*keys.length)]; };
+          var fixed = [
+            { noteFile: 'note9.png', answer: 'A♭', label: 'A♭4', clefImg: kEb.img, clefLabel: kEb.label },
+            { noteFile: 'note9.png',  answer: 'A',       label: 'A4',  clefImg: kBb.img, clefLabel: kBb.label },
+            { noteFile: 'note13.png',  answer: 'E',       label: 'E5',     clefImg: kF.img,  clefLabel: kF.label  },
+            { noteFile: 'note16.png', answer: 'A♭', label: 'A♭5', clefImg: kEb.img, clefLabel: kEb.label },
+            { noteFile: 'note16.png',  answer: 'A',       label: 'A5',  clefImg: kBb.img, clefLabel: kBb.label },
+          ];
+          var shared = [
+            { noteFile: 'note10.png', answer: 'B♭', label: 'B♭4', keys: [kBb,kEb,kF] },
+            { noteFile: 'note11.png',  answer: 'C',       label: 'C5',     keys: [kBb,kEb,kF] },
+            { noteFile: 'note12.png',  answer: 'D',       label: 'D5',     keys: [kBb,kEb,kF] },
+            { noteFile: 'note13.png', answer: 'E♭', label: 'E♭5',    keys: [kBb,kEb]    },
+            { noteFile: 'note14.png',  answer: 'F',       label: 'F5',     keys: [kBb,kEb,kF] },
+            { noteFile: 'note15.png',  answer: 'G',       label: 'G5',     keys: [kBb,kEb,kF] },
+            { noteFile: 'note17.png', answer: 'B♭', label: 'B♭5', keys: [kBb,kEb,kF] },
+          ];
+          var pool = fixed.concat(shared.map(function(n) {
+            var k = r(n.keys);
+            return { noteFile: n.noteFile, answer: n.answer, label: n.label, clefImg: k.img, clefLabel: k.label };
+          }));
+          for (var i=pool.length-1;i>0;i--) {
+            var j=Math.floor(Math.random()*(i+1));
+            var t=pool[i]; pool[i]=pool[j]; pool[j]=t;
+          }
+          return pool;
+        },
+      },
+      {
+        id: 'mallets-low',
+        title: 'Mallet Percussion Low A♭3–B♭4',
+        clefLabel: 'Treble Clef · B♭/E♭/F Major',
+        clefImg: 'treble-2.png',
+        icon: '🥁',
+        desc: 'Treble clef · B♭/E♭/F Major · Notes A♭3 through B♭4',
+        totalQuestions: 12,
+        noteOptions: ['A♭', 'A', 'B♭', 'C', 'D', 'E♭', 'E', 'F', 'G'],
+        buildQuiz: function() {
+          var kBb = { img: 'treble-2.png', label: 'B♭ Major' };
+          var kEb = { img: 'treble-3.png', label: 'E♭ Major' };
+          var kF  = { img: 'treble-1.png',  label: 'F Major' };
+          var r = function(keys) { return keys[Math.floor(Math.random()*keys.length)]; };
+          var fixed = [
+            { noteFile: 'note2.png', answer: 'A♭', label: 'A♭3', clefImg: kEb.img, clefLabel: kEb.label },
+            { noteFile: 'note2.png',  answer: 'A',       label: 'A3',  clefImg: kBb.img, clefLabel: kBb.label },
+            { noteFile: 'note6.png',  answer: 'E',       label: 'E4',     clefImg: kF.img,  clefLabel: kF.label  },
+            { noteFile: 'note9.png', answer: 'A♭', label: 'A♭4', clefImg: kEb.img, clefLabel: kEb.label },
+            { noteFile: 'note9.png',  answer: 'A',       label: 'A4',  clefImg: kBb.img, clefLabel: kBb.label },
+          ];
+          var shared = [
+            { noteFile: 'note3.png', answer: 'B♭', label: 'B♭3', keys: [kBb,kEb,kF] },
+            { noteFile: 'note4.png',  answer: 'C',       label: 'C4',     keys: [kBb,kEb,kF] },
+            { noteFile: 'note5.png',  answer: 'D',       label: 'D4',     keys: [kBb,kEb,kF] },
+            { noteFile: 'note6.png', answer: 'E♭', label: 'E♭4',    keys: [kBb,kEb]    },
+            { noteFile: 'note7.png',  answer: 'F',       label: 'F4',     keys: [kBb,kEb,kF] },
+            { noteFile: 'note8.png',  answer: 'G',       label: 'G4',     keys: [kBb,kEb,kF] },
+            { noteFile: 'note10.png', answer: 'B♭', label: 'B♭4', keys: [kBb,kEb,kF] },
+          ];
+          var pool = fixed.concat(shared.map(function(n) {
+            var k = r(n.keys);
+            return { noteFile: n.noteFile, answer: n.answer, label: n.label, clefImg: k.img, clefLabel: k.label };
+          }));
+          for (var i=pool.length-1;i>0;i--) {
+            var j=Math.floor(Math.random()*(i+1));
+            var t=pool[i]; pool[i]=pool[j]; pool[j]=t;
+          }
+          return pool;
+        },
+      },
+    ],
+  },
+
 ];
 
 // ── NAVIGATION STRUCTURE ───────────────────────────────────────────
@@ -2415,6 +2910,7 @@ const FOLDER_MAP = {
   'band|5th|q1':      'band-q1-5th',
   'band|5th|q2':      'band-q2-5th',
   'band|5th|q3':      'band-q3-5th',
+  'band|5th|q4':      'band-q4-5th',
   'chorus|5th|q1':    'chorus-q1-5th',
 };
 
