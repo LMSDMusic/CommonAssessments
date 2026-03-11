@@ -263,6 +263,7 @@
   .answer-btn.wrong          { background: var(--red);   color: white; border-color: var(--red); }
   .answer-btn.reveal-correct { background: var(--green); color: white; border-color: var(--green); opacity: 0.7; }
   .answer-btn:disabled       { cursor: default; transform: none; }
+  .answer-btn.trainer-locked { visibility: hidden; pointer-events: none; }
 
   .feedback {
     min-height: 36px; font-size: 1.1rem; font-weight: 700;
@@ -319,6 +320,62 @@
     font-size: 1rem; font-weight: 600; cursor: pointer; transition: background 0.2s;
   }
   .menu-btn:hover { background: #ddd8ce; }
+  /* ── TRAINER ── */
+  .trainer-progress {
+    display: flex; flex-wrap: wrap; gap: 6px; justify-content: center;
+    padding: 10px 16px 4px; margin-bottom: 2px;
+  }
+  .trainer-pip {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 36px; height: 32px; border-radius: 8px; padding: 0 10px;
+    font-family: 'DM Sans', sans-serif; font-size: 0.82rem; font-weight: 700;
+    border: 2px solid #ccc; background: var(--parchment); color: #bbb;
+    transition: all 0.3s ease;
+  }
+  .trainer-pip.unlocked {
+    background: var(--navy); color: var(--gold-light); border-color: var(--navy);
+  }
+  .trainer-pip.new-note {
+    background: var(--gold); color: var(--navy); border-color: var(--gold);
+    animation: pip-pop 0.45s ease;
+  }
+  @keyframes pip-pop {
+    0%   { transform: scale(0.7); }
+    60%  { transform: scale(1.2); }
+    100% { transform: scale(1); }
+  }
+  .trainer-streak {
+    font-size: 0.78rem; color: var(--muted); text-align: center;
+    min-height: 18px; margin-bottom: 2px; letter-spacing: 0.02em;
+  }
+  .trainer-card {
+    border: 2px solid var(--gold);
+    background: linear-gradient(135deg, #fffdf0 0%, #fff8e0 100%);
+  }
+  .trainer-card:hover {
+    background: linear-gradient(135deg, #fff8d6 0%, #ffeea0 100%);
+    border-color: #c8a000;
+  }
+  .congrats-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+    display: flex; align-items: center; justify-content: center; z-index: 100;
+    animation: fadeIn 0.3s ease;
+  }
+  .congrats-box {
+    background: white; border-radius: 20px; padding: 40px 36px;
+    text-align: center; max-width: 320px; width: 90%;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    animation: slideUp 0.4s ease;
+  }
+  .congrats-emoji { font-size: 3rem; margin-bottom: 12px; }
+  .congrats-title { font-family: 'Playfair Display', serif; font-size: 1.8rem; color: var(--navy); margin-bottom: 8px; }
+  .congrats-sub   { color: var(--muted); font-size: 0.95rem; margin-bottom: 24px; line-height: 1.5; }
+  .congrats-btn   {
+    width: 100%; padding: 14px; background: var(--navy); color: white;
+    border: none; border-radius: 10px; font-family: 'DM Sans', sans-serif;
+    font-size: 1rem; font-weight: 700; cursor: pointer;
+  }
+  .congrats-btn:hover { background: var(--navy-mid); }
   /* ── SUBMISSION PANEL ── */
   .saved-student {
     background: #f0f7ff; border: 1.5px solid #b3d4f5; border-radius: 8px;
@@ -1323,6 +1380,17 @@ const FOLDERS = [
         desc: 'Treble clef · D Major · Notes D4 through D5',
         totalQuestions: 8,
         noteOptions: ['D', 'E', 'F#', 'G', 'A', 'B', 'C#'],
+        trainer: true,
+        trainerNotes: [
+          { noteFile: 'note5.png',  answer: 'D',  label: 'D4' },
+          { noteFile: 'note6.png',  answer: 'E',  label: 'E4' },
+          { noteFile: 'note7.png',  answer: 'F#', label: 'F4' },
+          { noteFile: 'note8.png',  answer: 'G',  label: 'G4' },
+          { noteFile: 'note9.png',  answer: 'A',  label: 'A4' },
+          { noteFile: 'note10.png', answer: 'B',  label: 'B4' },
+          { noteFile: 'note11.png', answer: 'C#', label: 'C5' },
+          { noteFile: 'note12.png', answer: 'D',  label: 'D5' },
+        ],
         notePool: [
           { noteFile: 'note5.png',  answer: 'D',  label: 'D4' },
           { noteFile: 'note6.png',  answer: 'E',  label: 'E4' },
@@ -1364,6 +1432,17 @@ const FOLDERS = [
         desc: 'Alto clef · D Major · Notes D4 through D5',
         totalQuestions: 8,
         noteOptions: ['D', 'E', 'F#', 'G', 'A', 'B', 'C#'],
+        trainer: true,
+        trainerNotes: [
+          { noteFile: 'note11.png', answer: 'D',  label: 'D4' },
+          { noteFile: 'note12.png', answer: 'E',  label: 'E4' },
+          { noteFile: 'note13.png', answer: 'F#', label: 'F4' },
+          { noteFile: 'note14.png', answer: 'G',  label: 'G4' },
+          { noteFile: 'note15.png', answer: 'A',  label: 'A4' },
+          { noteFile: 'note16.png', answer: 'B',  label: 'B4' },
+          { noteFile: 'note17.png', answer: 'C#', label: 'C5' },
+          { noteFile: 'note18.png', answer: 'D',  label: 'D5' },
+        ],
         notePool: [
           { noteFile: 'note11.png', answer: 'D',  label: 'D4' },
           { noteFile: 'note12.png', answer: 'E',  label: 'E4' },
@@ -1405,6 +1484,17 @@ const FOLDERS = [
         desc: 'Bass clef · D Major · Notes D3 through D4',
         totalQuestions: 8,
         noteOptions: ['D', 'E', 'F#', 'G', 'A', 'B', 'C#'],
+        trainer: true,
+        trainerNotes: [
+          { noteFile: 'note10.png', answer: 'D',  label: 'D3' },
+          { noteFile: 'note11.png', answer: 'E',  label: 'E3' },
+          { noteFile: 'note12.png', answer: 'F#', label: 'F3' },
+          { noteFile: 'note13.png', answer: 'G',  label: 'G3' },
+          { noteFile: 'note14.png', answer: 'A',  label: 'A3' },
+          { noteFile: 'note15.png', answer: 'B',  label: 'B3' },
+          { noteFile: 'note16.png', answer: 'C#', label: 'C4' },
+          { noteFile: 'note17.png', answer: 'D',  label: 'D4' },
+        ],
         notePool: [
           { noteFile: 'note10.png', answer: 'D',  label: 'D3' },
           { noteFile: 'note11.png', answer: 'E',  label: 'E3' },
@@ -1446,6 +1536,17 @@ const FOLDERS = [
         desc: 'Bass clef · D Major · Notes D2 through D3 (sounds one octave lower)',
         totalQuestions: 8,
         noteOptions: ['D', 'E', 'F#', 'G', 'A', 'B', 'C#'],
+        trainer: true,
+        trainerNotes: [
+          { noteFile: 'note10.png', answer: 'D',  label: 'D2' },
+          { noteFile: 'note11.png', answer: 'E',  label: 'E2' },
+          { noteFile: 'note12.png', answer: 'F#', label: 'F2' },
+          { noteFile: 'note13.png', answer: 'G',  label: 'G2' },
+          { noteFile: 'note14.png', answer: 'A',  label: 'A2' },
+          { noteFile: 'note15.png', answer: 'B',  label: 'B2' },
+          { noteFile: 'note16.png', answer: 'C#', label: 'C3' },
+          { noteFile: 'note17.png', answer: 'D',  label: 'D3' },
+        ],
         notePool: [
           { noteFile: 'note10.png', answer: 'D',  label: 'D2' },
           { noteFile: 'note11.png', answer: 'E',  label: 'E2' },
@@ -1977,7 +2078,15 @@ const FOLDERS = [
         desc: 'Treble clef · B♭ Major · Notes B♭4 through F5',
         totalQuestions: 5,
         noteOptions: ['B♭', 'C', 'D', 'E♭', 'F'],
-        notePool: [
+        trainer: true,
+        trainerNotes: [
+          { noteFile: 'note10.png', answer: 'B♭', label: 'B♭4' },
+          { noteFile: 'note11.png', answer: 'C', label: 'C5' },
+          { noteFile: 'note12.png', answer: 'D', label: 'D5' },
+          { noteFile: 'note13.png', answer: 'E♭', label: 'E♭5' },
+          { noteFile: 'note14.png', answer: 'F', label: 'F5' }
+        ],
+                notePool: [
           { noteFile: 'note10.png', answer: 'B♭', label: 'B♭4' },
           { noteFile: 'note11.png', answer: 'C',  label: 'C5'  },
           { noteFile: 'note12.png', answer: 'D',  label: 'D5'  },
@@ -1994,7 +2103,15 @@ const FOLDERS = [
         desc: 'Treble clef · C Major · Notes C4 through G4',
         totalQuestions: 5,
         noteOptions: ['C', 'D', 'E', 'F', 'G'],
-        notePool: [
+        trainer: true,
+        trainerNotes: [
+          { noteFile: 'note4.png', answer: 'C', label: 'C4' },
+          { noteFile: 'note5.png', answer: 'D', label: 'D4' },
+          { noteFile: 'note6.png', answer: 'E', label: 'E4' },
+          { noteFile: 'note7.png', answer: 'F', label: 'F4' },
+          { noteFile: 'note8.png', answer: 'G', label: 'G4' }
+        ],
+                notePool: [
           { noteFile: 'note4.png', answer: 'C', label: 'C4' },
           { noteFile: 'note5.png', answer: 'D', label: 'D4' },
           { noteFile: 'note6.png', answer: 'E', label: 'E4' },
@@ -2011,7 +2128,15 @@ const FOLDERS = [
         desc: 'Treble clef · G Major · Notes G4 through D5',
         totalQuestions: 5,
         noteOptions: ['G', 'A', 'B', 'C', 'D'],
-        notePool: [
+        trainer: true,
+        trainerNotes: [
+          { noteFile: 'note8.png', answer: 'G', label: 'G4' },
+          { noteFile: 'note9.png', answer: 'A', label: 'A4' },
+          { noteFile: 'note10.png', answer: 'B', label: 'B4' },
+          { noteFile: 'note11.png', answer: 'C', label: 'C5' },
+          { noteFile: 'note12.png', answer: 'D', label: 'D5' }
+        ],
+                notePool: [
           { noteFile: 'note8.png',  answer: 'G', label: 'G4' },
           { noteFile: 'note9.png',  answer: 'A', label: 'A4' },
           { noteFile: 'note10.png', answer: 'B', label: 'B4' },
@@ -2028,7 +2153,15 @@ const FOLDERS = [
         desc: 'Treble clef · F Major · Notes F4 through C5',
         totalQuestions: 5,
         noteOptions: ['F', 'G', 'A', 'B♭', 'C'],
-        notePool: [
+        trainer: true,
+        trainerNotes: [
+          { noteFile: 'note7.png', answer: 'F', label: 'F4' },
+          { noteFile: 'note8.png', answer: 'G', label: 'G4' },
+          { noteFile: 'note9.png', answer: 'A', label: 'A4' },
+          { noteFile: 'note10.png', answer: 'B♭', label: 'B♭4' },
+          { noteFile: 'note11.png', answer: 'C', label: 'C5' }
+        ],
+                notePool: [
           { noteFile: 'note7.png',  answer: 'F',  label: 'F4'  },
           { noteFile: 'note8.png',  answer: 'G',  label: 'G4'  },
           { noteFile: 'note9.png',  answer: 'A',  label: 'A4'  },
@@ -2045,7 +2178,15 @@ const FOLDERS = [
         desc: 'Treble clef · C Major · Notes C4 through G4',
         totalQuestions: 5,
         noteOptions: ['C', 'D', 'E', 'F', 'G'],
-        notePool: [
+        trainer: true,
+        trainerNotes: [
+          { noteFile: 'note4.png', answer: 'C', label: 'C4' },
+          { noteFile: 'note5.png', answer: 'D', label: 'D4' },
+          { noteFile: 'note6.png', answer: 'E', label: 'E4' },
+          { noteFile: 'note7.png', answer: 'F', label: 'F4' },
+          { noteFile: 'note8.png', answer: 'G', label: 'G4' }
+        ],
+                notePool: [
           { noteFile: 'note4.png', answer: 'C', label: 'C4' },
           { noteFile: 'note5.png', answer: 'D', label: 'D4' },
           { noteFile: 'note6.png', answer: 'E', label: 'E4' },
@@ -2062,7 +2203,15 @@ const FOLDERS = [
         desc: 'Bass clef · B♭ Major · Notes B♭2 through F3',
         totalQuestions: 5,
         noteOptions: ['B♭', 'C', 'D', 'E♭', 'F'],
-        notePool: [
+        trainer: true,
+        trainerNotes: [
+          { noteFile: 'note8.png', answer: 'B♭', label: 'B♭2' },
+          { noteFile: 'note9.png', answer: 'C', label: 'C3' },
+          { noteFile: 'note10.png', answer: 'D', label: 'D3' },
+          { noteFile: 'note11.png', answer: 'E♭', label: 'E♭3' },
+          { noteFile: 'note12.png', answer: 'F', label: 'F3' }
+        ],
+                notePool: [
           { noteFile: 'note8.png',  answer: 'B♭', label: 'B♭2' },
           { noteFile: 'note9.png',  answer: 'C',  label: 'C3'  },
           { noteFile: 'note10.png', answer: 'D',  label: 'D3'  },
@@ -2079,7 +2228,15 @@ const FOLDERS = [
         desc: 'Treble clef · B♭ Major · Notes B♭4 through F5',
         totalQuestions: 5,
         noteOptions: ['B♭', 'C', 'D', 'E♭', 'F'],
-        notePool: [
+        trainer: true,
+        trainerNotes: [
+          { noteFile: 'note10.png', answer: 'B♭', label: 'B♭4' },
+          { noteFile: 'note11.png', answer: 'C', label: 'C5' },
+          { noteFile: 'note12.png', answer: 'D', label: 'D5' },
+          { noteFile: 'note13.png', answer: 'E♭', label: 'E♭5' },
+          { noteFile: 'note14.png', answer: 'F', label: 'F5' }
+        ],
+                notePool: [
           { noteFile: 'note10.png', answer: 'B♭', label: 'B♭4' },
           { noteFile: 'note11.png', answer: 'C',  label: 'C5'  },
           { noteFile: 'note12.png', answer: 'D',  label: 'D5'  },
@@ -2096,7 +2253,15 @@ const FOLDERS = [
         desc: 'Bass clef · B♭ Major · Notes B♭1 through F2',
         totalQuestions: 5,
         noteOptions: ['B♭', 'C', 'D', 'E♭', 'F'],
-        notePool: [
+        trainer: true,
+        trainerNotes: [
+          { noteFile: 'note1.png', answer: 'B♭', label: 'B♭1' },
+          { noteFile: 'note2.png', answer: 'C', label: 'C2' },
+          { noteFile: 'note3.png', answer: 'D', label: 'D2' },
+          { noteFile: 'note4.png', answer: 'E♭', label: 'E♭2' },
+          { noteFile: 'note5.png', answer: 'F', label: 'F2' }
+        ],
+                notePool: [
           { noteFile: 'note1.png', answer: 'B♭', label: 'B♭1' },
           { noteFile: 'note2.png', answer: 'C',  label: 'C2'  },
           { noteFile: 'note3.png', answer: 'D',  label: 'D2'  },
@@ -2113,7 +2278,15 @@ const FOLDERS = [
         desc: 'Treble clef · B♭ Major · Notes B♭4 through F5',
         totalQuestions: 5,
         noteOptions: ['B♭', 'C', 'D', 'E♭', 'F'],
-        notePool: [
+        trainer: true,
+        trainerNotes: [
+          { noteFile: 'note10.png', answer: 'B♭', label: 'B♭4' },
+          { noteFile: 'note11.png', answer: 'C', label: 'C5' },
+          { noteFile: 'note12.png', answer: 'D', label: 'D5' },
+          { noteFile: 'note13.png', answer: 'E♭', label: 'E♭5' },
+          { noteFile: 'note14.png', answer: 'F', label: 'F5' }
+        ],
+                notePool: [
           { noteFile: 'note10.png', answer: 'B♭', label: 'B♭4' },
           { noteFile: 'note11.png', answer: 'C',  label: 'C5'  },
           { noteFile: 'note12.png', answer: 'D',  label: 'D5'  },
@@ -2130,7 +2303,15 @@ const FOLDERS = [
         desc: 'Treble clef · B♭ Major · Notes B♭3 through F4',
         totalQuestions: 5,
         noteOptions: ['B♭', 'C', 'D', 'E♭', 'F'],
-        notePool: [
+        trainer: true,
+        trainerNotes: [
+          { noteFile: 'note6.png', answer: 'B♭', label: 'B♭3' },
+          { noteFile: 'note7.png', answer: 'C', label: 'C4' },
+          { noteFile: 'note8.png', answer: 'D', label: 'D4' },
+          { noteFile: 'note9.png', answer: 'E♭', label: 'E♭4' },
+          { noteFile: 'note10.png', answer: 'F', label: 'F4' }
+        ],
+                notePool: [
           { noteFile: 'note6.png', answer: 'B♭', label: 'B♭3' },
           { noteFile: 'note7.png', answer: 'C',  label: 'C4'  },
           { noteFile: 'note8.png', answer: 'D',  label: 'D4'  },
@@ -3330,6 +3511,21 @@ function renderQuarters(ensembleId, grade, instrumentId) {
       const desc      = ready ? quiz.desc : 'Coming soon';
       const arrow     = ready ? '\u203a' : '';
 
+      // If this quiz has a trainer, inject a Trainer card right before the quiz card
+      if (ready && quiz.trainer && !isFingerQuiz) {
+        cardsHtml +=
+          '<div class="quiz-card ' + ic + ' trainer-card" onclick="launchTrainer(\'' + folderId + '\',\'' + qId + '\')">' +
+            '<div class="quiz-card-icon" style="font-size:0.72rem;font-weight:700;line-height:1.2;text-align:center;">' +
+              q.label.replace('Quarter ','Q') + '<br>🎓' +
+            '</div>' +
+            '<div>' +
+              '<div class="quiz-card-title">' + q.label + ' \u2013 Note Trainer</div>' +
+              '<div class="quiz-card-desc">Learn notes step-by-step · Progressive unlock</div>' +
+            '</div>' +
+            '<div class="quiz-card-arrow">\u203a</div>' +
+          '</div>';
+      }
+
       cardsHtml +=
         '<div class="quiz-card ' + ic + '" ' + clickAttr + ' style="' + styleAttr + '">' +
           '<div class="quiz-card-icon" style="font-size:0.72rem;font-weight:700;line-height:1.2;text-align:center;">' +
@@ -3360,6 +3556,264 @@ function renderQuarters(ensembleId, grade, instrumentId) {
       '<div class="menu-intro">Choose a Quiz</div>' +
       '<div class="quiz-cards">' + cardsHtml + '</div>' +
     '</div>';
+}
+
+// ── TRAINER ENGINE ───────────────────────────────────────────────
+// State
+let trainerNotes      = [];   // full ordered sequence from quiz.trainerNotes
+let trainerUnlocked   = 0;    // index of highest unlocked note (0-based; 0 = first note active)
+let trainerNewStreak  = 0;    // consecutive correct answers on the newest note
+let trainerAnswered   = false;
+let trainerFolder     = null;
+let trainerQuiz       = null;
+let trainerCurrentQ   = null; // { noteFile, answer, label }
+let trainerLastAnswer = null; // answer of last question shown (for no-repeat suppression)
+
+function launchTrainer(folderId, quizId) {
+  trainerFolder  = getFolder(folderId);
+  trainerQuiz    = trainerFolder.quizzes.find(q => q.id === quizId);
+  trainerNotes   = trainerQuiz.trainerNotes.slice();
+  trainerUnlocked  = 0;
+  trainerNewStreak = 0;
+  trainerAnswered  = false;
+  trainerLastAnswer = null;
+  activeFolder  = trainerFolder;
+  activeQuiz    = trainerQuiz;
+  // Set hash so exit/back works
+  if (activeEnsemble && activeGrade && activeInstrument) {
+    const qm   = folderId.match(/q([0-9])/);
+    const qnum = qm ? 'q' + qm[1] : folderId;
+    setHash(activeEnsemble.id + '/' + activeGrade + '/' + activeInstrument.id + '/' + qnum + '/trainer');
+  }
+  renderTrainer();
+}
+
+function trainerPickQuestion() {
+  // Pick a random note from the unlocked set (indices 0..trainerUnlocked)
+  // Suppress repeating the same answer as the last question, unless only one note is available
+  const pool = trainerNotes.slice(0, trainerUnlocked + 1);
+  if (pool.length === 1) return pool[0];
+  const noRepeat = pool.filter(n => n.answer !== trainerLastAnswer);
+  const candidates = noRepeat.length > 0 ? noRepeat : pool;
+  return candidates[Math.floor(Math.random() * candidates.length)];
+}
+
+function trainerVisibleOptions() {
+  // Always return ALL noteOptions so button positions never shift.
+  // Locked buttons are rendered but invisible (via 'trainer-locked' class).
+  return trainerQuiz.noteOptions;
+}
+
+function buildTrainerAnswerButtons(opts) {
+  // Same layout logic as buildAnswerButtons but locked notes get invisible placeholder buttons
+  const unlocked = trainerNotes.slice(0, trainerUnlocked + 1).map(n => n.answer);
+  const NOTE_ORDER = ['A\u266d','A','B\u266d','B','C','C#','D','E\u266d','E','F','F#','G'];
+
+  const letterMap = {};
+  opts.forEach(function(n) {
+    var letter = n.replace(/[\u266d#]/g, '');
+    if (!letterMap[letter]) letterMap[letter] = [];
+    letterMap[letter].push(n);
+  });
+
+  var isNoteQuiz = opts.some(function(n) { return NOTE_ORDER.includes(n); });
+  if (!isNoteQuiz) {
+    return opts.map(function(n) {
+      var isLocked = !unlocked.includes(n);
+      var cls = 'answer-btn' + (isLocked ? ' trainer-locked' : '');
+      var dis = isLocked ? ' disabled' : '';
+      return '<button class="' + cls + '" data-value="' + n + '"' + dis + ' onclick="selectAnswer(\'' + n + '\', this)">' + n + '</button>';
+    }).join('');
+  }
+
+  var seen = {};
+  var slots = [];
+  NOTE_ORDER.forEach(function(n) {
+    if (!opts.includes(n)) return;
+    var letter = n.replace(/[\u266d#]/g, '');
+    if (seen[letter]) return;
+    seen[letter] = true;
+    var variants = letterMap[letter] || [n];
+    if (variants.length > 1) {
+      var btns = variants.map(function(v) {
+        var isLocked = !unlocked.includes(v);
+        var cls = 'answer-btn' + (isLocked ? ' trainer-locked' : '');
+        var dis = isLocked ? ' disabled' : '';
+        return '<button class="' + cls + '" data-value="' + v + '"' + dis + ' onclick="selectAnswer(\'' + v + '\', this)">' + displayNote(v) + '</button>';
+      }).join('');
+      slots.push('<div class="btn-pair">' + btns + '</div>');
+    } else {
+      var isLocked = !unlocked.includes(n);
+      var cls = 'answer-btn' + (isLocked ? ' trainer-locked' : '');
+      var dis = isLocked ? ' disabled' : '';
+      slots.push('<button class="' + cls + '" data-value="' + n + '"' + dis + ' onclick="selectAnswer(\'' + n + '\', this)">' + displayNote(n) + '</button>');
+    }
+  });
+  return slots.join('');
+}
+
+function renderTrainer(animateNewNote) {
+  trainerAnswered  = false;
+  trainerCurrentQ  = trainerPickQuestion();
+  trainerLastAnswer = trainerCurrentQ.answer;
+
+  const q         = trainerCurrentQ;
+  const clefImg   = trainerQuiz.clefImg;
+  const clefLabel = trainerQuiz.clefLabel;
+  const opts      = trainerVisibleOptions();
+  const newNote   = trainerNotes[trainerUnlocked].answer;
+  const isNewNote = q.answer === newNote;
+
+  // Progress pips
+  const pipsHtml = trainerNotes.map(function(n, i) {
+    let cls = 'trainer-pip';
+    if (i < trainerUnlocked) cls += ' unlocked';
+    else if (i === trainerUnlocked) cls += (animateNewNote && i > 0) ? ' new-note' : ' unlocked';
+    return '<div class="' + cls + '">' + displayNote(n.answer) + '</div>';
+  }).join('');
+
+  const streakHint = trainerUnlocked < trainerNotes.length - 1
+    ? (trainerNewStreak === 1
+        ? '⭐ One more correct \u2018' + displayNote(newNote) + '\u2019 to unlock the next note!'
+        : 'Identify \u2018' + displayNote(newNote) + '\u2019 correctly twice in a row to unlock the next note')
+    : '';
+
+  // Build buttons — all notes always rendered, locked ones invisible
+  const btnsHtml = buildTrainerAnswerButtons(opts);
+
+  const gridClass = opts.length >= 6 ? 'answers-grid opts-7' : 'answers-grid';
+
+  // Full render
+  document.getElementById('app').innerHTML =
+    '<div class="header">' +
+      '<h1>' +
+        '<span>' + trainerFolder.title + ' \u2013 ' + trainerFolder.subtitle + '</span>' +
+        '🎓 Note Trainer: ' + trainerQuiz.title +
+      '</h1>' +
+      '<div class="header-right">' +
+        '<span class="key-badge">' + clefLabel + '</span>' +
+        '<button class="back-btn" onclick="renderQuarters(\'' +
+          (activeEnsemble ? activeEnsemble.id : 'orchestra') + '\',\'' +
+          (activeGrade || '5th') + '\',\'' +
+          (activeInstrument ? activeInstrument.id : 'violin') + '\')">✕ Exit</button>' +
+      '</div>' +
+    '</div>' +
+    '<div class="trainer-progress" id="trainer-progress">' + pipsHtml + '</div>' +
+    '<div class="trainer-streak" id="trainer-streak">' + streakHint + '</div>' +
+    '<div class="body">' +
+      '<div class="question-text" style="margin-top:4px;">What note is shown on the staff?</div>' +
+      '<div class="staff-container">' +
+        '<img src="' + clefImg + '" id="staff-clef" class="staff-img" alt="Clef" />' +
+        '<img src="' + q.noteFile + '" id="staff-note" class="staff-img" alt="Note on staff" />' +
+      '</div>' +
+      '<div class="' + gridClass + '" id="answers-grid">' + btnsHtml + '</div>' +
+      '<div class="feedback" id="feedback"></div>' +
+    '</div>';
+}
+
+function selectAnswer(chosen, btn) {
+  // Route to trainer handler if in trainer mode
+  if (activeQuiz && activeQuiz.trainer) {
+    selectTrainerAnswer(chosen, btn); return;
+  }
+  if (answered) return;
+  answered = true;
+
+  const q = questions[currentQ];
+  const correct = chosen === q.answer;
+  if (correct) score++;
+
+  results.push({ label: q.label, keyLabel: q.keyLabel || null, chosen, correct, correctAnswer: q.answer });
+
+  document.querySelectorAll('.answer-btn').forEach(b => {
+    b.disabled = true;
+    if (b.dataset && b.dataset.value === q.answer && !correct) b.classList.add('reveal-correct');
+  });
+
+  if (correct) {
+    btn.classList.add('correct');
+    document.getElementById('feedback').textContent = '✓ Correct!';
+    document.getElementById('feedback').className = 'feedback correct';
+  } else {
+    btn.classList.add('wrong');
+    document.getElementById('feedback').textContent = `✗ The correct answer is ${q.answer}.`;
+    document.getElementById('feedback').className = 'feedback wrong';
+  }
+
+  setTimeout(nextQuestion, 1000);
+}
+
+function nextQuestion() {
+  currentQ++;
+  answered = false;
+  currentQ < totalQ() ? renderQuestion() : renderScore();
+}
+
+function selectTrainerAnswer(chosen, btn) {
+  if (trainerAnswered) return;
+  trainerAnswered = true;
+
+  const q       = trainerCurrentQ;
+  const correct = chosen === q.answer;
+  const newNote = trainerNotes[trainerUnlocked].answer;
+
+  document.querySelectorAll('.answer-btn').forEach(b => b.disabled = true);
+
+  if (correct) {
+    btn.classList.add('correct');
+    document.getElementById('feedback').textContent = '✓ Correct!';
+    document.getElementById('feedback').className   = 'feedback correct';
+
+    // Track streak only for the newest (unlocked frontier) note
+    if (q.answer === newNote) {
+      trainerNewStreak++;
+    } else {
+      // Correct on an already-mastered note — streak for new note unaffected
+    }
+
+    // Check if we should unlock the next note
+    const lastNote  = trainerUnlocked >= trainerNotes.length - 1;
+    const shouldUnlock = !lastNote && trainerNewStreak >= 2;
+
+    if (shouldUnlock) {
+      trainerUnlocked++;
+      trainerNewStreak = 0;
+      setTimeout(function() { renderTrainer(true); }, 900);
+    } else if (lastNote && trainerNewStreak >= 2) {
+      // All notes mastered!
+      setTimeout(showCongratsOverlay, 900);
+    } else {
+      setTimeout(function() { renderTrainer(false); }, 900);
+    }
+  } else {
+    btn.classList.add('wrong');
+    // Reveal the correct button
+    document.querySelectorAll('.answer-btn').forEach(b => {
+      if (b.dataset && b.dataset.value === q.answer) b.classList.add('reveal-correct');
+    });
+    document.getElementById('feedback').textContent = '✗ The answer is ' + displayNote(q.answer) + '.';
+    document.getElementById('feedback').className   = 'feedback wrong';
+    // Reset streak if wrong on the new note
+    if (q.answer === newNote) trainerNewStreak = 0;
+    setTimeout(function() { renderTrainer(false); }, 1200);
+  }
+}
+
+function showCongratsOverlay() {
+  const overlay = document.createElement('div');
+  overlay.className = 'congrats-overlay';
+  overlay.innerHTML =
+    '<div class="congrats-box">' +
+      '<div class="congrats-emoji">🎉</div>' +
+      '<div class="congrats-title">Congratulations!</div>' +
+      '<div class="congrats-sub">You\'ve learned all ' + trainerNotes.length +
+        ' notes in ' + trainerQuiz.title + '.<br>You\'re ready for the quiz!</div>' +
+      '<button class="congrats-btn" onclick="this.closest(\'.congrats-overlay\').remove(); renderQuarters(\'' +
+        (activeEnsemble ? activeEnsemble.id : 'orchestra') + '\',\'' +
+        (activeGrade || '5th') + '\',\'' +
+        (activeInstrument ? activeInstrument.id : 'violin') + '\')">Back to Quizzes</button>' +
+    '</div>';
+  document.body.appendChild(overlay);
 }
 
 // ── LAUNCH QUIZ (replaces startQuiz entry point from menus) ───────
@@ -3501,40 +3955,6 @@ function renderQuestion() {
   grid.className = gridClass;
   if (isFingerGrid) grid.style.setProperty('--finger-cols', opts.length);
   grid.innerHTML = buildAnswerButtons(opts);
-}
-
-function selectAnswer(chosen, btn) {
-  if (answered) return;
-  answered = true;
-
-  const q = questions[currentQ];
-  const correct = chosen === q.answer;
-  if (correct) score++;
-
-  results.push({ label: q.label, keyLabel: q.keyLabel || null, chosen, correct, correctAnswer: q.answer });
-
-  document.querySelectorAll('.answer-btn').forEach(b => {
-    b.disabled = true;
-    if (b.dataset && b.dataset.value === q.answer && !correct) b.classList.add('reveal-correct');
-  });
-
-  if (correct) {
-    btn.classList.add('correct');
-    document.getElementById('feedback').textContent = '✓ Correct!';
-    document.getElementById('feedback').className = 'feedback correct';
-  } else {
-    btn.classList.add('wrong');
-    document.getElementById('feedback').textContent = `✗ The correct answer is ${q.answer}.`;
-    document.getElementById('feedback').className = 'feedback wrong';
-  }
-
-  setTimeout(nextQuestion, 1000);
-}
-
-function nextQuestion() {
-  currentQ++;
-  answered = false;
-  currentQ < totalQ() ? renderQuestion() : renderScore();
 }
 
 // ── SCREEN: SCORE ────────────────────────────────────────────────
