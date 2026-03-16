@@ -166,6 +166,13 @@
 
   /* ── QUIZ CARDS (instrument level) ── */
   .quiz-cards { display: flex; flex-direction: column; gap: 12px; }
+  .quiz-quarter-divider {
+    font-size: 0.7rem; font-weight: 700; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--muted);
+    padding: 4px 0 2px 2px; margin-top: 8px;
+    border-top: 1px solid var(--parchment);
+  }
+  .quiz-quarter-divider:first-child { margin-top: 0; border-top: none; }
   .quiz-card {
     display: flex; align-items: center; gap: 16px;
     background: var(--cream); border: 2px solid var(--parchment);
@@ -347,6 +354,11 @@
   .trainer-streak {
     font-size: 0.78rem; color: var(--muted); text-align: center;
     min-height: 18px; margin-bottom: 2px; letter-spacing: 0.02em;
+  }
+  .trainer-new-note-banner {
+    position: absolute; top: 6px; left: 0; right: 0;
+    font-size: 1.1rem; font-weight: 700; text-align: center; line-height: 36px;
+    color: var(--green); pointer-events: none;
   }
   .trainer-card {
     border: 2px solid var(--gold);
@@ -1596,6 +1608,21 @@ const FOLDERS = [
         icon: '𝄞',
         desc: 'Treble clef · D Major · Notes G3 through D5',
         noteOptions: ['A', 'B', 'C#', 'D', 'E', 'F#', 'G'],
+        trainer: true,
+        trainerNotes: [
+          { noteFile: 'note1.png', answer: 'G', label: 'G3' },
+          { noteFile: 'note2.png', answer: 'A', label: 'A3' },
+          { noteFile: 'note3.png', answer: 'B', label: 'B3' },
+          { noteFile: 'note4.png', answer: 'C#', label: 'C4' },
+          { noteFile: 'note5.png', answer: 'D', label: 'D4' },
+          { noteFile: 'note6.png', answer: 'E', label: 'E4' },
+          { noteFile: 'note7.png', answer: 'F#', label: 'F4' },
+          { noteFile: 'note8.png', answer: 'G', label: 'G4' },
+          { noteFile: 'note9.png', answer: 'A', label: 'A4' },
+          { noteFile: 'note10.png', answer: 'B', label: 'B4' },
+          { noteFile: 'note11.png', answer: 'C#', label: 'C5' },
+          { noteFile: 'note12.png', answer: 'D', label: 'D5' },
+        ],
         notePool: [
           { noteFile: 'note1.png',  answer: 'G',  label: 'G3' },
           { noteFile: 'note2.png',  answer: 'A',  label: 'A3' },
@@ -1649,6 +1676,21 @@ const FOLDERS = [
         icon: '𝄡',
         desc: 'Alto clef · D Major · Notes G3 through D5',
         noteOptions: ['A', 'B', 'C#', 'D', 'E', 'F#', 'G'],
+        trainer: true,
+        trainerNotes: [
+          { noteFile: 'note7.png', answer: 'G', label: 'G3' },
+          { noteFile: 'note8.png', answer: 'A', label: 'A3' },
+          { noteFile: 'note9.png', answer: 'B', label: 'B3' },
+          { noteFile: 'note10.png', answer: 'C#', label: 'C4' },
+          { noteFile: 'note11.png', answer: 'D', label: 'D4' },
+          { noteFile: 'note12.png', answer: 'E', label: 'E4' },
+          { noteFile: 'note13.png', answer: 'F#', label: 'F4' },
+          { noteFile: 'note14.png', answer: 'G', label: 'G4' },
+          { noteFile: 'note15.png', answer: 'A', label: 'A4' },
+          { noteFile: 'note16.png', answer: 'B', label: 'B4' },
+          { noteFile: 'note17.png', answer: 'C#', label: 'C5' },
+          { noteFile: 'note18.png', answer: 'D', label: 'D5' },
+        ],
         notePool: [
           { noteFile: 'note7.png',  answer: 'G',  label: 'G3' },
           { noteFile: 'note8.png',  answer: 'A',  label: 'A3' },
@@ -1702,6 +1744,21 @@ const FOLDERS = [
         icon: '𝄢',
         desc: 'Bass clef · D Major · Notes G2 through D4',
         noteOptions: ['A', 'B', 'C#', 'D', 'E', 'F#', 'G'],
+        trainer: true,
+        trainerNotes: [
+          { noteFile: 'note6.png', answer: 'G', label: 'G2' },
+          { noteFile: 'note7.png', answer: 'A', label: 'A2' },
+          { noteFile: 'note8.png', answer: 'B', label: 'B2' },
+          { noteFile: 'note9.png', answer: 'C#', label: 'C3' },
+          { noteFile: 'note10.png', answer: 'D', label: 'D3' },
+          { noteFile: 'note11.png', answer: 'E', label: 'E3' },
+          { noteFile: 'note12.png', answer: 'F#', label: 'F3' },
+          { noteFile: 'note13.png', answer: 'G', label: 'G3' },
+          { noteFile: 'note14.png', answer: 'A', label: 'A3' },
+          { noteFile: 'note15.png', answer: 'B', label: 'B3' },
+          { noteFile: 'note16.png', answer: 'C#', label: 'C4' },
+          { noteFile: 'note17.png', answer: 'D', label: 'D4' },
+        ],
         notePool: [
           { noteFile: 'note6.png',  answer: 'G',  label: 'G2' },
           { noteFile: 'note7.png',  answer: 'A',  label: 'A2' },
@@ -1756,6 +1813,20 @@ const FOLDERS = [
         icon: '𝄢',
         desc: 'Bass clef · D Major · Notes A1 through D3 (sounds one octave lower)',
         noteOptions: ['A', 'B', 'C#', 'D', 'E', 'F#', 'G'],
+        trainer: true,
+        trainerNotes: [
+          { noteFile: 'note7.png', answer: 'A', label: 'A1' },
+          { noteFile: 'note8.png', answer: 'B', label: 'B1' },
+          { noteFile: 'note9.png', answer: 'C#', label: 'C2' },
+          { noteFile: 'note10.png', answer: 'D', label: 'D2' },
+          { noteFile: 'note11.png', answer: 'E', label: 'E2' },
+          { noteFile: 'note12.png', answer: 'F#', label: 'F2' },
+          { noteFile: 'note13.png', answer: 'G', label: 'G2' },
+          { noteFile: 'note14.png', answer: 'A', label: 'A2' },
+          { noteFile: 'note15.png', answer: 'B', label: 'B2' },
+          { noteFile: 'note16.png', answer: 'C#', label: 'C3' },
+          { noteFile: 'note17.png', answer: 'D', label: 'D3' },
+        ],
         notePool: [
           { noteFile: 'note7.png',  answer: 'A',  label: 'A1' },
           { noteFile: 'note8.png',  answer: 'B',  label: 'B1' },
@@ -1806,6 +1877,23 @@ const FOLDERS = [
         desc: 'Treble clef · C, G & D Major · Notes G3 through D5 · 14 questions',
         totalQuestions: 14,
         noteOptions: ['A', 'B', 'C', 'C#', 'D', 'E', 'F', 'F#', 'G'],
+        trainer: true,
+        trainerNotes: [
+          { noteFile: 'note1.png',  answer: 'G',  label: 'G3', clefImg: 'treble2.png', clefLabel: 'D Major' },
+          { noteFile: 'note2.png',  answer: 'A',  label: 'A3', clefImg: 'treble2.png', clefLabel: 'D Major' },
+          { noteFile: 'note3.png',  answer: 'B',  label: 'B3', clefImg: 'treble2.png', clefLabel: 'D Major' },
+          { noteFile: 'note4.png',  answer: 'C#', label: 'C4', clefImg: 'treble2.png', clefLabel: 'D Major' },
+          { noteFile: 'note4.png',  answer: 'C',  label: 'C4', clefImg: 'treble0.png', clefLabel: 'C Major' },
+          { noteFile: 'note5.png',  answer: 'D',  label: 'D4', clefImg: 'treble0.png', clefLabel: 'C Major' },
+          { noteFile: 'note6.png',  answer: 'E',  label: 'E4', clefImg: 'treble0.png', clefLabel: 'C Major' },
+          { noteFile: 'note7.png',  answer: 'F',  label: 'F4', clefImg: 'treble0.png', clefLabel: 'C Major' },
+          { noteFile: 'note7.png',  answer: 'F#', label: 'F4', clefImg: 'treble1.png', clefLabel: 'G Major' },
+          { noteFile: 'note8.png',  answer: 'G',  label: 'G4', clefImg: 'treble1.png', clefLabel: 'G Major' },
+          { noteFile: 'note9.png',  answer: 'A',  label: 'A4', clefImg: 'treble1.png', clefLabel: 'G Major' },
+          { noteFile: 'note10.png', answer: 'B',  label: 'B4', clefImg: 'treble0.png', clefLabel: 'C Major' },
+          { noteFile: 'note11.png', answer: 'C',  label: 'C5', clefImg: 'treble1.png', clefLabel: 'G Major' },
+          { noteFile: 'note12.png', answer: 'D',  label: 'D5', clefImg: 'treble2.png', clefLabel: 'D Major' },
+        ],
         buildQuiz: function() { return buildQ3NoteQuiz(Q3_TREBLE_POOL); },
       },
       {
@@ -1834,6 +1922,23 @@ const FOLDERS = [
         desc: 'Alto clef · C, G & D Major · Notes G3 through D5 · 14 questions',
         totalQuestions: 14,
         noteOptions: ['A', 'B', 'C', 'C#', 'D', 'E', 'F', 'F#', 'G'],
+        trainer: true,
+        trainerNotes: [
+          { noteFile: 'note7.png', answer: 'G', label: 'G3', clefImg: 'alto2.png', clefLabel: 'D Major' },
+          { noteFile: 'note8.png', answer: 'A', label: 'A3', clefImg: 'alto2.png', clefLabel: 'D Major' },
+          { noteFile: 'note9.png', answer: 'B', label: 'B3', clefImg: 'alto2.png', clefLabel: 'D Major' },
+          { noteFile: 'note10.png', answer: 'C#', label: 'C4', clefImg: 'alto2.png', clefLabel: 'D Major' },
+          { noteFile: 'note10.png', answer: 'C', label: 'C4', clefImg: 'alto0.png', clefLabel: 'C Major' },
+          { noteFile: 'note11.png', answer: 'D', label: 'D4', clefImg: 'alto0.png', clefLabel: 'C Major' },
+          { noteFile: 'note12.png', answer: 'E', label: 'E4', clefImg: 'alto0.png', clefLabel: 'C Major' },
+          { noteFile: 'note13.png', answer: 'F', label: 'F4', clefImg: 'alto0.png', clefLabel: 'C Major' },
+          { noteFile: 'note13.png', answer: 'F#', label: 'F4', clefImg: 'alto1.png', clefLabel: 'G Major' },
+          { noteFile: 'note14.png', answer: 'G', label: 'G4', clefImg: 'alto2.png', clefLabel: 'D Major' },
+          { noteFile: 'note15.png', answer: 'A', label: 'A4', clefImg: 'alto1.png', clefLabel: 'G Major' },
+          { noteFile: 'note16.png', answer: 'B', label: 'B4', clefImg: 'alto0.png', clefLabel: 'C Major' },
+          { noteFile: 'note17.png', answer: 'C', label: 'C5', clefImg: 'alto1.png', clefLabel: 'G Major' },
+          { noteFile: 'note18.png', answer: 'D', label: 'D5', clefImg: 'alto2.png', clefLabel: 'D Major' }
+        ],
         buildQuiz: function() { return buildQ3NoteQuiz(Q3_ALTO_POOL); },
       },
       {
@@ -1862,6 +1967,23 @@ const FOLDERS = [
         desc: 'Bass clef · C, G & D Major · Notes G2 through D4 · 14 questions',
         totalQuestions: 14,
         noteOptions: ['A', 'B', 'C', 'C#', 'D', 'E', 'F', 'F#', 'G'],
+        trainer: true,
+        trainerNotes: [
+          { noteFile: 'note6.png', answer: 'G', label: 'G2', clefImg: 'bass2.png', clefLabel: 'D Major' },
+          { noteFile: 'note7.png', answer: 'A', label: 'A2', clefImg: 'bass2.png', clefLabel: 'D Major' },
+          { noteFile: 'note8.png', answer: 'B', label: 'B2', clefImg: 'bass2.png', clefLabel: 'D Major' },
+          { noteFile: 'note9.png', answer: 'C#', label: 'C3', clefImg: 'bass2.png', clefLabel: 'D Major' },
+          { noteFile: 'note9.png', answer: 'C', label: 'C3', clefImg: 'bass0.png', clefLabel: 'C Major' },
+          { noteFile: 'note10.png', answer: 'D', label: 'D3', clefImg: 'bass0.png', clefLabel: 'C Major' },
+          { noteFile: 'note11.png', answer: 'E', label: 'E3', clefImg: 'bass0.png', clefLabel: 'C Major' },
+          { noteFile: 'note12.png', answer: 'F', label: 'F3', clefImg: 'bass0.png', clefLabel: 'C Major' },
+          { noteFile: 'note12.png', answer: 'F#', label: 'F3', clefImg: 'bass1.png', clefLabel: 'G Major' },
+          { noteFile: 'note13.png', answer: 'G', label: 'G3', clefImg: 'bass2.png', clefLabel: 'D Major' },
+          { noteFile: 'note14.png', answer: 'A', label: 'A3', clefImg: 'bass1.png', clefLabel: 'G Major' },
+          { noteFile: 'note15.png', answer: 'B', label: 'B3', clefImg: 'bass0.png', clefLabel: 'C Major' },
+          { noteFile: 'note16.png', answer: 'C', label: 'C4', clefImg: 'bass1.png', clefLabel: 'G Major' },
+          { noteFile: 'note17.png', answer: 'D', label: 'D4', clefImg: 'bass2.png', clefLabel: 'D Major' }
+        ],
         buildQuiz: function() { return buildQ3NoteQuiz(Q3_BASS_CELLO_POOL); },
       },
       {
@@ -1890,6 +2012,23 @@ const FOLDERS = [
         desc: 'Bass clef · C, G & D Major · Notes G1 through D3 · 14 questions (sounds one octave lower)',
         totalQuestions: 14,
         noteOptions: ['A', 'B', 'C', 'C#', 'D', 'E', 'F', 'F#', 'G'],
+        trainer: true,
+        trainerNotes: [
+          { noteFile: 'note6.png', answer: 'G', label: 'G1', clefImg: 'bass2.png', clefLabel: 'D Major' },
+          { noteFile: 'note7.png', answer: 'A', label: 'A1', clefImg: 'bass2.png', clefLabel: 'D Major' },
+          { noteFile: 'note8.png', answer: 'B', label: 'B1', clefImg: 'bass2.png', clefLabel: 'D Major' },
+          { noteFile: 'note9.png', answer: 'C#', label: 'C2', clefImg: 'bass2.png', clefLabel: 'D Major' },
+          { noteFile: 'note9.png', answer: 'C', label: 'C2', clefImg: 'bass0.png', clefLabel: 'C Major' },
+          { noteFile: 'note10.png', answer: 'D', label: 'D2', clefImg: 'bass0.png', clefLabel: 'C Major' },
+          { noteFile: 'note11.png', answer: 'E', label: 'E2', clefImg: 'bass0.png', clefLabel: 'C Major' },
+          { noteFile: 'note12.png', answer: 'F', label: 'F2', clefImg: 'bass0.png', clefLabel: 'C Major' },
+          { noteFile: 'note12.png', answer: 'F#', label: 'F2', clefImg: 'bass1.png', clefLabel: 'G Major' },
+          { noteFile: 'note13.png', answer: 'G', label: 'G2', clefImg: 'bass2.png', clefLabel: 'D Major' },
+          { noteFile: 'note14.png', answer: 'A', label: 'A2', clefImg: 'bass1.png', clefLabel: 'G Major' },
+          { noteFile: 'note15.png', answer: 'B', label: 'B2', clefImg: 'bass0.png', clefLabel: 'C Major' },
+          { noteFile: 'note16.png', answer: 'C', label: 'C3', clefImg: 'bass1.png', clefLabel: 'G Major' },
+          { noteFile: 'note17.png', answer: 'D', label: 'D3', clefImg: 'bass2.png', clefLabel: 'D Major' }
+        ],
         buildQuiz: function() { return buildQ3NoteQuiz(Q3_BASS_BASS_POOL); },
       },
       {
@@ -1927,6 +2066,28 @@ const FOLDERS = [
         desc: 'Treble clef · C, G & D Major · Notes G3 through A5 · 19 questions',
         totalQuestions: 19,
         noteOptions: ['A', 'B', 'C', 'C#', 'D', 'E', 'F', 'F#', 'G'],
+        trainer: true,
+        trainerNotes: [
+          { noteFile: 'note1.png', answer: 'G', label: 'G3', clefImg: 'treble2.png', clefLabel: 'D Major' },
+          { noteFile: 'note2.png', answer: 'A', label: 'A3', clefImg: 'treble2.png', clefLabel: 'D Major' },
+          { noteFile: 'note3.png', answer: 'B', label: 'B3', clefImg: 'treble2.png', clefLabel: 'D Major' },
+          { noteFile: 'note4.png', answer: 'C#', label: 'C4', clefImg: 'treble2.png', clefLabel: 'D Major' },
+          { noteFile: 'note4.png', answer: 'C', label: 'C4', clefImg: 'treble0.png', clefLabel: 'C Major' },
+          { noteFile: 'note5.png', answer: 'D', label: 'D4', clefImg: 'treble0.png', clefLabel: 'C Major' },
+          { noteFile: 'note6.png', answer: 'E', label: 'E4', clefImg: 'treble0.png', clefLabel: 'C Major' },
+          { noteFile: 'note7.png', answer: 'F', label: 'F4', clefImg: 'treble0.png', clefLabel: 'C Major' },
+          { noteFile: 'note7.png', answer: 'F#', label: 'F4', clefImg: 'treble1.png', clefLabel: 'G Major' },
+          { noteFile: 'note8.png', answer: 'G', label: 'G4', clefImg: 'treble2.png', clefLabel: 'D Major' },
+          { noteFile: 'note9.png', answer: 'A', label: 'A4', clefImg: 'treble1.png', clefLabel: 'G Major' },
+          { noteFile: 'note10.png', answer: 'B', label: 'B4', clefImg: 'treble0.png', clefLabel: 'C Major' },
+          { noteFile: 'note11.png', answer: 'C', label: 'C5', clefImg: 'treble1.png', clefLabel: 'G Major' },
+          { noteFile: 'note12.png', answer: 'D', label: 'D5', clefImg: 'treble2.png', clefLabel: 'D Major' },
+          { noteFile: 'note13.png', answer: 'E', label: 'E5', clefImg: 'treble0.png', clefLabel: 'C Major' },
+          { noteFile: 'note14.png', answer: 'F', label: 'F5', clefImg: 'treble0.png', clefLabel: 'C Major' },
+          { noteFile: 'note14.png', answer: 'F#', label: 'F5', clefImg: 'treble1.png', clefLabel: 'G Major' },
+          { noteFile: 'note15.png', answer: 'G', label: 'G5', clefImg: 'treble2.png', clefLabel: 'D Major' },
+          { noteFile: 'note16.png', answer: 'A', label: 'A5', clefImg: 'treble1.png', clefLabel: 'G Major' }
+        ],
         buildQuiz: function() {
           var pool = Q4_TREBLE_NOTE_POOL.slice();
           for (var i=pool.length-1;i>0;i--) {
@@ -1980,6 +2141,28 @@ const FOLDERS = [
         desc: 'Alto clef · C, G & D Major · Notes C3 through D5 · 19 questions',
         totalQuestions: 19,
         noteOptions: ['A', 'B', 'C', 'C#', 'D', 'E', 'F', 'F#', 'G'],
+        trainer: true,
+        trainerNotes: [
+          { noteFile: 'note3.png', answer: 'C#', label: 'C3', clefImg: 'alto2.png', clefLabel: 'D Major' },
+          { noteFile: 'note3.png', answer: 'C', label: 'C3', clefImg: 'alto0.png', clefLabel: 'C Major' },
+          { noteFile: 'note4.png', answer: 'D', label: 'D3', clefImg: 'alto0.png', clefLabel: 'C Major' },
+          { noteFile: 'note5.png', answer: 'E', label: 'E3', clefImg: 'alto1.png', clefLabel: 'G Major' },
+          { noteFile: 'note6.png', answer: 'F', label: 'F3', clefImg: 'alto0.png', clefLabel: 'C Major' },
+          { noteFile: 'note7.png', answer: 'G', label: 'G3', clefImg: 'alto2.png', clefLabel: 'D Major' },
+          { noteFile: 'note8.png', answer: 'A', label: 'A3', clefImg: 'alto0.png', clefLabel: 'C Major' },
+          { noteFile: 'note9.png', answer: 'B', label: 'B3', clefImg: 'alto1.png', clefLabel: 'G Major' },
+          { noteFile: 'note10.png', answer: 'C#', label: 'C4', clefImg: 'alto2.png', clefLabel: 'D Major' },
+          { noteFile: 'note10.png', answer: 'C', label: 'C4', clefImg: 'alto0.png', clefLabel: 'C Major' },
+          { noteFile: 'note11.png', answer: 'D', label: 'D4', clefImg: 'alto1.png', clefLabel: 'G Major' },
+          { noteFile: 'note12.png', answer: 'E', label: 'E4', clefImg: 'alto0.png', clefLabel: 'C Major' },
+          { noteFile: 'note13.png', answer: 'F', label: 'F4', clefImg: 'alto0.png', clefLabel: 'C Major' },
+          { noteFile: 'note13.png', answer: 'F#', label: 'F4', clefImg: 'alto1.png', clefLabel: 'G Major' },
+          { noteFile: 'note14.png', answer: 'G', label: 'G4', clefImg: 'alto2.png', clefLabel: 'D Major' },
+          { noteFile: 'note15.png', answer: 'A', label: 'A4', clefImg: 'alto1.png', clefLabel: 'G Major' },
+          { noteFile: 'note16.png', answer: 'B', label: 'B4', clefImg: 'alto0.png', clefLabel: 'C Major' },
+          { noteFile: 'note17.png', answer: 'C', label: 'C5', clefImg: 'alto1.png', clefLabel: 'G Major' },
+          { noteFile: 'note18.png', answer: 'D', label: 'D5', clefImg: 'alto2.png', clefLabel: 'D Major' }
+        ],
         buildQuiz: function() {
           var pool = Q4_ALTO_NOTE_POOL.slice();
           for (var i=pool.length-1;i>0;i--) {
@@ -1997,6 +2180,28 @@ const FOLDERS = [
         desc: 'Bass clef · C, G & D Major · Notes C2 through D4 · 19 questions',
         totalQuestions: 19,
         noteOptions: ['A', 'B', 'C', 'C#', 'D', 'E', 'F', 'F#', 'G'],
+        trainer: true,
+        trainerNotes: [
+          { noteFile: 'note2.png', answer: 'C#', label: 'C2', clefImg: 'bass2.png', clefLabel: 'D Major' },
+          { noteFile: 'note2.png', answer: 'C', label: 'C2', clefImg: 'bass0.png', clefLabel: 'C Major' },
+          { noteFile: 'note3.png', answer: 'D', label: 'D2', clefImg: 'bass0.png', clefLabel: 'C Major' },
+          { noteFile: 'note4.png', answer: 'E', label: 'E2', clefImg: 'bass1.png', clefLabel: 'G Major' },
+          { noteFile: 'note5.png', answer: 'F', label: 'F2', clefImg: 'bass0.png', clefLabel: 'C Major' },
+          { noteFile: 'note6.png', answer: 'G', label: 'G2', clefImg: 'bass2.png', clefLabel: 'D Major' },
+          { noteFile: 'note7.png', answer: 'A', label: 'A2', clefImg: 'bass0.png', clefLabel: 'C Major' },
+          { noteFile: 'note8.png', answer: 'B', label: 'B2', clefImg: 'bass1.png', clefLabel: 'G Major' },
+          { noteFile: 'note9.png', answer: 'C#', label: 'C3', clefImg: 'bass2.png', clefLabel: 'D Major' },
+          { noteFile: 'note9.png', answer: 'C', label: 'C3', clefImg: 'bass0.png', clefLabel: 'C Major' },
+          { noteFile: 'note10.png', answer: 'D', label: 'D3', clefImg: 'bass1.png', clefLabel: 'G Major' },
+          { noteFile: 'note11.png', answer: 'E', label: 'E3', clefImg: 'bass0.png', clefLabel: 'C Major' },
+          { noteFile: 'note12.png', answer: 'F', label: 'F3', clefImg: 'bass0.png', clefLabel: 'C Major' },
+          { noteFile: 'note12.png', answer: 'F#', label: 'F3', clefImg: 'bass1.png', clefLabel: 'G Major' },
+          { noteFile: 'note13.png', answer: 'G', label: 'G3', clefImg: 'bass2.png', clefLabel: 'D Major' },
+          { noteFile: 'note14.png', answer: 'A', label: 'A3', clefImg: 'bass1.png', clefLabel: 'G Major' },
+          { noteFile: 'note15.png', answer: 'B', label: 'B3', clefImg: 'bass0.png', clefLabel: 'C Major' },
+          { noteFile: 'note16.png', answer: 'C', label: 'C4', clefImg: 'bass1.png', clefLabel: 'G Major' },
+          { noteFile: 'note17.png', answer: 'D', label: 'D4', clefImg: 'bass2.png', clefLabel: 'D Major' }
+        ],
         buildQuiz: function() {
           var pool = Q4_BASS_CELLO_NOTE_POOL.slice();
           for (var i=pool.length-1;i>0;i--) {
@@ -2032,6 +2237,25 @@ const FOLDERS = [
         desc: 'Bass clef · C, G & D Major · Notes E1 through D3 · 16 questions (sounds one octave lower)',
         totalQuestions: 16,
         noteOptions: ['A', 'B', 'C', 'C#', 'D', 'E', 'F', 'F#', 'G'],
+        trainer: true,
+        trainerNotes: [
+          { noteFile: 'note4.png', answer: 'E', label: 'E1', clefImg: 'bass0.png', clefLabel: 'C Major' },
+          { noteFile: 'note5.png', answer: 'F#', label: 'F1', clefImg: 'bass1.png', clefLabel: 'G Major' },
+          { noteFile: 'note6.png', answer: 'G', label: 'G1', clefImg: 'bass2.png', clefLabel: 'D Major' },
+          { noteFile: 'note7.png', answer: 'A', label: 'A1', clefImg: 'bass0.png', clefLabel: 'C Major' },
+          { noteFile: 'note8.png', answer: 'B', label: 'B1', clefImg: 'bass1.png', clefLabel: 'G Major' },
+          { noteFile: 'note9.png', answer: 'C', label: 'C2', clefImg: 'bass0.png', clefLabel: 'C Major' },
+          { noteFile: 'note9.png', answer: 'C#', label: 'C2', clefImg: 'bass2.png', clefLabel: 'D Major' },
+          { noteFile: 'note10.png', answer: 'D', label: 'D2', clefImg: 'bass1.png', clefLabel: 'G Major' },
+          { noteFile: 'note11.png', answer: 'E', label: 'E2', clefImg: 'bass0.png', clefLabel: 'C Major' },
+          { noteFile: 'note12.png', answer: 'F', label: 'F2', clefImg: 'bass0.png', clefLabel: 'C Major' },
+          { noteFile: 'note12.png', answer: 'F#', label: 'F2', clefImg: 'bass1.png', clefLabel: 'G Major' },
+          { noteFile: 'note13.png', answer: 'G', label: 'G2', clefImg: 'bass2.png', clefLabel: 'D Major' },
+          { noteFile: 'note14.png', answer: 'A', label: 'A2', clefImg: 'bass0.png', clefLabel: 'C Major' },
+          { noteFile: 'note15.png', answer: 'B', label: 'B2', clefImg: 'bass1.png', clefLabel: 'G Major' },
+          { noteFile: 'note16.png', answer: 'C', label: 'C3', clefImg: 'bass1.png', clefLabel: 'G Major' },
+          { noteFile: 'note17.png', answer: 'D', label: 'D3', clefImg: 'bass2.png', clefLabel: 'D Major' }
+        ],
         buildQuiz: function() {
           var pool = Q4_BASS_BASS_NOTE_POOL.slice();
           for (var i=pool.length-1;i>0;i--) {
@@ -2221,27 +2445,27 @@ const FOLDERS = [
       },
       {
         id: 'baritone',
-        title: 'Baritone B♭4–F5',
-        clefLabel: 'Treble Clef · B♭ Major',
-        clefImg: 'treble-2.png',
+        title: 'Baritone B♭2–F3',
+        clefLabel: 'Bass Clef · B♭ Major',
+        clefImg: 'bass-2.png',
         icon: '🎺',
-        desc: 'Treble clef · B♭ Major · Notes B♭4 through F5',
+        desc: 'Bass clef · B♭ Major · Notes B♭2 through F3',
         totalQuestions: 5,
         noteOptions: ['B♭', 'C', 'D', 'E♭', 'F'],
         trainer: true,
         trainerNotes: [
-          { noteFile: 'note10.png', answer: 'B♭', label: 'B♭4' },
-          { noteFile: 'note11.png', answer: 'C', label: 'C5' },
-          { noteFile: 'note12.png', answer: 'D', label: 'D5' },
-          { noteFile: 'note13.png', answer: 'E♭', label: 'E♭5' },
-          { noteFile: 'note14.png', answer: 'F', label: 'F5' }
+          { noteFile: 'note8.png',  answer: 'B♭', label: 'B♭2' },
+          { noteFile: 'note9.png',  answer: 'C',  label: 'C3'  },
+          { noteFile: 'note10.png', answer: 'D',  label: 'D3'  },
+          { noteFile: 'note11.png', answer: 'E♭', label: 'E♭3' },
+          { noteFile: 'note12.png', answer: 'F',  label: 'F3'  }
         ],
-                notePool: [
-          { noteFile: 'note10.png', answer: 'B♭', label: 'B♭4' },
-          { noteFile: 'note11.png', answer: 'C',  label: 'C5'  },
-          { noteFile: 'note12.png', answer: 'D',  label: 'D5'  },
-          { noteFile: 'note13.png', answer: 'E♭', label: 'E♭5' },
-          { noteFile: 'note14.png', answer: 'F',  label: 'F5'  },
+        notePool: [
+          { noteFile: 'note8.png',  answer: 'B♭', label: 'B♭2' },
+          { noteFile: 'note9.png',  answer: 'C',  label: 'C3'  },
+          { noteFile: 'note10.png', answer: 'D',  label: 'D3'  },
+          { noteFile: 'note11.png', answer: 'E♭', label: 'E♭3' },
+          { noteFile: 'note12.png', answer: 'F',  label: 'F3'  },
         ],
       },
       {
@@ -2339,6 +2563,17 @@ const FOLDERS = [
         desc: 'Treble clef · C Major · Notes C4 through C5',
         totalQuestions: 8,
         noteOptions: ['C', 'D', 'E', 'F', 'G', 'A', 'B'],
+        trainer: true,
+        trainerNotes: [
+          { noteFile: 'note4.png',  answer: 'C', label: 'C4' },
+          { noteFile: 'note5.png',  answer: 'D', label: 'D4' },
+          { noteFile: 'note6.png',  answer: 'E', label: 'E4' },
+          { noteFile: 'note7.png',  answer: 'F', label: 'F4' },
+          { noteFile: 'note8.png',  answer: 'G', label: 'G4' },
+          { noteFile: 'note9.png',  answer: 'A', label: 'A4' },
+          { noteFile: 'note10.png', answer: 'B', label: 'B4' },
+          { noteFile: 'note11.png', answer: 'C', label: 'C5' },
+        ],
         notePool: [
           { noteFile: 'note4.png',  answer: 'C', label: 'C4' },
           { noteFile: 'note5.png',  answer: 'D', label: 'D4' },
@@ -2370,6 +2605,15 @@ const FOLDERS = [
         desc: 'Treble clef · B♭ Major · Notes B♭4 through G5',
         totalQuestions: 6,
         noteOptions: ['B♭', 'C', 'D', 'E♭', 'F', 'G'],
+        trainer: true,
+        trainerNotes: [
+          { noteFile: 'note10.png', answer: 'B♭', label: 'B♭4', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note11.png', answer: 'C', label: 'C5', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note12.png', answer: 'D', label: 'D5', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note13.png', answer: 'E♭', label: 'E♭5', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note14.png', answer: 'F', label: 'F5', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note15.png', answer: 'G', label: 'G5', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' }
+        ],
         notePool: [
           { noteFile: 'note10.png', answer: 'B♭', label: 'B♭4' },
           { noteFile: 'note11.png', answer: 'C',       label: 'C5'       },
@@ -2388,6 +2632,15 @@ const FOLDERS = [
         desc: 'Treble clef · C Major · Notes C4 through A4',
         totalQuestions: 6,
         noteOptions: ['C', 'D', 'E', 'F', 'G', 'A'],
+        trainer: true,
+        trainerNotes: [
+          { noteFile: 'note4.png', answer: 'C', label: 'C4', clefImg: 'treble0.png', clefLabel: 'C Major' },
+          { noteFile: 'note5.png', answer: 'D', label: 'D4', clefImg: 'treble0.png', clefLabel: 'C Major' },
+          { noteFile: 'note6.png', answer: 'E', label: 'E4', clefImg: 'treble0.png', clefLabel: 'C Major' },
+          { noteFile: 'note7.png', answer: 'F', label: 'F4', clefImg: 'treble0.png', clefLabel: 'C Major' },
+          { noteFile: 'note8.png', answer: 'G', label: 'G4', clefImg: 'treble0.png', clefLabel: 'C Major' },
+          { noteFile: 'note9.png', answer: 'A', label: 'A4', clefImg: 'treble0.png', clefLabel: 'C Major' }
+        ],
         notePool: [
           { noteFile: 'note4.png', answer: 'C', label: 'C4' },
           { noteFile: 'note5.png', answer: 'D', label: 'D4' },
@@ -2406,6 +2659,15 @@ const FOLDERS = [
         desc: 'Treble clef · G Major · Notes G4 through E5',
         totalQuestions: 6,
         noteOptions: ['G', 'A', 'B', 'C', 'D', 'E'],
+        trainer: true,
+        trainerNotes: [
+          { noteFile: 'note8.png', answer: 'G', label: 'G4', clefImg: 'treble1.png', clefLabel: 'G Major' },
+          { noteFile: 'note9.png', answer: 'A', label: 'A4', clefImg: 'treble1.png', clefLabel: 'G Major' },
+          { noteFile: 'note10.png', answer: 'B', label: 'B4', clefImg: 'treble1.png', clefLabel: 'G Major' },
+          { noteFile: 'note11.png', answer: 'C', label: 'C5', clefImg: 'treble1.png', clefLabel: 'G Major' },
+          { noteFile: 'note12.png', answer: 'D', label: 'D5', clefImg: 'treble1.png', clefLabel: 'G Major' },
+          { noteFile: 'note13.png', answer: 'E', label: 'E5', clefImg: 'treble1.png', clefLabel: 'G Major' }
+        ],
         notePool: [
           { noteFile: 'note8.png',  answer: 'G', label: 'G4' },
           { noteFile: 'note9.png',  answer: 'A', label: 'A4' },
@@ -2424,6 +2686,15 @@ const FOLDERS = [
         desc: 'Treble clef · F Major · Notes F4 through D5',
         totalQuestions: 6,
         noteOptions: ['F', 'G', 'A', 'B♭', 'C', 'D'],
+        trainer: true,
+        trainerNotes: [
+          { noteFile: 'note7.png', answer: 'F', label: 'F4', clefImg: 'treble-1.png', clefLabel: 'F Major' },
+          { noteFile: 'note8.png', answer: 'G', label: 'G4', clefImg: 'treble-1.png', clefLabel: 'F Major' },
+          { noteFile: 'note9.png', answer: 'A', label: 'A4', clefImg: 'treble-1.png', clefLabel: 'F Major' },
+          { noteFile: 'note10.png', answer: 'B♭', label: 'B♭4', clefImg: 'treble-1.png', clefLabel: 'F Major' },
+          { noteFile: 'note11.png', answer: 'C', label: 'C5', clefImg: 'treble-1.png', clefLabel: 'F Major' },
+          { noteFile: 'note12.png', answer: 'D', label: 'D5', clefImg: 'treble-1.png', clefLabel: 'F Major' }
+        ],
         notePool: [
           { noteFile: 'note7.png',  answer: 'F',       label: 'F4'       },
           { noteFile: 'note8.png',  answer: 'G',       label: 'G4'       },
@@ -2442,6 +2713,15 @@ const FOLDERS = [
         desc: 'Treble clef · C Major · Notes C4 through A4',
         totalQuestions: 6,
         noteOptions: ['C', 'D', 'E', 'F', 'G', 'A'],
+        trainer: true,
+        trainerNotes: [
+          { noteFile: 'note4.png', answer: 'C', label: 'C4', clefImg: 'treble0.png', clefLabel: 'C Major' },
+          { noteFile: 'note5.png', answer: 'D', label: 'D4', clefImg: 'treble0.png', clefLabel: 'C Major' },
+          { noteFile: 'note6.png', answer: 'E', label: 'E4', clefImg: 'treble0.png', clefLabel: 'C Major' },
+          { noteFile: 'note7.png', answer: 'F', label: 'F4', clefImg: 'treble0.png', clefLabel: 'C Major' },
+          { noteFile: 'note8.png', answer: 'G', label: 'G4', clefImg: 'treble0.png', clefLabel: 'C Major' },
+          { noteFile: 'note9.png', answer: 'A', label: 'A4', clefImg: 'treble0.png', clefLabel: 'C Major' }
+        ],
         notePool: [
           { noteFile: 'note4.png', answer: 'C', label: 'C4' },
           { noteFile: 'note5.png', answer: 'D', label: 'D4' },
@@ -2460,6 +2740,15 @@ const FOLDERS = [
         desc: 'Bass clef · B♭ Major · Notes B♭2 through G3',
         totalQuestions: 6,
         noteOptions: ['B♭', 'C', 'D', 'E♭', 'F', 'G'],
+        trainer: true,
+        trainerNotes: [
+          { noteFile: 'note8.png', answer: 'B♭', label: 'B♭2', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note9.png', answer: 'C', label: 'C3', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note10.png', answer: 'D', label: 'D3', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note11.png', answer: 'E♭', label: 'E♭3', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note12.png', answer: 'F', label: 'F3', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note13.png', answer: 'G', label: 'G3', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' }
+        ],
         notePool: [
           { noteFile: 'note8.png',  answer: 'B♭', label: 'B♭2' },
           { noteFile: 'note9.png',  answer: 'C',       label: 'C3'       },
@@ -2471,20 +2760,29 @@ const FOLDERS = [
       },
       {
         id: 'baritone',
-        title: 'Baritone B♭4–G5',
-        clefLabel: 'Treble Clef · B♭ Major',
-        clefImg: 'treble-2.png',
+        title: 'Baritone B♭2–G3',
+        clefLabel: 'Bass Clef · B♭ Major',
+        clefImg: 'bass-2.png',
         icon: '🎺',
-        desc: 'Treble clef · B♭ Major · Notes B♭4 through G5',
+        desc: 'Bass clef · B♭ Major · Notes B♭2 through G3',
         totalQuestions: 6,
         noteOptions: ['B♭', 'C', 'D', 'E♭', 'F', 'G'],
+        trainer: true,
+        trainerNotes: [
+          { noteFile: 'note8.png', answer: 'B♭', label: 'B♭2', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note9.png', answer: 'C', label: 'C3', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note10.png', answer: 'D', label: 'D3', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note11.png', answer: 'E♭', label: 'E♭3', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note12.png', answer: 'F', label: 'F3', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note13.png', answer: 'G', label: 'G3', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' }
+        ],
         notePool: [
-          { noteFile: 'note10.png', answer: 'B♭', label: 'B♭4' },
-          { noteFile: 'note11.png', answer: 'C',       label: 'C5'       },
-          { noteFile: 'note12.png', answer: 'D',       label: 'D5'       },
-          { noteFile: 'note13.png', answer: 'E♭', label: 'E♭5' },
-          { noteFile: 'note14.png', answer: 'F',       label: 'F5'       },
-          { noteFile: 'note15.png', answer: 'G',       label: 'G5'       },
+          { noteFile: 'note8.png',  answer: 'B♭', label: 'B♭2' },
+          { noteFile: 'note9.png',  answer: 'C',       label: 'C3'       },
+          { noteFile: 'note10.png', answer: 'D',       label: 'D3'       },
+          { noteFile: 'note11.png', answer: 'E♭', label: 'E♭3' },
+          { noteFile: 'note12.png', answer: 'F',       label: 'F3'       },
+          { noteFile: 'note13.png', answer: 'G',       label: 'G3'       },
         ],
       },
       {
@@ -2496,6 +2794,15 @@ const FOLDERS = [
         desc: 'Bass clef · B♭ Major · Notes B♭1 through G2',
         totalQuestions: 6,
         noteOptions: ['B♭', 'C', 'D', 'E♭', 'F', 'G'],
+        trainer: true,
+        trainerNotes: [
+          { noteFile: 'note1.png', answer: 'B♭', label: 'B♭1', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note2.png', answer: 'C', label: 'C2', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note3.png', answer: 'D', label: 'D2', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note4.png', answer: 'E♭', label: 'E♭2', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note5.png', answer: 'F', label: 'F2', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note6.png', answer: 'G', label: 'G2', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' }
+        ],
         notePool: [
           { noteFile: 'note1.png', answer: 'B♭', label: 'B♭1' },
           { noteFile: 'note2.png', answer: 'C',       label: 'C2'       },
@@ -2514,6 +2821,15 @@ const FOLDERS = [
         desc: 'Treble clef · B♭ Major · Notes B♭4 through G5',
         totalQuestions: 6,
         noteOptions: ['B♭', 'C', 'D', 'E♭', 'F', 'G'],
+        trainer: true,
+        trainerNotes: [
+          { noteFile: 'note10.png', answer: 'B♭', label: 'B♭4', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note11.png', answer: 'C', label: 'C5', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note12.png', answer: 'D', label: 'D5', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note13.png', answer: 'E♭', label: 'E♭5', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note14.png', answer: 'F', label: 'F5', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note15.png', answer: 'G', label: 'G5', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' }
+        ],
         notePool: [
           { noteFile: 'note10.png', answer: 'B♭', label: 'B♭4' },
           { noteFile: 'note11.png', answer: 'C',       label: 'C5'       },
@@ -2532,6 +2848,15 @@ const FOLDERS = [
         desc: 'Treble clef · B♭ Major · Notes B♭3 through G4',
         totalQuestions: 6,
         noteOptions: ['B♭', 'C', 'D', 'E♭', 'F', 'G'],
+        trainer: true,
+        trainerNotes: [
+          { noteFile: 'note6.png', answer: 'B♭', label: 'B♭3', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note7.png', answer: 'C', label: 'C4', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note8.png', answer: 'D', label: 'D4', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note9.png', answer: 'E♭', label: 'E♭4', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note10.png', answer: 'F', label: 'F4', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note11.png', answer: 'G', label: 'G4', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' }
+        ],
         notePool: [
           { noteFile: 'note6.png',  answer: 'B♭', label: 'B♭3' },
           { noteFile: 'note7.png',  answer: 'C',       label: 'C4'       },
@@ -2555,12 +2880,25 @@ const FOLDERS = [
       {
         id: 'flute',
         title: 'Flute A♭4–A5',
-        clefLabel: 'Treble Clef · B♭/E♭ Major',
-        clefImg: 'treble-2.png',
+        clefLabel: 'Bass Clef · B♭/E♭ Major',
+        clefImg: 'bass-2.png',
         icon: '🎵',
-        desc: 'Treble clef · B♭/E♭ Major · Notes A♭4 through A5',
+        desc: 'Bass clef · B♭/E♭ Major · Notes A♭2 through A3',
         totalQuestions: 10,
         noteOptions: ['A♭', 'A', 'B♭', 'C', 'D', 'E♭', 'F', 'G'],
+        trainer: true,
+        trainerNotes: [
+          { noteFile: 'note10.png', answer: 'B♭', label: 'B♭4', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note11.png', answer: 'C', label: 'C5', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note12.png', answer: 'D', label: 'D5', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note13.png', answer: 'E♭', label: 'E♭5', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note14.png', answer: 'F', label: 'F5', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note15.png', answer: 'G', label: 'G5', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note9.png', answer: 'A', label: 'A4', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note9.png', answer: 'A♭', label: 'A♭4', clefImg: 'treble-3.png', clefLabel: 'E♭ Major' },
+          { noteFile: 'note16.png', answer: 'A', label: 'A5', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note16.png', answer: 'A♭', label: 'A♭5', clefImg: 'treble-3.png', clefLabel: 'E♭ Major' }
+        ],
         buildQuiz: function() {
           var pool = [
             { noteFile: 'note9.png', answer: 'A♭', label: 'A♭4', clefImg: 'treble-3.png', clefLabel: 'E♭ Major' },
@@ -2590,6 +2928,19 @@ const FOLDERS = [
         desc: 'Treble clef · C/F Major · Notes B♭3 through B4',
         totalQuestions: 10,
         noteOptions: ['B♭', 'B', 'C', 'D', 'E', 'F', 'G', 'A'],
+        trainer: true,
+        trainerNotes: [
+          { noteFile: 'note3.png', answer: 'B', label: 'B3', clefImg: 'treble0.png', clefLabel: 'C Major' },
+          { noteFile: 'note4.png', answer: 'C', label: 'C4', clefImg: 'treble0.png', clefLabel: 'C Major' },
+          { noteFile: 'note5.png', answer: 'D', label: 'D4', clefImg: 'treble0.png', clefLabel: 'C Major' },
+          { noteFile: 'note6.png', answer: 'E', label: 'E4', clefImg: 'treble0.png', clefLabel: 'C Major' },
+          { noteFile: 'note7.png', answer: 'F', label: 'F4', clefImg: 'treble0.png', clefLabel: 'C Major' },
+          { noteFile: 'note8.png', answer: 'G', label: 'G4', clefImg: 'treble0.png', clefLabel: 'C Major' },
+          { noteFile: 'note9.png', answer: 'A', label: 'A4', clefImg: 'treble0.png', clefLabel: 'C Major' },
+          { noteFile: 'note3.png', answer: 'B♭', label: 'B♭3', clefImg: 'treble-1.png', clefLabel: 'F Major' },
+          { noteFile: 'note10.png', answer: 'B♭', label: 'B♭4', clefImg: 'treble-1.png', clefLabel: 'F Major' },
+          { noteFile: 'note10.png', answer: 'B', label: 'B4', clefImg: 'treble0.png', clefLabel: 'C Major' }
+        ],
         buildQuiz: function() {
           var pool = [
             { noteFile: 'note3.png', answer: 'B♭', label: 'B♭3', clefImg: 'treble-1.png', clefLabel: 'F Major' },
@@ -2619,6 +2970,19 @@ const FOLDERS = [
         desc: 'Treble clef · G/C Major · Notes F4 through F#5',
         totalQuestions: 10,
         noteOptions: ['F', 'F#', 'G', 'A', 'B', 'C', 'D', 'E'],
+        trainer: true,
+        trainerNotes: [
+          { noteFile: 'note8.png', answer: 'G', label: 'G4', clefImg: 'treble1.png', clefLabel: 'G Major' },
+          { noteFile: 'note9.png', answer: 'A', label: 'A4', clefImg: 'treble1.png', clefLabel: 'G Major' },
+          { noteFile: 'note10.png', answer: 'B', label: 'B4', clefImg: 'treble1.png', clefLabel: 'G Major' },
+          { noteFile: 'note11.png', answer: 'C', label: 'C5', clefImg: 'treble1.png', clefLabel: 'G Major' },
+          { noteFile: 'note12.png', answer: 'D', label: 'D5', clefImg: 'treble1.png', clefLabel: 'G Major' },
+          { noteFile: 'note13.png', answer: 'E', label: 'E5', clefImg: 'treble1.png', clefLabel: 'G Major' },
+          { noteFile: 'note7.png', answer: 'F#', label: 'F#4', clefImg: 'treble1.png', clefLabel: 'G Major' },
+          { noteFile: 'note7.png', answer: 'F', label: 'F4', clefImg: 'treble0.png', clefLabel: 'C Major' },
+          { noteFile: 'note14.png', answer: 'F#', label: 'F#5', clefImg: 'treble1.png', clefLabel: 'G Major' },
+          { noteFile: 'note14.png', answer: 'F', label: 'F5', clefImg: 'treble0.png', clefLabel: 'C Major' }
+        ],
         buildQuiz: function() {
           var pool = [
             { noteFile: 'note7.png', answer: 'F', label: 'F4', clefImg: 'treble0.png', clefLabel: 'C Major' },
@@ -2648,6 +3012,19 @@ const FOLDERS = [
         desc: 'Treble clef · B♭/F Major · Notes E♭4 through E5',
         totalQuestions: 10,
         noteOptions: ['E♭', 'E', 'F', 'G', 'A', 'B♭', 'C', 'D'],
+        trainer: true,
+        trainerNotes: [
+          { noteFile: 'note7.png', answer: 'F', label: 'F4', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note8.png', answer: 'G', label: 'G4', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note9.png', answer: 'A', label: 'A4', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note10.png', answer: 'B♭', label: 'B♭4', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note11.png', answer: 'C', label: 'C5', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note12.png', answer: 'D', label: 'D5', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note6.png', answer: 'E♭', label: 'E♭4', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note6.png', answer: 'E', label: 'E4', clefImg: 'treble-1.png', clefLabel: 'F Major' },
+          { noteFile: 'note13.png', answer: 'E♭', label: 'E♭5', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note13.png', answer: 'E', label: 'E5', clefImg: 'treble-1.png', clefLabel: 'F Major' }
+        ],
         buildQuiz: function() {
           var pool = [
             { noteFile: 'note6.png', answer: 'E♭', label: 'E♭4', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
@@ -2677,6 +3054,19 @@ const FOLDERS = [
         desc: 'Treble clef · C/F Major · Notes B♭3 through B4',
         totalQuestions: 10,
         noteOptions: ['B♭', 'B', 'C', 'D', 'E', 'F', 'G', 'A'],
+        trainer: true,
+        trainerNotes: [
+          { noteFile: 'note3.png', answer: 'B', label: 'B3', clefImg: 'treble0.png', clefLabel: 'C Major' },
+          { noteFile: 'note4.png', answer: 'C', label: 'C4', clefImg: 'treble0.png', clefLabel: 'C Major' },
+          { noteFile: 'note5.png', answer: 'D', label: 'D4', clefImg: 'treble0.png', clefLabel: 'C Major' },
+          { noteFile: 'note6.png', answer: 'E', label: 'E4', clefImg: 'treble0.png', clefLabel: 'C Major' },
+          { noteFile: 'note7.png', answer: 'F', label: 'F4', clefImg: 'treble0.png', clefLabel: 'C Major' },
+          { noteFile: 'note8.png', answer: 'G', label: 'G4', clefImg: 'treble0.png', clefLabel: 'C Major' },
+          { noteFile: 'note9.png', answer: 'A', label: 'A4', clefImg: 'treble0.png', clefLabel: 'C Major' },
+          { noteFile: 'note3.png', answer: 'B♭', label: 'B♭3', clefImg: 'treble-1.png', clefLabel: 'F Major' },
+          { noteFile: 'note10.png', answer: 'B♭', label: 'B♭4', clefImg: 'treble-1.png', clefLabel: 'F Major' },
+          { noteFile: 'note10.png', answer: 'B', label: 'B4', clefImg: 'treble0.png', clefLabel: 'C Major' }
+        ],
         buildQuiz: function() {
           var pool = [
             { noteFile: 'note3.png', answer: 'B♭', label: 'B♭3', clefImg: 'treble-1.png', clefLabel: 'F Major' },
@@ -2706,6 +3096,19 @@ const FOLDERS = [
         desc: 'Bass clef · B♭/E♭ Major · Notes A♭2 through A3',
         totalQuestions: 10,
         noteOptions: ['A♭', 'A', 'B♭', 'C', 'D', 'E♭', 'F', 'G'],
+        trainer: true,
+        trainerNotes: [
+          { noteFile: 'note8.png', answer: 'B♭', label: 'B♭2', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note9.png', answer: 'C', label: 'C3', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note10.png', answer: 'D', label: 'D3', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note11.png', answer: 'E♭', label: 'E♭3', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note12.png', answer: 'F', label: 'F3', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note13.png', answer: 'G', label: 'G3', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note7.png', answer: 'A', label: 'A2', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note7.png', answer: 'A♭', label: 'A♭2', clefImg: 'bass-3.png', clefLabel: 'E♭ Major' },
+          { noteFile: 'note14.png', answer: 'A', label: 'A3', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note14.png', answer: 'A♭', label: 'A♭3', clefImg: 'bass-3.png', clefLabel: 'E♭ Major' }
+        ],
         buildQuiz: function() {
           var pool = [
             { noteFile: 'note7.png', answer: 'A♭', label: 'A♭2', clefImg: 'bass-3.png', clefLabel: 'E♭ Major' },
@@ -2728,25 +3131,38 @@ const FOLDERS = [
       },
       {
         id: 'baritone',
-        title: 'Baritone A♭4–A5',
-        clefLabel: 'Treble Clef · B♭/E♭ Major',
-        clefImg: 'treble-2.png',
+        title: 'Baritone A♭2–A3',
+        clefLabel: 'Bass Clef · B♭/E♭ Major',
+        clefImg: 'bass-2.png',
         icon: '🎺',
-        desc: 'Treble clef · B♭/E♭ Major · Notes A♭4 through A5',
+        desc: 'Bass clef · B♭/E♭ Major · Notes A♭2 through A3',
         totalQuestions: 10,
         noteOptions: ['A♭', 'A', 'B♭', 'C', 'D', 'E♭', 'F', 'G'],
+        trainer: true,
+        trainerNotes: [
+          { noteFile: 'note8.png', answer: 'B♭', label: 'B♭2', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note9.png', answer: 'C', label: 'C3', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note10.png', answer: 'D', label: 'D3', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note11.png', answer: 'E♭', label: 'E♭3', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note12.png', answer: 'F', label: 'F3', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note13.png', answer: 'G', label: 'G3', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note7.png', answer: 'A', label: 'A2', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note7.png', answer: 'A♭', label: 'A♭2', clefImg: 'bass-3.png', clefLabel: 'E♭ Major' },
+          { noteFile: 'note14.png', answer: 'A', label: 'A3', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note14.png', answer: 'A♭', label: 'A♭3', clefImg: 'bass-3.png', clefLabel: 'E♭ Major' }
+        ],
         buildQuiz: function() {
           var pool = [
-            { noteFile: 'note9.png', answer: 'A♭', label: 'A♭4', clefImg: 'treble-3.png', clefLabel: 'E♭ Major' },
-            { noteFile: 'note9.png', answer: 'A', label: 'A4', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
-            { noteFile: 'note10.png', answer: 'B♭', label: 'B♭4', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
-            { noteFile: 'note11.png', answer: 'C', label: 'C5', clefImg: 'treble-3.png', clefLabel: 'E♭ Major' },
-            { noteFile: 'note12.png', answer: 'D', label: 'D5', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
-            { noteFile: 'note13.png', answer: 'E♭', label: 'E♭5', clefImg: 'treble-3.png', clefLabel: 'E♭ Major' },
-            { noteFile: 'note14.png', answer: 'F', label: 'F5', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
-            { noteFile: 'note15.png', answer: 'G', label: 'G5', clefImg: 'treble-3.png', clefLabel: 'E♭ Major' },
-            { noteFile: 'note16.png', answer: 'A♭', label: 'A♭5', clefImg: 'treble-3.png', clefLabel: 'E♭ Major' },
-            { noteFile: 'note16.png', answer: 'A', label: 'A5', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' }
+            { noteFile: 'note7.png',  answer: 'A♭', label: 'A♭2', clefImg: 'bass-3.png', clefLabel: 'E♭ Major' },
+            { noteFile: 'note7.png',  answer: 'A',  label: 'A2',  clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+            { noteFile: 'note8.png',  answer: 'B♭', label: 'B♭2', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+            { noteFile: 'note9.png',  answer: 'C',  label: 'C3',  clefImg: 'bass-3.png', clefLabel: 'E♭ Major' },
+            { noteFile: 'note10.png', answer: 'D',  label: 'D3',  clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+            { noteFile: 'note11.png', answer: 'E♭', label: 'E♭3', clefImg: 'bass-3.png', clefLabel: 'E♭ Major' },
+            { noteFile: 'note12.png', answer: 'F',  label: 'F3',  clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+            { noteFile: 'note13.png', answer: 'G',  label: 'G3',  clefImg: 'bass-3.png', clefLabel: 'E♭ Major' },
+            { noteFile: 'note14.png', answer: 'A♭', label: 'A♭3', clefImg: 'bass-3.png', clefLabel: 'E♭ Major' },
+            { noteFile: 'note14.png', answer: 'A',  label: 'A3',  clefImg: 'bass-2.png', clefLabel: 'B♭ Major' }
           ];
           for (var i=pool.length-1;i>0;i--) {
             var j=Math.floor(Math.random()*(i+1));
@@ -2764,6 +3180,19 @@ const FOLDERS = [
         desc: 'Bass clef · B♭/E♭ Major · Notes A♭1 through A2',
         totalQuestions: 10,
         noteOptions: ['A♭','A','B♭','C','D','E♭','F','G'],
+        trainer: true,
+        trainerNotes: [
+          { noteFile: 'note1.png', answer: 'B♭', label: 'B♭1', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note2.png', answer: 'C', label: 'C2', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note3.png', answer: 'D', label: 'D2', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note4.png', answer: 'E♭', label: 'E♭2', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note5.png', answer: 'F', label: 'F2', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note6.png', answer: 'G', label: 'G2', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note0.png', answer: 'A', label: 'A1', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note0.png', answer: 'A♭', label: 'A♭1', clefImg: 'bass-3.png', clefLabel: 'E♭ Major' },
+          { noteFile: 'note7.png', answer: 'A', label: 'A2', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note7.png', answer: 'A♭', label: 'A♭2', clefImg: 'bass-3.png', clefLabel: 'E♭ Major' }
+        ],
         buildQuiz: function() {
           var pool = [
             { noteFile: 'note0.png', answer: 'A♭', label: 'A♭1', clefImg: 'bass-3.png', clefLabel: 'E♭ Major' },
@@ -2793,6 +3222,19 @@ const FOLDERS = [
         desc: 'Treble clef · B♭/E♭ Major · Notes A♭4 through A5',
         totalQuestions: 10,
         noteOptions: ['A♭','A','B♭','C','D','E♭','F','G'],
+        trainer: true,
+        trainerNotes: [
+          { noteFile: 'note10.png', answer: 'B♭', label: 'B♭4', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note11.png', answer: 'C', label: 'C5', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note12.png', answer: 'D', label: 'D5', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note13.png', answer: 'E♭', label: 'E♭5', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note14.png', answer: 'F', label: 'F5', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note15.png', answer: 'G', label: 'G5', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note9.png', answer: 'A', label: 'A4', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note9.png', answer: 'A♭', label: 'A♭4', clefImg: 'treble-3.png', clefLabel: 'E♭ Major' },
+          { noteFile: 'note16.png', answer: 'A', label: 'A5', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note16.png', answer: 'A♭', label: 'A♭5', clefImg: 'treble-3.png', clefLabel: 'E♭ Major' }
+        ],
         buildQuiz: function() {
           var pool = [
             { noteFile: 'note9.png', answer: 'A♭', label: 'A♭4', clefImg: 'treble-3.png', clefLabel: 'E♭ Major' },
@@ -2822,6 +3264,19 @@ const FOLDERS = [
         desc: 'Treble clef · B♭/E♭ Major · Notes A♭3 through A4',
         totalQuestions: 10,
         noteOptions: ['A♭','A','B♭','C','D','E♭','F','G'],
+        trainer: true,
+        trainerNotes: [
+          { noteFile: 'note3.png', answer: 'B♭', label: 'B♭3', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note4.png', answer: 'C', label: 'C4', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note5.png', answer: 'D', label: 'D4', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note6.png', answer: 'E♭', label: 'E♭4', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note7.png', answer: 'F', label: 'F4', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note8.png', answer: 'G', label: 'G4', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note2.png', answer: 'A', label: 'A3', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note2.png', answer: 'A♭', label: 'A♭3', clefImg: 'treble-3.png', clefLabel: 'E♭ Major' },
+          { noteFile: 'note9.png', answer: 'A', label: 'A4', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note9.png', answer: 'A♭', label: 'A♭4', clefImg: 'treble-3.png', clefLabel: 'E♭ Major' }
+        ],
         buildQuiz: function() {
           var pool = [
             { noteFile: 'note2.png', answer: 'A♭', label: 'A♭3', clefImg: 'treble-3.png', clefLabel: 'E♭ Major' },
@@ -2856,12 +3311,27 @@ const FOLDERS = [
       {
         id: 'flute',
         title: 'Flute A♭4–B♭5',
-        clefLabel: 'Treble Clef · B♭/E♭/F Major',
-        clefImg: 'treble-2.png',
+        clefLabel: 'Bass Clef · B♭/E♭/F Major',
+        clefImg: 'bass-2.png',
         icon: '🎵',
-        desc: 'Treble clef · B♭/E♭/F Major · Notes A♭4 through B♭5',
+        desc: 'Bass clef · B♭/E♭/F Major · Notes A♭2 through B♭3',
         totalQuestions: 12,
         noteOptions: ['A♭','A','B♭','C','D','E♭','E','F','G'],
+        trainer: true,
+        trainerNotes: [
+          { noteFile: 'note10.png', answer: 'B♭', label: 'B♭4', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note11.png', answer: 'C', label: 'C5', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note12.png', answer: 'D', label: 'D5', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note13.png', answer: 'E♭', label: 'E♭5', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note14.png', answer: 'F', label: 'F5', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note15.png', answer: 'G', label: 'G5', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note9.png', answer: 'A', label: 'A4', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note9.png', answer: 'A♭', label: 'A♭4', clefImg: 'treble-3.png', clefLabel: 'E♭ Major' },
+          { noteFile: 'note16.png', answer: 'A', label: 'A5', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note16.png', answer: 'A♭', label: 'A♭5', clefImg: 'treble-3.png', clefLabel: 'E♭ Major' },
+          { noteFile: 'note13.png', answer: 'E', label: 'E5', clefImg: 'treble-1.png', clefLabel: 'F Major' },
+          { noteFile: 'note17.png', answer: 'B♭', label: 'B♭5', clefImg: 'treble-1.png', clefLabel: 'F Major' }
+        ],
         buildQuiz: function() {
           var kBb = { img: 'treble-2.png', label: 'B♭ Major' };
           var kEb = { img: 'treble-3.png', label: 'E♭ Major' };
@@ -2903,6 +3373,21 @@ const FOLDERS = [
         desc: 'Treble clef · C/F/G Major · Notes B♭3 through C5',
         totalQuestions: 12,
         noteOptions: ['B♭','B','C','D','E','F','F#','G','A'],
+        trainer: true,
+        trainerNotes: [
+          { noteFile: 'note3.png', answer: 'B', label: 'B3', clefImg: 'treble0.png', clefLabel: 'C Major' },
+          { noteFile: 'note4.png', answer: 'C', label: 'C4', clefImg: 'treble0.png', clefLabel: 'C Major' },
+          { noteFile: 'note5.png', answer: 'D', label: 'D4', clefImg: 'treble0.png', clefLabel: 'C Major' },
+          { noteFile: 'note6.png', answer: 'E', label: 'E4', clefImg: 'treble0.png', clefLabel: 'C Major' },
+          { noteFile: 'note7.png', answer: 'F', label: 'F4', clefImg: 'treble0.png', clefLabel: 'C Major' },
+          { noteFile: 'note8.png', answer: 'G', label: 'G4', clefImg: 'treble0.png', clefLabel: 'C Major' },
+          { noteFile: 'note9.png', answer: 'A', label: 'A4', clefImg: 'treble0.png', clefLabel: 'C Major' },
+          { noteFile: 'note3.png', answer: 'B♭', label: 'B♭3', clefImg: 'treble-1.png', clefLabel: 'F Major' },
+          { noteFile: 'note10.png', answer: 'B♭', label: 'B♭4', clefImg: 'treble-1.png', clefLabel: 'F Major' },
+          { noteFile: 'note10.png', answer: 'B', label: 'B4', clefImg: 'treble0.png', clefLabel: 'C Major' },
+          { noteFile: 'note7.png', answer: 'F#', label: 'F#4', clefImg: 'treble1.png', clefLabel: 'G Major' },
+          { noteFile: 'note11.png', answer: 'C', label: 'C5', clefImg: 'treble1.png', clefLabel: 'G Major' }
+        ],
         buildQuiz: function() {
           var kC = { img: 'treble0.png',  label: 'C Major' };
           var kF = { img: 'treble-1.png', label: 'F Major' };
@@ -2944,6 +3429,21 @@ const FOLDERS = [
         desc: 'Treble clef · G/C/D Major · Notes F4 through G5',
         totalQuestions: 12,
         noteOptions: ['F', 'F#', 'G', 'A', 'B', 'C', 'C#', 'D', 'E'],
+        trainer: true,
+        trainerNotes: [
+          { noteFile: 'note8.png', answer: 'G', label: 'G4', clefImg: 'treble1.png', clefLabel: 'G Major' },
+          { noteFile: 'note9.png', answer: 'A', label: 'A4', clefImg: 'treble1.png', clefLabel: 'G Major' },
+          { noteFile: 'note10.png', answer: 'B', label: 'B4', clefImg: 'treble1.png', clefLabel: 'G Major' },
+          { noteFile: 'note11.png', answer: 'C', label: 'C5', clefImg: 'treble1.png', clefLabel: 'G Major' },
+          { noteFile: 'note12.png', answer: 'D', label: 'D5', clefImg: 'treble1.png', clefLabel: 'G Major' },
+          { noteFile: 'note13.png', answer: 'E', label: 'E5', clefImg: 'treble1.png', clefLabel: 'G Major' },
+          { noteFile: 'note7.png', answer: 'F#', label: 'F#4', clefImg: 'treble1.png', clefLabel: 'G Major' },
+          { noteFile: 'note7.png', answer: 'F', label: 'F4', clefImg: 'treble0.png', clefLabel: 'C Major' },
+          { noteFile: 'note14.png', answer: 'F', label: 'F5', clefImg: 'treble0.png', clefLabel: 'C Major' },
+          { noteFile: 'note14.png', answer: 'F#', label: 'F#5', clefImg: 'treble1.png', clefLabel: 'G Major' },
+          { noteFile: 'note11.png', answer: 'C#', label: 'C#5', clefImg: 'treble2.png', clefLabel: 'D Major' },
+          { noteFile: 'note15.png', answer: 'G', label: 'G5', clefImg: 'treble2.png', clefLabel: 'D Major' }
+        ],
         buildQuiz: function() {
           var kC = { img: 'treble0.png',  label: 'C Major' };
           var kG = { img: 'treble1.png',  label: 'G Major' };
@@ -2985,6 +3485,21 @@ const FOLDERS = [
         desc: 'Treble clef · B♭/F/C Major · Notes E♭4 through F5',
         totalQuestions: 12,
         noteOptions: ['E♭', 'E', 'F', 'G', 'A', 'B♭', 'B', 'C', 'D'],
+        trainer: true,
+        trainerNotes: [
+          { noteFile: 'note7.png', answer: 'F', label: 'F4', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note8.png', answer: 'G', label: 'G4', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note9.png', answer: 'A', label: 'A4', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note10.png', answer: 'B♭', label: 'B♭4', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note11.png', answer: 'C', label: 'C5', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note12.png', answer: 'D', label: 'D5', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note6.png', answer: 'E♭', label: 'E♭4', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note6.png', answer: 'E', label: 'E4', clefImg: 'treble0.png', clefLabel: 'C Major' },
+          { noteFile: 'note13.png', answer: 'E♭', label: 'E♭5', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note13.png', answer: 'E', label: 'E5', clefImg: 'treble0.png', clefLabel: 'C Major' },
+          { noteFile: 'note10.png', answer: 'B', label: 'B4', clefImg: 'treble0.png', clefLabel: 'C Major' },
+          { noteFile: 'note14.png', answer: 'F', label: 'F5', clefImg: 'treble-1.png', clefLabel: 'F Major' }
+        ],
         buildQuiz: function() {
           var kBb = { img: 'treble-2.png', label: 'B♭ Major' };
           var kF  = { img: 'treble-1.png', label: 'F Major' };
@@ -3026,6 +3541,21 @@ const FOLDERS = [
         desc: 'Treble clef · C/F/G Major · Notes B♭3 through C5',
         totalQuestions: 12,
         noteOptions: ['B♭', 'B', 'C', 'D', 'E', 'F', 'F#', 'G', 'A'],
+        trainer: true,
+        trainerNotes: [
+          { noteFile: 'note3.png', answer: 'B', label: 'B3', clefImg: 'treble0.png', clefLabel: 'C Major' },
+          { noteFile: 'note4.png', answer: 'C', label: 'C4', clefImg: 'treble0.png', clefLabel: 'C Major' },
+          { noteFile: 'note5.png', answer: 'D', label: 'D4', clefImg: 'treble0.png', clefLabel: 'C Major' },
+          { noteFile: 'note6.png', answer: 'E', label: 'E4', clefImg: 'treble0.png', clefLabel: 'C Major' },
+          { noteFile: 'note7.png', answer: 'F', label: 'F4', clefImg: 'treble0.png', clefLabel: 'C Major' },
+          { noteFile: 'note8.png', answer: 'G', label: 'G4', clefImg: 'treble0.png', clefLabel: 'C Major' },
+          { noteFile: 'note9.png', answer: 'A', label: 'A4', clefImg: 'treble0.png', clefLabel: 'C Major' },
+          { noteFile: 'note3.png', answer: 'B♭', label: 'B♭3', clefImg: 'treble-1.png', clefLabel: 'F Major' },
+          { noteFile: 'note10.png', answer: 'B♭', label: 'B♭4', clefImg: 'treble-1.png', clefLabel: 'F Major' },
+          { noteFile: 'note10.png', answer: 'B', label: 'B4', clefImg: 'treble0.png', clefLabel: 'C Major' },
+          { noteFile: 'note7.png', answer: 'F#', label: 'F#4', clefImg: 'treble1.png', clefLabel: 'G Major' },
+          { noteFile: 'note11.png', answer: 'C', label: 'C5', clefImg: 'treble0.png', clefLabel: 'C Major' }
+        ],
         buildQuiz: function() {
           var kC = { img: 'treble0.png',  label: 'C Major' };
           var kF = { img: 'treble-1.png', label: 'F Major' };
@@ -3067,6 +3597,21 @@ const FOLDERS = [
         desc: 'Bass clef · B♭/E♭/F Major · Notes A♭2 through B♭3',
         totalQuestions: 12,
         noteOptions: ['A♭', 'A', 'B♭', 'C', 'D', 'E♭', 'E', 'F', 'G'],
+        trainer: true,
+        trainerNotes: [
+          { noteFile: 'note8.png', answer: 'B♭', label: 'B♭2', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note9.png', answer: 'C', label: 'C3', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note10.png', answer: 'D', label: 'D3', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note11.png', answer: 'E♭', label: 'E♭3', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note12.png', answer: 'F', label: 'F3', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note13.png', answer: 'G', label: 'G3', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note7.png', answer: 'A', label: 'A2', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note7.png', answer: 'A♭', label: 'A♭2', clefImg: 'bass-3.png', clefLabel: 'E♭ Major' },
+          { noteFile: 'note14.png', answer: 'A', label: 'A3', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note14.png', answer: 'A♭', label: 'A♭3', clefImg: 'bass-3.png', clefLabel: 'E♭ Major' },
+          { noteFile: 'note11.png', answer: 'E', label: 'E3', clefImg: 'bass-1.png', clefLabel: 'F Major' },
+          { noteFile: 'note15.png', answer: 'B♭', label: 'B♭3', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' }
+        ],
         buildQuiz: function() {
           var kBb = { img: 'bass-2.png', label: 'B♭ Major' };
           var kEb = { img: 'bass-3.png', label: 'E♭ Major' };
@@ -3101,33 +3646,48 @@ const FOLDERS = [
       },
       {
         id: 'baritone',
-        title: 'Baritone A♭4–B♭5',
-        clefLabel: 'Treble Clef · B♭/E♭/F Major',
-        clefImg: 'treble-2.png',
+        title: 'Baritone A♭2–B♭3',
+        clefLabel: 'Bass Clef · B♭/E♭/F Major',
+        clefImg: 'bass-2.png',
         icon: '🎺',
-        desc: 'Treble clef · B♭/E♭/F Major · Notes A♭4 through B♭5',
+        desc: 'Bass clef · B♭/E♭/F Major · Notes A♭2 through B♭3',
         totalQuestions: 12,
         noteOptions: ['A♭', 'A', 'B♭', 'C', 'D', 'E♭', 'E', 'F', 'G'],
+        trainer: true,
+        trainerNotes: [
+          { noteFile: 'note8.png', answer: 'B♭', label: 'B♭2', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note9.png', answer: 'C', label: 'C3', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note10.png', answer: 'D', label: 'D3', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note11.png', answer: 'E♭', label: 'E♭3', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note12.png', answer: 'F', label: 'F3', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note13.png', answer: 'G', label: 'G3', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note7.png', answer: 'A', label: 'A2', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note7.png', answer: 'A♭', label: 'A♭2', clefImg: 'bass-3.png', clefLabel: 'E♭ Major' },
+          { noteFile: 'note14.png', answer: 'A', label: 'A3', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note14.png', answer: 'A♭', label: 'A♭3', clefImg: 'bass-3.png', clefLabel: 'E♭ Major' },
+          { noteFile: 'note11.png', answer: 'E', label: 'E3', clefImg: 'bass-1.png', clefLabel: 'F Major' },
+          { noteFile: 'note15.png', answer: 'B♭', label: 'B♭3', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' }
+        ],
         buildQuiz: function() {
-          var kBb = { img: 'treble-2.png', label: 'B♭ Major' };
-          var kEb = { img: 'treble-3.png', label: 'E♭ Major' };
-          var kF  = { img: 'treble-1.png',  label: 'F Major' };
+          var kBb = { img: 'bass-2.png', label: 'B♭ Major' };
+          var kEb = { img: 'bass-3.png', label: 'E♭ Major' };
+          var kF  = { img: 'bass-1.png',  label: 'F Major' };
           var r = function(keys) { return keys[Math.floor(Math.random()*keys.length)]; };
           var fixed = [
-            { noteFile: 'note9.png', answer: 'A♭', label: 'A♭4', clefImg: kEb.img, clefLabel: kEb.label },
-            { noteFile: 'note9.png',  answer: 'A',       label: 'A4',  clefImg: kBb.img, clefLabel: kBb.label },
-            { noteFile: 'note13.png',  answer: 'E',       label: 'E5',     clefImg: kF.img,  clefLabel: kF.label  },
-            { noteFile: 'note16.png', answer: 'A♭', label: 'A♭5', clefImg: kEb.img, clefLabel: kEb.label },
-            { noteFile: 'note16.png',  answer: 'A',       label: 'A5',  clefImg: kBb.img, clefLabel: kBb.label },
+            { noteFile: 'note7.png',  answer: 'A♭', label: 'A♭2', clefImg: kEb.img, clefLabel: kEb.label },
+            { noteFile: 'note7.png',  answer: 'A',  label: 'A2',  clefImg: kBb.img, clefLabel: kBb.label },
+            { noteFile: 'note11.png', answer: 'E',  label: 'E3',  clefImg: kF.img,  clefLabel: kF.label  },
+            { noteFile: 'note14.png', answer: 'A♭', label: 'A♭3', clefImg: kEb.img, clefLabel: kEb.label },
+            { noteFile: 'note14.png', answer: 'A',  label: 'A3',  clefImg: kBb.img, clefLabel: kBb.label },
           ];
           var shared = [
-            { noteFile: 'note10.png', answer: 'B♭', label: 'B♭4', keys: [kBb,kEb,kF] },
-            { noteFile: 'note11.png',  answer: 'C',       label: 'C5',     keys: [kBb,kEb,kF] },
-            { noteFile: 'note12.png',  answer: 'D',       label: 'D5',     keys: [kBb,kEb,kF] },
-            { noteFile: 'note13.png', answer: 'E♭', label: 'E♭5',    keys: [kBb,kEb]    },
-            { noteFile: 'note14.png',  answer: 'F',       label: 'F5',     keys: [kBb,kEb,kF] },
-            { noteFile: 'note15.png',  answer: 'G',       label: 'G5',     keys: [kBb,kEb,kF] },
-            { noteFile: 'note17.png', answer: 'B♭', label: 'B♭5', keys: [kBb,kEb,kF] },
+            { noteFile: 'note8.png',  answer: 'B♭', label: 'B♭2', keys: [kBb,kEb,kF] },
+            { noteFile: 'note9.png',  answer: 'C',  label: 'C3',  keys: [kBb,kEb,kF] },
+            { noteFile: 'note10.png', answer: 'D',  label: 'D3',  keys: [kBb,kEb,kF] },
+            { noteFile: 'note11.png', answer: 'E♭', label: 'E♭3', keys: [kBb,kEb]    },
+            { noteFile: 'note12.png', answer: 'F',  label: 'F3',  keys: [kBb,kEb,kF] },
+            { noteFile: 'note13.png', answer: 'G',  label: 'G3',  keys: [kBb,kEb,kF] },
+            { noteFile: 'note15.png', answer: 'B♭', label: 'B♭3', keys: [kBb,kEb,kF] },
           ];
           var pool = fixed.concat(shared.map(function(n) {
             var k = r(n.keys);
@@ -3149,6 +3709,21 @@ const FOLDERS = [
         desc: 'Bass clef · B♭/E♭/F Major · Notes A♭1 through B♭2',
         totalQuestions: 12,
         noteOptions: ['A♭', 'A', 'B♭', 'C', 'D', 'E♭', 'E', 'F', 'G'],
+        trainer: true,
+        trainerNotes: [
+          { noteFile: 'note1.png', answer: 'B♭', label: 'B♭1', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note2.png', answer: 'C', label: 'C2', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note3.png', answer: 'D', label: 'D2', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note4.png', answer: 'E♭', label: 'E♭2', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note5.png', answer: 'F', label: 'F2', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note6.png', answer: 'G', label: 'G2', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note0.png', answer: 'A', label: 'A1', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note0.png', answer: 'A♭', label: 'A♭1', clefImg: 'bass-3.png', clefLabel: 'E♭ Major' },
+          { noteFile: 'note7.png', answer: 'A', label: 'A2', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note7.png', answer: 'A♭', label: 'A♭2', clefImg: 'bass-3.png', clefLabel: 'E♭ Major' },
+          { noteFile: 'note4.png', answer: 'E', label: 'E2', clefImg: 'bass-1.png', clefLabel: 'F Major' },
+          { noteFile: 'note8.png', answer: 'B♭', label: 'B♭2', clefImg: 'bass-2.png', clefLabel: 'B♭ Major' }
+        ],
         buildQuiz: function() {
           var kBb = { img: 'bass-2.png', label: 'B♭ Major' };
           var kEb = { img: 'bass-3.png', label: 'E♭ Major' };
@@ -3190,6 +3765,21 @@ const FOLDERS = [
         desc: 'Treble clef · B♭/E♭/F Major · Notes A♭4 through B♭5',
         totalQuestions: 12,
         noteOptions: ['A♭', 'A', 'B♭', 'C', 'D', 'E♭', 'E', 'F', 'G'],
+        trainer: true,
+        trainerNotes: [
+          { noteFile: 'note10.png', answer: 'B♭', label: 'B♭4', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note11.png', answer: 'C', label: 'C5', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note12.png', answer: 'D', label: 'D5', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note13.png', answer: 'E♭', label: 'E♭5', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note14.png', answer: 'F', label: 'F5', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note15.png', answer: 'G', label: 'G5', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note9.png', answer: 'A', label: 'A4', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note9.png', answer: 'A♭', label: 'A♭4', clefImg: 'treble-3.png', clefLabel: 'E♭ Major' },
+          { noteFile: 'note16.png', answer: 'A', label: 'A5', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note16.png', answer: 'A♭', label: 'A♭5', clefImg: 'treble-3.png', clefLabel: 'E♭ Major' },
+          { noteFile: 'note13.png', answer: 'E', label: 'E5', clefImg: 'treble-1.png', clefLabel: 'F Major' },
+          { noteFile: 'note17.png', answer: 'B♭', label: 'B♭5', clefImg: 'treble-1.png', clefLabel: 'F Major' }
+        ],
         buildQuiz: function() {
           var kBb = { img: 'treble-2.png', label: 'B♭ Major' };
           var kEb = { img: 'treble-3.png', label: 'E♭ Major' };
@@ -3231,6 +3821,21 @@ const FOLDERS = [
         desc: 'Treble clef · B♭/E♭/F Major · Notes A♭3 through B♭4',
         totalQuestions: 12,
         noteOptions: ['A♭', 'A', 'B♭', 'C', 'D', 'E♭', 'E', 'F', 'G'],
+        trainer: true,
+        trainerNotes: [
+          { noteFile: 'note3.png', answer: 'B♭', label: 'B♭3', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note4.png', answer: 'C',  label: 'C4',  clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note5.png', answer: 'D',  label: 'D4',  clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note6.png', answer: 'E♭', label: 'E♭4', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note7.png', answer: 'F',  label: 'F4',  clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note8.png', answer: 'G',  label: 'G4',  clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note2.png', answer: 'A',  label: 'A3',  clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note2.png', answer: 'A♭', label: 'A♭3', clefImg: 'treble-3.png', clefLabel: 'E♭ Major' },
+          { noteFile: 'note9.png', answer: 'A',  label: 'A4',  clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+          { noteFile: 'note9.png', answer: 'A♭', label: 'A♭4', clefImg: 'treble-3.png', clefLabel: 'E♭ Major' },
+          { noteFile: 'note6.png', answer: 'E',  label: 'E4',  clefImg: 'treble-1.png', clefLabel: 'F Major' },
+          { noteFile: 'note10.png',answer: 'B♭', label: 'B♭4', clefImg: 'treble-2.png', clefLabel: 'B♭ Major' },
+        ],
         buildQuiz: function() {
           var kBb = { img: 'treble-2.png', label: 'B♭ Major' };
           var kEb = { img: 'treble-3.png', label: 'E♭ Major' };
@@ -3492,10 +4097,23 @@ function renderQuarters(ensembleId, grade, instrumentId) {
   const quizIds = activeInstrument.quizIds || [instrumentId];
 
   let cardsHtml = '';
+  let lastQuarter = null;
   for (const q of quarterDefs) {
     const key      = quizKey(ensembleId, grade, q.id);
     const folderId = FOLDER_MAP[key];
     const folder   = folderId ? getFolder(folderId) : null;
+
+    // Check if this quarter has any content worth showing
+    const hasAny = quizIds.some(function(qId) {
+      return !!(folder && folder.quizzes.find(function(qz){ return qz.id === qId; }));
+    });
+    if (!hasAny && !folder) continue; // skip quarters with no folder at all
+
+    // Quarter divider
+    if (q.id !== lastQuarter) {
+      lastQuarter = q.id;
+      cardsHtml += '<div class="quiz-quarter-divider">' + q.label + '</div>';
+    }
 
     for (const qId of quizIds) {
       const quiz  = folder ? folder.quizzes.find(function(qz){ return qz.id === qId; }) : null;
@@ -3562,8 +4180,11 @@ function renderQuarters(ensembleId, grade, instrumentId) {
 // State
 let trainerNotes      = [];   // full ordered sequence from quiz.trainerNotes
 let trainerUnlocked   = 0;    // index of highest unlocked note (0-based; 0 = first note active)
-let trainerNewStreak  = 0;    // consecutive correct answers on the newest note
+let trainerNewStreak  = 0;    // correct answers on the newest note since it was introduced
 let trainerAnswered   = false;
+let trainerMode       = false; // true only when trainer is actively running
+let trainerForceNew   = false; // true when the next question must be the newest note
+let trainerShownBanner = new Set(); // indices of notes whose "New Note" banner has been shown
 let trainerFolder     = null;
 let trainerQuiz       = null;
 let trainerCurrentQ   = null; // { noteFile, answer, label }
@@ -3577,6 +4198,9 @@ function launchTrainer(folderId, quizId) {
   trainerNewStreak = 0;
   trainerAnswered  = false;
   trainerLastAnswer = null;
+  trainerMode      = true;
+  trainerForceNew  = true;  // always ask the first note first
+  trainerShownBanner = new Set();
   activeFolder  = trainerFolder;
   activeQuiz    = trainerQuiz;
   // Set hash so exit/back works
@@ -3654,12 +4278,18 @@ function buildTrainerAnswerButtons(opts) {
 
 function renderTrainer(animateNewNote) {
   trainerAnswered  = false;
-  trainerCurrentQ  = trainerPickQuestion();
+  // If forced, always ask the newest note first; otherwise pick randomly
+  if (trainerForceNew) {
+    trainerCurrentQ = trainerNotes[trainerUnlocked];
+    trainerForceNew = false;
+  } else {
+    trainerCurrentQ = trainerPickQuestion();
+  }
   trainerLastAnswer = trainerCurrentQ.answer;
 
   const q         = trainerCurrentQ;
-  const clefImg   = trainerQuiz.clefImg;
-  const clefLabel = trainerQuiz.clefLabel;
+  const clefImg   = q.clefImg   || trainerQuiz.clefImg;
+  const clefLabel = q.clefLabel || trainerQuiz.clefLabel;
   const opts      = trainerVisibleOptions();
   const newNote   = trainerNotes[trainerUnlocked].answer;
   const isNewNote = q.answer === newNote;
@@ -3672,10 +4302,21 @@ function renderTrainer(animateNewNote) {
     return '<div class="' + cls + '">' + displayNote(n.answer) + '</div>';
   }).join('');
 
+  const threshold  = trainerUnlocked === 0 ? 2 : 3;
+  const remaining  = threshold - trainerNewStreak;
   const streakHint = trainerUnlocked < trainerNotes.length - 1
-    ? (trainerNewStreak === 1
+    ? (remaining === 1
         ? '⭐ One more correct \u2018' + displayNote(newNote) + '\u2019 to unlock the next note!'
-        : 'Identify \u2018' + displayNote(newNote) + '\u2019 correctly twice in a row to unlock the next note')
+        : remaining === 2
+          ? '⭐ Two more correct \u2018' + displayNote(newNote) + '\u2019 to unlock the next note!'
+          : 'Identify \u2018' + displayNote(newNote) + '\u2019 correctly ' + threshold + ' times to unlock the next note')
+    : '';
+
+  const isNewNoteQ = q.answer === newNote;
+  const showBanner = isNewNoteQ && !trainerShownBanner.has(trainerUnlocked);
+  if (showBanner) trainerShownBanner.add(trainerUnlocked);
+  const newNoteBanner = showBanner
+    ? '<div class="trainer-new-note-banner">New Note: ' + displayNote(newNote) + '</div>'
     : '';
 
   // Build buttons — all notes always rendered, locked ones invisible
@@ -3702,7 +4343,8 @@ function renderTrainer(animateNewNote) {
     '<div class="trainer-streak" id="trainer-streak">' + streakHint + '</div>' +
     '<div class="body">' +
       '<div class="question-text" style="margin-top:4px;">What note is shown on the staff?</div>' +
-      '<div class="staff-container">' +
+      '<div class="staff-container" style="position:relative;">' +
+        newNoteBanner +
         '<img src="' + clefImg + '" id="staff-clef" class="staff-img" alt="Clef" />' +
         '<img src="' + q.noteFile + '" id="staff-note" class="staff-img" alt="Note on staff" />' +
       '</div>' +
@@ -3713,7 +4355,7 @@ function renderTrainer(animateNewNote) {
 
 function selectAnswer(chosen, btn) {
   // Route to trainer handler if in trainer mode
-  if (activeQuiz && activeQuiz.trainer) {
+  if (trainerMode) {
     selectTrainerAnswer(chosen, btn); return;
   }
   if (answered) return;
@@ -3772,14 +4414,17 @@ function selectTrainerAnswer(chosen, btn) {
     }
 
     // Check if we should unlock the next note
-    const lastNote  = trainerUnlocked >= trainerNotes.length - 1;
-    const shouldUnlock = !lastNote && trainerNewStreak >= 2;
+    // First note only needs 2 correct (only one button visible); all others need 3
+    const threshold    = trainerUnlocked === 0 ? 2 : 3;
+    const lastNote     = trainerUnlocked >= trainerNotes.length - 1;
+    const shouldUnlock = !lastNote && trainerNewStreak >= threshold;
 
     if (shouldUnlock) {
       trainerUnlocked++;
       trainerNewStreak = 0;
+      trainerForceNew  = true;  // next question must be the newly unlocked note
       setTimeout(function() { renderTrainer(true); }, 900);
-    } else if (lastNote && trainerNewStreak >= 2) {
+    } else if (lastNote && trainerNewStreak >= threshold) {
       // All notes mastered!
       setTimeout(showCongratsOverlay, 900);
     } else {
@@ -3818,6 +4463,7 @@ function showCongratsOverlay() {
 
 // ── LAUNCH QUIZ (replaces startQuiz entry point from menus) ───────
 function launchQuiz(folderId, quizId) {
+  trainerMode  = false;
   activeFolder = getFolder(folderId);
   if (activeEnsemble && activeGrade && activeInstrument) {
     const qm   = folderId.match(/q([0-9])/);
