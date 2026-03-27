@@ -1,0 +1,1909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Staff Hero</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0a0a1a;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    overflow: hidden;
+    font-family: 'Press Start 2P', monospace;
+  }
+  #gameCanvas {
+    display: block;
+    image-rendering: pixelated;
+    border: 3px solid #444;
+  }
+
+  #canvasWrapper {
+    position: relative;
+    display: inline-block;
+  }
+  #submitPanel {
+    display: none;
+    position: absolute;
+    bottom: -54px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #0a0a1a;
+    border: 2px solid #ffe066;
+    padding: 10px 16px 12px;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 9px;
+    color: #ffe066;
+    white-space: nowrap;
+  }
+  #submitPanel.visible { display: flex; }
+  #playerName {
+    background: #111133;
+    border: 2px solid #ffe066;
+    color: #fff;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 9px;
+    padding: 6px 8px;
+    width: 140px;
+    outline: none;
+  }
+  #submitBtn {
+    background: #1a1a3a;
+    border: 2px solid #ffe066;
+    color: #fff;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 9px;
+    padding: 6px 10px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  #submitBtn:hover { background: #4466ee; }
+  #submitBtn:disabled { opacity: 0.45; cursor: default; }
+  #submitStatus { font-size: 8px; min-width: 60px; }
+</style>
+</head>
+<body>
+<div id="canvasWrapper">
+  <canvas id="gameCanvas" tabindex="0"></canvas>
+  <div id="submitPanel">
+    <span>NAME:</span>
+    <input id="playerName" type="text" maxlength="24" placeholder="Your name" autocomplete="off" />
+    <button id="submitBtn">SUBMIT</button>
+    <span id="submitStatus"></span>
+  </div>
+</div>
+
+<script>
+// ─── SCORE SUBMISSION ─────────────────────────────────────────────────────────
+// Paste your Google Apps Script Web App URL here after deploying:
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyOUJ0oQtUgzlPRUsfSFMqykPgtuu_7KK-J27ewjzRaAZb3q64KfSBiMgDAusIp77kl/exec';
+
+const submitPanel = document.getElementById('submitPanel');
+const playerNameInput = document.getElementById('playerName');
+const submitBtn = document.getElementById('submitBtn');
+const submitStatus = document.getElementById('submitStatus');
+
+function showSubmitPanel() {
+  submitPanel.classList.add('visible');
+  submitStatus.textContent = '';
+  submitBtn.disabled = false;
+  submitBtn.textContent = 'SUBMIT';
+  playerNameInput.focus();
+}
+
+function hideSubmitPanel() {
+  submitPanel.classList.remove('visible');
+}
+
+submitBtn.addEventListener('click', async () => {
+  const name = playerNameInput.value.trim();
+  if (!name) { submitStatus.style.color = '#ff4444'; submitStatus.textContent = 'Enter name!'; return; }
+  if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') {
+    submitStatus.style.color = '#ff4444'; submitStatus.textContent = 'No URL set'; return;
+  }
+  submitBtn.disabled = true;
+  submitBtn.textContent = '...';
+  submitStatus.style.color = '#aaddff';
+  submitStatus.textContent = 'Sending...';
+  try {
+    const payload = {
+      name,
+      score,
+      level: currentLevel,
+      instrument: selectedInstrument,
+      timestamp: new Date().toISOString(),
+    };
+    const form = new URLSearchParams();
+    form.append('name',       payload.name);
+    form.append('score',      payload.score);
+    form.append('level',      payload.level);
+    form.append('instrument', payload.instrument);
+    form.append('timestamp',  payload.timestamp);
+    await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      body: form,
+    });
+    submitStatus.style.color = '#44ff88';
+    submitStatus.textContent = 'Saved!';
+    submitBtn.textContent = 'DONE';
+  } catch (err) {
+    submitStatus.style.color = '#ff4444';
+    submitStatus.textContent = 'Error!';
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'SUBMIT';
+  }
+});
+
+// Allow Enter key in name field to trigger submit
+playerNameInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') { e.stopPropagation(); submitBtn.click(); }
+});
+
+// ─── CANVAS SETUP ─────────────────────────────────────────────────────────────
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+const W = 800, H = 420;
+canvas.width = W;
+canvas.height = H;
+
+// ─── STAFF LAYOUT ─────────────────────────────────────────────────────────────
+// Staff: 5 lines, each LINE_SPACING px apart.
+// staffLines[0] = top line, staffLines[4] = bottom line.
+//
+// TREBLE CLEF lines bottom→top: E4, G4, B4, D5, F5
+// ALTO CLEF   lines bottom→top: F3, A3, C4, E4, G4
+//   Middle C (C4) sits on the MIDDLE line (staffLines[2])
+
+const LINE_SPACING = 18;
+const STAFF_TOP = 110;
+const staffLines = [
+  STAFF_TOP,
+  STAFF_TOP + LINE_SPACING,
+  STAFF_TOP + LINE_SPACING * 2,
+  STAFF_TOP + LINE_SPACING * 3,
+  STAFF_TOP + LINE_SPACING * 4,
+];
+const STAFF_BOTTOM = staffLines[4];
+
+// ── Treble clef note Y positions ──────────────────────────────────────────────
+// Lines (bottom→top): E4 G4 B4 D5 F5
+// Spaces (bottom→top): F4 A4 C5 E5
+const NOTE_Y_TREBLE = {
+  'D4': STAFF_BOTTOM + LINE_SPACING / 2,        // space below bottom line
+  'E4': STAFF_BOTTOM,                            // line 5 (bottom)
+  'F4': STAFF_BOTTOM - LINE_SPACING / 2,        // first space (F#4)
+  'G4': STAFF_BOTTOM - LINE_SPACING,            // line 4
+  'A4': STAFF_BOTTOM - LINE_SPACING * 1.5,      // second space
+  'B4': STAFF_BOTTOM - LINE_SPACING * 2,        // line 3
+  'C5': STAFF_BOTTOM - LINE_SPACING * 2.5,      // third space (C#5)
+  'D5': STAFF_BOTTOM - LINE_SPACING * 3,        // line 2
+};
+
+// ── Alto clef note Y positions ────────────────────────────────────────────────
+// Lines (bottom→top): F3 A3 C4 E4 G4
+// Spaces (bottom→top): G3 B3 D4 F4 (then above staff: A4 space, B4, C5, D5)
+// Middle line (staffLines[2]) = C4. Each diatonic step = LINE_SPACING/2 upward.
+const NOTE_Y_ALTO = {
+  'D4': staffLines[2] - LINE_SPACING * 0.5,   // 2nd space from bottom (D4)
+  'E4': staffLines[2] - LINE_SPACING * 1.0,   // 4th line (E4)
+  'F4': staffLines[2] - LINE_SPACING * 1.5,   // 4th space (F#4)
+  'G4': staffLines[2] - LINE_SPACING * 2.0,   // top line (G4)
+  'A4': staffLines[2] - LINE_SPACING * 2.5,   // space above top line
+  'B4': staffLines[2] - LINE_SPACING * 3.0,   // first ledger line above
+  'C5': staffLines[2] - LINE_SPACING * 3.5,   // space above first ledger
+  'D5': staffLines[2] - LINE_SPACING * 4.0,   // second ledger line above
+};
+
+// ── Bass clef note Y positions ────────────────────────────────────────────────
+// Lines (bottom→top): G2 B2 D3 F3 A3
+// Spaces (bottom→top): A2 C3 E3 G3
+// Middle line (staffLines[2]) = D3. Each diatonic step = LINE_SPACING/2 upward.
+const NOTE_Y_BASS = {
+  'D3': staffLines[2],                         // middle line (3rd line)
+  'E3': staffLines[2] - LINE_SPACING * 0.5,   // 3rd space
+  'F3': staffLines[2] - LINE_SPACING * 1.0,   // 4th line (F#3)
+  'G3': staffLines[2] - LINE_SPACING * 1.5,   // 4th space
+  'A3': staffLines[2] - LINE_SPACING * 2.0,   // top line (A3)
+  'B3': staffLines[2] - LINE_SPACING * 2.5,   // space above top line
+  'C4': staffLines[2] - LINE_SPACING * 3.0,   // first ledger line above (C#4)
+  'D4': staffLines[2] - LINE_SPACING * 3.5,   // space above first ledger
+};
+
+// Returns the correct Y map for the active instrument
+function getNoteYMap() {
+  if (selectedInstrument === 'Viola') return NOTE_Y_ALTO;
+  if (selectedInstrument === 'Cello' || selectedInstrument === 'Bass') return NOTE_Y_BASS;
+  return NOTE_Y_TREBLE;
+}
+
+// Convenience — Y for a single pitch given current instrument
+function getNoteY(pitch) { return getNoteYMap()[pitch]; }
+
+// ─── LEVEL DEFINITIONS ────────────────────────────────────────────────────────
+const LEVELS = {
+  1: { pitches: ['D4','E4','F4'],                              tonic: 'D4' },
+  2: { pitches: ['D4','E4','F4','G4','A4'],                    tonic: 'D4' },
+  3: { pitches: ['D4','E4','F4','G4','A4','B4','C5','D5'],     tonic: 'D4' },
+};
+const CELLO_LEVELS = {
+  1: { pitches: ['D3','E3','F3'],                           tonic: 'D3' },
+  2: { pitches: ['D3','E3','F3','G3','A3'],                 tonic: 'D3' },
+  3: { pitches: ['D3','E3','F3','G3','A3','B3','C4','D4'],  tonic: 'D3' },
+};
+// Display names (accidentals implied by D Major key signature)
+const PITCH_DISPLAY = {
+  D4:'D', E4:'E', F4:'F#', G4:'G', A4:'A', B4:'B', C5:'C#', D5:'D',
+  D3:'D', E3:'E', F3:'F#', G3:'G', A3:'A', B3:'B', C4:'C#', D4b:'D',
+};
+// Which pitches get an extra gap AFTER them in the button row (visual grouping)
+const EXTRA_GAP_AFTER = new Set(['G4', 'G3']); // gap between G and A
+
+// ─── AUDIO ────────────────────────────────────────────────────────────────────
+// Frequencies for D4, E4, F#4 etc. (violin/viola) and D3, E3, F#3 etc. (cello)
+const NOTE_FREQ = {
+  'D4': 293.66, 'E4': 329.63, 'F4': 369.99,
+  'G4': 392.00, 'A4': 440.00, 'B4': 493.88,
+  'C5': 554.37, 'D5': 587.33,
+  // Cello — one octave below violin
+  'D3': 146.83, 'E3': 164.81, 'F3': 185.00,
+  'G3': 196.00, 'A3': 220.00, 'B3': 246.94,
+  'C4': 261.63,
+};
+
+let audioCtx = null;
+
+function getAudioCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+
+function playNoteSound(pitch, big = false) {
+  const freq = NOTE_FREQ[pitch];
+  if (!freq) return;
+  const ac = getAudioCtx();
+
+  // Primary sawtooth — the note's actual pitch
+  const osc = ac.createOscillator();
+  const gain = ac.createGain();
+  osc.type = 'sawtooth';
+  osc.frequency.setValueAtTime(freq, ac.currentTime);
+  gain.gain.setValueAtTime(0, ac.currentTime);
+  gain.gain.linearRampToValueAtTime(big ? 0.32 : 0.28, ac.currentTime + 0.01);
+  gain.gain.exponentialRampToValueAtTime(0.0001, ac.currentTime + (big ? 0.38 : 0.22));
+  osc.connect(gain);
+  gain.connect(ac.destination);
+  osc.start(ac.currentTime);
+  osc.stop(ac.currentTime + 0.4);
+
+  // On a big hit: add the same pitch one octave down
+  if (big) {
+    const osc2 = ac.createOscillator();
+    const gain2 = ac.createGain();
+    osc2.type = 'sawtooth';
+    osc2.frequency.setValueAtTime(freq / 2, ac.currentTime);
+    gain2.gain.setValueAtTime(0, ac.currentTime);
+    gain2.gain.linearRampToValueAtTime(0.22, ac.currentTime + 0.015);
+    gain2.gain.exponentialRampToValueAtTime(0.0001, ac.currentTime + 0.45);
+    osc2.connect(gain2);
+    gain2.connect(ac.destination);
+    osc2.start(ac.currentTime);
+    osc2.stop(ac.currentTime + 0.5);
+  }
+}
+
+// ─── BACKING TRACK ────────────────────────────────────────────────────────────
+// D4-A4-D5-A4 looping as eighth notes at 84 BPM
+// Eighth note duration = 60 / 84 / 2 = 0.357s
+const BPM            = 84;
+const EIGHTH_DUR     = 60 / BPM / 2;          // ~0.357s per eighth note
+const BACKING_FREQS  = [293.66, 440.00, 587.33, 440.00]; // D4, A4, D5, A4
+const LOOKAHEAD_MS   = 25.0;   // how often the scheduler fires (ms)
+const SCHEDULE_AHEAD = 0.1;    // how far ahead to schedule (seconds)
+
+let backingActive    = false;
+let backingNoteIdx   = 0;
+let nextNoteTime     = 0;
+let backingInterval  = null;
+let floatingLabels = []; // Array to hold {x, y, text, color, vx, vy, life}	
+
+function scheduleBackingNote(freq, time) {
+  const ac = getAudioCtx();
+
+  const osc  = ac.createOscillator();
+  const gain = ac.createGain();
+  // Sine wave — warm, unobtrusive underneath the player's sawtooth zaps
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(freq, time);
+
+  const noteDur = EIGHTH_DUR * 0.75; // slight staccato so notes separate
+  gain.gain.setValueAtTime(0, time);
+  gain.gain.linearRampToValueAtTime(0.10, time + 0.008);
+  gain.gain.exponentialRampToValueAtTime(0.0001, time + noteDur);
+
+  osc.connect(gain);
+  gain.connect(ac.destination);
+  osc.start(time);
+  osc.stop(time + noteDur + 0.01);
+}
+
+function backingScheduler() {
+  const ac = getAudioCtx();
+  while (nextNoteTime < ac.currentTime + SCHEDULE_AHEAD) {
+    scheduleBackingNote(BACKING_FREQS[backingNoteIdx % BACKING_FREQS.length], nextNoteTime);
+    backingNoteIdx++;
+    nextNoteTime += EIGHTH_DUR;
+  }
+}
+
+function startBackingTrack() {
+  if (backingActive) return;
+  backingActive  = true;
+  backingNoteIdx = 0;
+  nextNoteTime   = getAudioCtx().currentTime + 0.02;
+  backingInterval = setInterval(backingScheduler, LOOKAHEAD_MS);
+}
+
+function stopBackingTrack() {
+  backingActive = false;
+  if (backingInterval) { clearInterval(backingInterval); backingInterval = null; }
+  // Close and null the AudioContext — kills all queued scheduled nodes immediately.
+  // getAudioCtx() will create a fresh one next time it's needed.
+  if (audioCtx) { audioCtx.close(); audioCtx = null; }
+}
+
+function isOnBeat() {
+  if (!backingActive) return false;
+  const ac = getAudioCtx();
+  const now = ac.currentTime;
+  // How far into the current eighth-note interval are we?
+  // nextNoteTime is always the NEXT scheduled note, so the last beat was nextNoteTime - EIGHTH_DUR
+  const lastBeat = nextNoteTime - EIGHTH_DUR;
+  const phase = now - lastBeat;               // 0 = right on the beat, EIGHTH_DUR = next beat
+  // Distance to nearest beat (could be the last or the upcoming one)
+  const distToNearest = Math.min(phase, EIGHTH_DUR - phase);
+  const tolerance = EIGHTH_DUR * 0.12;        // ±12% of an eighth note = tighter window for bonus
+  return distToNearest < tolerance;
+}
+
+
+const NOTE_SPACING = 90; // horizontal pixels between notes
+const CLEF_WIDTH = 120;  // space reserved for clef + key sig
+const LEVEL_LENGTH = 25;
+
+function generateLevel() {
+  const levelSet = selectedInstrument === 'Cello' || selectedInstrument === 'Bass' ? CELLO_LEVELS : LEVELS;
+  const levelDef = levelSet[currentLevel];
+  const pitches = levelDef.pitches;
+  const tonic = levelDef.tonic;
+  const notes = [];
+  let lastPitch = null;
+  for (let i = 0; i < LEVEL_LENGTH; i++) {
+    let pitch;
+    if (i === LEVEL_LENGTH - 1) {
+      // Last note must be the tonic
+      pitch = lastPitch === tonic
+        ? pitches.filter(p => p !== tonic)[Math.floor(Math.random() * (pitches.length - 1))]
+        : tonic;
+    } else if (i === LEVEL_LENGTH - 2) {
+      // Second-to-last must not be the tonic
+      const available = pitches.filter(p => p !== lastPitch && p !== tonic);
+      pitch = available[Math.floor(Math.random() * available.length)];
+    } else {
+      const available = pitches.filter(p => p !== lastPitch);
+      pitch = available[Math.floor(Math.random() * available.length)];
+    }
+    lastPitch = pitch;
+    notes.push({
+      pitch,
+      name: pitch[0],   // first letter: D, E, F, G, A
+      x: CLEF_WIDTH + 60 + i * NOTE_SPACING,
+      y: getNoteY(pitch),
+      answered: false,
+    });
+  }
+  return notes;
+}
+
+// ─── SCREEN STATE ─────────────────────────────────────────────────────────────
+// 'title' | 'levelPreview' | 'playing'
+let gameState = 'title';
+let currentLevel = 1;
+let selectedInstrument = null;
+let hoveredBtn = null;
+
+const INSTRUMENTS = ['Violin', 'Viola', 'Cello', 'Bass'];
+let instrBtns = [];
+let startBtn = null;
+let menuBtn = null;       // level complete screen
+let nextLevelBtn = null;  // level complete screen
+
+// ─── GAME STATE ───────────────────────────────────────────────────────────────
+let notes = generateLevel();
+let currentNoteIdx = 0;
+let camera = 0;
+let hearts = 6;
+let score = 0;
+let gameOver = false;
+let levelComplete = false;
+let elapsedTime = 0;
+let finalTime = 0;
+let countIn = true;       // true while the Ready/Go count-in is running
+let countInBeat = 0;      // 0 = before first beat, 1 = "Ready", 2 = "Go", 3 = done
+let countInStartTime = 0; // audioCtx time when count-in began
+
+let DOUBLE_BAR_X = notes[notes.length - 1].x + NOTE_SPACING * 0.7;
+
+function formatTime(s) {
+  const m = Math.floor(s / 60);
+  const sec = Math.floor(s % 60);
+  const cs = Math.floor((s % 1) * 100);
+  return `${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}.${String(cs).padStart(2,'0')}`;
+}
+
+// ─── HERO ─────────────────────────────────────────────────────────────────────
+// Hero state
+const HERO_W = 16, HERO_H = 32;
+const HERO_GAP = 10; // px above the notehead centre
+let hero = {
+  x: notes[0].x,
+  y: notes[0].y - HERO_H - HERO_GAP,
+  vy: 0,
+  state: 'idle',   // idle | bounce | shake | flip
+  shakeTimer: 0,
+  shakeX: 0,
+  bounceTarget: null,
+  bounceStartX: 0,
+  bounceStartY: 0,
+  bounceT: 0,
+  flipT: 0,        // 0→1 over the flip arc
+  flipStartX: 0,
+  flipStartY: 0,
+  frame: 0,
+  frameTimer: 0,
+};
+
+// ─── PIXEL ART HERO ──────────────────────────────────────────────────────────
+// Each cell = 2px. Sprite is 16 cols × 24 rows = drawn at 2× = 32×48 display
+// We'll draw at natural size, each "pixel" = 2 screen pixels
+const PX = 2;
+
+// Color palette
+const C = {
+  skin:   '#f5c99a',
+  hair:   '#3a1a00',
+  shirt:  '#3355cc',
+  pants:  '#222266',
+  shoe:   '#331100',
+  eye:    '#000',
+  white:  '#fff',
+  mouth:  '#cc4444',
+  note:   '#ffe066',
+  outline:'#111',
+  empty:  null,
+};
+
+// Using single characters: S=skin, H=hair, B=shirt, P=pants, K=shoe, E=eye, W=white, M=mouth, _=empty
+const SPRITE_IDLE = [
+  '___HWH_HWH_HWH__', // Row 00: Three Turret Tops
+  '___HWH_HWH_HWH__', // Row 01: Three Turret Tops
+  '___HHHHHHHHHHH__', // Row 02: Top bridge (connecting the turrets)
+  '___HWWWWWWWWWH__', // Row 03: Top crown highlight
+  '___HHHHHHHHHHH__', // Row 04: Crown base
+  '____HHHHHHHHH___', // Row 05: Neck compression
+  '____HWWWWWWWH___', // Row 06: Pillar start
+  '____HWWWWWWWH___', // Row 07: Pillar
+  '____HWWWWWWWH___', // Row 08: Pillar
+  '____HWWWWWWWH___', // Row 09: Pillar
+  '___HHHHHHHHHHH__', // Row 10: Base flare start
+  '___HWWWWWWWWWH__', // Row 11: Base highlight
+  '__HHHHHHHHHHHHH_', // Row 12: Lower tier
+  '__HWWWWWWWWWWWH_', // Row 13: Lower tier highlight
+  '_HHHHHHHHHHHHHHH', // Row 14: Bottom foundation
+  '________________', // Row 15: Ground contact
+];
+
+const SPRITE_WALK = [
+  '_____HHHH___HWH_', // Row 00: Distant Turret (L) and Front Turret (R) top
+  '_____HWHH___HWH_', // Row 01: Connects to slightly hidden center turret
+  '__HHHHHHHHHHHHWH', // Row 02: Main top bridge, heavily skewed right
+  '__HWWWWWWWWWWWH_', // Row 03: Top highlight follows the skew
+  '___HHHHHHHHHHHH_', // Row 04: Top base, compressed on the left side
+  '____HHHHHHHHHH__', // Row 05: Neck compression, shifted right
+  '____HWWWWWWWH___', // Row 06: Pillar start
+  '___HWWWWWWWH____', // Row 07: Pillar, tilting left (meaning top is right)
+  '___HWWWWWWWH____', // Row 08: Pillar
+  '__HWWWWWWWH_____', // Row 09: Pillar, base pulling backward (left)
+  '_HHHHHHHHHHH____', // Row 10: Base flare starts, angled
+  '_HWWWWWWWWWH____', // Row 11: Base highlight
+  'HHHHHHHHHHH_____', // Row 12: Lower tier foundation (far right element)
+  'WWWWWWWWWH______', // Row 13: Ground effect/thrust hint
+  '________________', // Row 14: Clear air/motion blur
+  '________________', // Row 15: Clear air
+];
+
+const colorMap = { S:'skin', H:'hair', B:'shirt', P:'pants', K:'shoe', E:'eye', W:'white', M:'mouth', _:null };
+
+function drawSprite(sprite, cx, cy, flipX = false) {
+  const cols = sprite[0].length;
+  const rows = sprite.length;
+  const drawW = cols * PX;
+  const drawH = rows * PX;
+  ctx.save();
+  if (flipX) {
+    ctx.translate(cx + drawW / 2, cy);
+    ctx.scale(-1, 1);
+    ctx.translate(-drawW / 2, 0);
+  } else {
+    ctx.translate(cx, cy);
+  }
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+      const ch = sprite[row][col];
+      const key = colorMap[ch];
+      if (!key) continue;
+      ctx.fillStyle = C[key];
+      ctx.fillRect(col * PX, row * PX, PX, PX);
+    }
+  }
+  ctx.restore();
+}
+
+// ─── HEART DRAWING ────────────────────────────────────────────────────────────
+function drawHeart(x, y, full, half) {
+  const size = 10;
+  ctx.save();
+  ctx.translate(x, y);
+  // outline
+  ctx.fillStyle = '#440000';
+  drawHeartShape(size + 1);
+  if (full) {
+    ctx.fillStyle = '#ff2222';
+    drawHeartShape(size);
+  } else if (half) {
+    ctx.fillStyle = '#ff2222';
+    ctx.beginPath();
+    ctx.rect(0, -size / 2, size / 2 + 1, size * 1.2);
+    ctx.clip();
+    drawHeartShape(size);
+  } else {
+    ctx.fillStyle = '#333';
+    drawHeartShape(size);
+  }
+  ctx.restore();
+}
+
+function drawHeartShape(size) {
+  ctx.beginPath();
+  ctx.moveTo(0, size * 0.3);
+  ctx.bezierCurveTo(-size, -size * 0.3, -size, size * 0.8, 0, size);
+  ctx.bezierCurveTo(size, size * 0.8, size, -size * 0.3, 0, size * 0.3);
+  ctx.fill();
+}
+
+// ─── TREBLE CLEF DRAWING ──────────────────────────────────────────────────────
+function drawTrebleClef(x) {
+  ctx.save();
+  ctx.fillStyle = '#ffe066';
+  const clefHeight = LINE_SPACING * 7.5;
+  ctx.font = `${clefHeight}px serif`;
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'alphabetic';
+  ctx.fillText('𝄞', x, staffLines[3] + LINE_SPACING * 1.2);
+  ctx.restore();
+}
+
+// ─── ALTO CLEF DRAWING ────────────────────────────────────────────────────────
+// Unicode 𝄡 is the B clef — the notch must sit exactly on staffLines[2] (C4/middle line).
+// The glyph's visual centre sits above its typographic middle, so we nudge down manually.
+function drawAltoClef(x) {
+  ctx.save();
+  ctx.fillStyle = '#ffe066';
+  const clefHeight = LINE_SPACING * 5.2;
+  ctx.font = `${clefHeight}px serif`;
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  // Offset: push the glyph down so its visual notch aligns with the middle staff line.
+  // The 𝄡 glyph centre sits roughly 18% above typographic middle — nudge down to compensate.
+  const nudge = clefHeight * 0.09;
+  ctx.fillText('𝄡', x, staffLines[2] + nudge);
+  ctx.restore();
+}
+
+// ─── BASS CLEF DRAWING ────────────────────────────────────────────────────────
+// Unicode 𝄢 — the two dots straddle the F3 line (staffLines[1] in bass clef).
+// staffLines[1] = STAFF_TOP + LINE_SPACING = 2nd line from top = A3 line.
+// We position the glyph so its F-dot notch aligns with staffLines[1].
+function drawBassClef(x) {
+  ctx.save();
+  ctx.fillStyle = '#ffe066';
+  const clefHeight = LINE_SPACING * 4.2 * 1.1576;
+  ctx.font = `${clefHeight}px serif`;
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  // 𝄢 visual center sits roughly at the F line; nudge so it aligns with staffLines[1]
+  ctx.fillText('𝄢', x, staffLines[1] + LINE_SPACING * 0.1 + 11);
+  ctx.restore();
+}
+
+function drawClef(x) {
+  if (selectedInstrument === 'Viola') drawAltoClef(x);
+  else if (selectedInstrument === 'Cello' || selectedInstrument === 'Bass') drawBassClef(x);
+  else drawTrebleClef(x);
+}
+
+// ─── KEY SIGNATURE (D Major: F# and C#) ──────────────────────────────────────
+// Sharp positions differ between treble, alto, and bass clef
+function drawKeySignature(x) {
+  ctx.save();
+  ctx.fillStyle = '#ffe066';
+  ctx.font = `bold ${LINE_SPACING * 1.6}px serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'alphabetic'; // Add this to lock the vertical anchor
+
+  if (selectedInstrument === 'Viola') {
+    // Alto clef D major key signature:
+    // F# on the top line (G4, staffLines[0])
+    // C# on the third line (C4, staffLines[2]) — one step above = staffLines[2] - LS/2
+    ctx.fillText('♯', x,      staffLines[0] + LINE_SPACING * 0.6);
+    ctx.fillText('♯', x + 14, staffLines[2] - LINE_SPACING * 0.5 + LINE_SPACING * 0.6);
+  } else if (selectedInstrument === 'Cello' || selectedInstrument === 'Bass') {
+    // Bass clef D major key signature:
+    // F# on the 4th line from bottom (staffLines[1] = A3 line, F3 is staffLines[3])
+    // C# two steps below F# = staffLines[1] + LINE_SPACING (space between lines 1 and 2)
+    ctx.fillText('♯', x,      staffLines[3] + LINE_SPACING * 0.6); // F# on 4th line
+    ctx.fillText('♯', x + 14, staffLines[1] + LINE_SPACING * 0.6); // C# on 2nd line
+  } else {
+    // Treble clef D major key signature
+    ctx.fillText('♯', x,      staffLines[0] + LINE_SPACING * 0.6);
+    ctx.fillText('♯', x + 14, staffLines[2] - LINE_SPACING * 0.5 + LINE_SPACING * 0.6);
+  }
+  ctx.restore();
+}
+
+// ─── NOTE DRAWING ─────────────────────────────────────────────────────────────
+function drawNote(note, camX) {
+  const sx = note.x - camX;
+  const sy = note.y;
+  if (sx < -30 || sx > W + 30) return;
+
+  // Ledger lines for alto clef notes above the staff
+  if (selectedInstrument === 'Viola') {
+    const topLine = staffLines[0]; // G4 line
+    const col = note.answered ? '#555' : '#ffe066';
+    ctx.strokeStyle = col;
+    ctx.lineWidth = 1.5;
+    // B4 sits ON the first ledger line above
+    if (note.pitch === 'B4') {
+      const ly = topLine - LINE_SPACING;
+      ctx.beginPath(); ctx.moveTo(sx - 13, ly); ctx.lineTo(sx + 13, ly); ctx.stroke();
+    }
+    // C5 (C#) sits in the space ABOVE the first ledger — ledger must still be shown
+    if (note.pitch === 'C5') {
+      const ly = topLine - LINE_SPACING;
+      ctx.beginPath(); ctx.moveTo(sx - 13, ly); ctx.lineTo(sx + 13, ly); ctx.stroke();
+    }
+    // D5 sits ON the second ledger line — draw both ledgers
+    if (note.pitch === 'D5') {
+      const ly1 = topLine - LINE_SPACING;
+      const ly2 = topLine - LINE_SPACING * 2;
+      ctx.beginPath(); ctx.moveTo(sx - 13, ly1); ctx.lineTo(sx + 13, ly1); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(sx - 13, ly2); ctx.lineTo(sx + 13, ly2); ctx.stroke();
+    }
+  }
+
+  // Ledger lines for bass clef notes above the staff
+  if (selectedInstrument === 'Cello' || selectedInstrument === 'Bass') {
+    const topLine = staffLines[0]; // A3 top line of bass staff
+    const col = note.answered ? '#555' : '#ffe066';
+    ctx.strokeStyle = col;
+    ctx.lineWidth = 1.5;
+    // C4 (C#) sits ON the first ledger line above
+    if (note.pitch === 'C4') {
+      const ly = topLine - LINE_SPACING;
+      ctx.beginPath(); ctx.moveTo(sx - 13, ly); ctx.lineTo(sx + 13, ly); ctx.stroke();
+    }
+    // D4 sits in the space above the first ledger — ledger still shown
+    if (note.pitch === 'D4') {
+      const ly = topLine - LINE_SPACING;
+      ctx.beginPath(); ctx.moveTo(sx - 13, ly); ctx.lineTo(sx + 13, ly); ctx.stroke();
+    }
+  }
+
+  // Solid notehead (oval)
+  ctx.save();
+  ctx.fillStyle = note.answered ? '#555' : '#ffe066';
+  ctx.strokeStyle = note.answered ? '#333' : '#cc9900';
+  ctx.lineWidth = 1;
+  ctx.translate(sx, sy);
+  ctx.rotate(-0.3);
+  ctx.beginPath();
+  ctx.ellipse(0, 0, 11, 7.5, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+  ctx.restore();
+}
+
+// ─── STAFF DRAWING ────────────────────────────────────────────────────────────
+function drawStaff(camX) {
+  // Staff ends at the double bar line — no line past it
+  const barSx = Math.max(20, DOUBLE_BAR_X - camX); // pinned position (same as drawDoubleBarLine)
+  const staffEnd = barSx + 10; // a few px past the thin bar so it meets cleanly
+  ctx.strokeStyle = '#ffe066';
+  ctx.lineWidth = 1.5;
+  for (let i = 0; i < 5; i++) {
+    ctx.beginPath();
+    ctx.moveTo(0, staffLines[i]);
+    ctx.lineTo(staffEnd, staffLines[i]);
+    ctx.stroke();
+  }
+}
+
+// ─── HUD ──────────────────────────────────────────────────────────────────────
+function drawHUD() {
+  // Score
+  ctx.fillStyle = '#ffe066';
+  ctx.font = '8px "Press Start 2P"';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'top'; // Standardize the baseline for the top bar
+  ctx.fillText(`SCORE: ${score}`, 10, 20);
+
+  // Timer (top center)
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#aaffaa';
+  ctx.fillText(formatTime(levelComplete || gameOver ? finalTime : elapsedTime), W / 2, 20);
+
+  // Note counter (below timer)
+  ctx.fillStyle = '#ffe066';
+  ctx.font = '7px "Press Start 2P"';
+  ctx.fillText(`NOTE ${Math.min(currentNoteIdx + 1, LEVEL_LENGTH)} / ${LEVEL_LENGTH}`, W / 2, 34);
+
+  // Hearts
+  const heartStartX = W - 20;
+  const totalHearts = 3;
+  for (let i = 0; i < totalHearts; i++) {
+    const hx = heartStartX - i * 26;
+    const halfHeartsForThis = hearts - (totalHearts - 1 - i) * 2;
+    const full = halfHeartsForThis >= 2;
+    const half = halfHeartsForThis === 1;
+    drawHeart(hx, 18, full, half);
+  }
+
+  // Note buttons — drawn on canvas, large touch targets
+  if (!gameOver && !levelComplete && !countIn && currentNoteIdx < notes.length) {
+    drawNoteButtons();
+  }
+}
+
+// ─── NOTE BUTTONS ─────────────────────────────────────────────────────────────
+let noteBtns = []; // hit-test rects, rebuilt each frame
+
+function drawNoteButtons() {
+  const levelSet = selectedInstrument === 'Cello' || selectedInstrument === 'Bass' ? CELLO_LEVELS : LEVELS;
+  const levelPitches = levelSet[currentLevel].pitches;
+  // Scale button width down slightly for larger note sets so they all fit
+  const btnW = levelPitches.length <= 5 ? 80 : 66;
+  const btnH = 56;
+  const gap = 12;
+  const extraGap = 20; // additional space after G4
+
+  // Calculate total width accounting for extra gap
+  const extraGapCount = levelPitches.filter(p => EXTRA_GAP_AFTER.has(p)).length;
+  const totalW = levelPitches.length * btnW
+               + (levelPitches.length - 1) * gap
+               + extraGapCount * extraGap;
+  const btnY = H - 80;
+
+  noteBtns = [];
+  let curX = (W - totalW) / 2;
+
+  levelPitches.forEach((pitch, i) => {
+    const bx = curX;
+    const label = PITCH_DISPLAY[pitch];
+    const hovered = hoveredBtn === `NOTE_${pitch}`;
+
+    // Shadow
+    ctx.fillStyle = '#000';
+    ctx.fillRect(bx + 3, btnY + 3, btnW, btnH);
+    // Body
+    ctx.fillStyle = hovered ? '#4466ee' : '#1a1a3a';
+    ctx.fillRect(bx, btnY, btnW, btnH);
+    // Border
+    ctx.strokeStyle = '#ffe066';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(bx, btnY, btnW, btnH);
+    // Label
+    ctx.fillStyle = '#fff';
+    ctx.font = `${btnW <= 66 ? 11 : 14}px "Press Start 2P"`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(label, bx + btnW / 2, btnY + btnH / 2);
+
+    noteBtns.push({ pitch, name: pitch[0], x: bx, y: btnY, w: btnW, h: btnH });
+
+    curX += btnW + gap + (EXTRA_GAP_AFTER.has(pitch) ? extraGap : 0);
+  });
+}
+
+// ─── DOUBLE BAR LINE ──────────────────────────────────────────────────────────
+function drawDoubleBarLine(camX) {
+  // Pin to left edge once the bar scrolls into view — never let it go further left than x=20
+  const sx = Math.max(20, DOUBLE_BAR_X - camX);
+  if (DOUBLE_BAR_X - camX > W + 10) return; // not yet visible
+  ctx.save();
+  ctx.strokeStyle = '#ffe066';
+  // Thin bar
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(sx, staffLines[0]);
+  ctx.lineTo(sx, staffLines[4]);
+  ctx.stroke();
+  // Thick bar
+  ctx.lineWidth = 6;
+  ctx.beginPath();
+  ctx.moveTo(sx + 7, staffLines[0]);
+  ctx.lineTo(sx + 7, staffLines[4]);
+  ctx.stroke();
+  ctx.restore();
+}
+
+// ─── PARTICLE SYSTEM ──────────────────────────────────────────────────────────
+// Each particle: { x, y, vx, vy, life, maxLife, size, color }
+let particles = [];
+
+const PARTICLE_COLORS = [
+  '#ffe066', '#ffffff', '#ff6644', '#44ffaa', '#66aaff', '#ff44bb', '#ffaa22'
+];
+
+function spawnExplosion(worldX, worldY, big = false) {
+  const count = big ? 42 : 22;
+  const speedMult = big ? 1.6 : 1.0;
+  const sizeMult  = big ? 1.8 : 1.0;
+  for (let i = 0; i < count; i++) {
+    const angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.4;
+    const speed = (60 + Math.random() * 120) * speedMult;
+    const life   = (big ? 0.55 : 0.45) + Math.random() * 0.3;
+    particles.push({
+      x:       worldX,
+      y:       worldY,
+      vx:      Math.cos(angle) * speed,
+      vy:      Math.sin(angle) * speed - (big ? 50 : 30),
+      life,
+      maxLife: life,
+      size:    (2 + Math.floor(Math.random() * 3) * 2) * sizeMult,
+      color:   PARTICLE_COLORS[Math.floor(Math.random() * PARTICLE_COLORS.length)],
+    });
+  }
+}
+
+function updateParticles(dt) {
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const p = particles[i];
+    p.x    += p.vx * dt;
+    p.y    += p.vy * dt;
+    p.vy   += 220 * dt;   // gravity
+    p.life -= dt;
+    if (p.life <= 0) particles.splice(i, 1);
+  }
+}
+
+function drawParticles(camX) {
+  for (const p of particles) {
+    const sx = p.x - camX;
+    if (sx < -20 || sx > W + 20) continue;
+    const alpha = Math.max(0, p.life / p.maxLife);
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = p.color;
+    ctx.fillRect(sx - p.size / 2, p.y - p.size / 2, p.size, p.size);
+    ctx.restore();
+  }
+}
+function updateAndDrawLabels(dt, camX) {
+  for (let i = floatingLabels.length - 1; i >= 0; i--) {
+    const l = floatingLabels[i];
+    // Move label
+    l.x += l.vx * dt;
+    l.y += l.vy * dt;
+    l.vy += 400 * dt; // Gravity pulls it down
+    l.life -= dt;
+
+    if (l.life <= 0) {
+      floatingLabels.splice(i, 1);
+      continue;
+    }
+
+    // Draw label
+    ctx.save();
+    ctx.globalAlpha = Math.min(1, l.life * 2);
+    ctx.fillStyle = l.color;
+    ctx.font = 'bold 12px "Press Start 2P"';
+    ctx.textAlign = 'center';
+    ctx.fillText(l.text, l.x - camX, l.y);
+    ctx.restore();
+  }
+}
+	
+// ─── NES BUTTON HELPER ────────────────────────────────────────────────────────
+function drawNesButton(label, x, y, w, h, hovered, selected) {
+  ctx.save();
+  // Shadow
+  ctx.fillStyle = '#000';
+  ctx.fillRect(x + 3, y + 3, w, h);
+  // Body
+  ctx.fillStyle = selected ? '#ffe066' : hovered ? '#4466ee' : '#1a1a3a';
+  ctx.fillRect(x, y, w, h);
+  // Border
+  ctx.strokeStyle = selected ? '#fff' : '#ffe066';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(x, y, w, h);
+  // Label
+  ctx.fillStyle = selected ? '#000' : '#fff';
+  ctx.font = '9px "Press Start 2P"';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(label, x + w / 2, y + h / 2);
+  ctx.restore();
+}
+
+// ─── INSTRUMENT PIXEL ART SPRITES ────────────────────────────────────────────
+// Each cell = 2px. Colors: W=wood(amber), D=dark wood, S=shadow, L=light, N=neck, G=string, _=empty
+// I=instrument body inner, C=chin rest / tail, B=bow hair, R=rosin/bow stick
+
+const IC = {
+  W: '#d4860a',   // warm wood body
+  D: '#8b4a00',   // dark wood edge / shadow
+  L: '#f5c84a',   // light highlight
+  N: '#c07020',   // neck
+  G: '#cccccc',   // strings (light grey)
+  S: '#3a1a00',   // deep shadow outline
+  I: '#e8a030',   // inner body
+  C: '#222',      // chin rest / tailpiece
+  B: '#f5f5dc',   // bow hair (cream)
+  R: '#8b6914',   // bow stick
+  _: null,
+};
+
+// Violin — 10 wide × 22 tall (drawn at PX=2 → 20×44px)
+const SPRITE_VIOLIN = [
+  '____DDD_____', // Peg tips
+  '__DDDDDDD___', // Top pegs
+  '____DDD_____', // Peg box
+  '__DDDDDDD___', // Bottom pegs
+  '____SSS_____', // Neck
+  '____SSS_____', // Neck
+  '____SSS_____', // Neck base
+  '____SSS_____', // Shoulders
+  '__DWSSSWD___', // Upper bout
+  '_DWWSSSWWD__', // Upper bout (with highlights)
+  '_DWWSSSWWD__', 
+  '__DDSSSDD___', // Waist (C-bouts)
+  '__DDSSSDD___',
+  '__DWWWWWD___', // Lower bout
+  '_DWWSSSWWD__', // Lower bout widening
+  '_DWWWWWWWD__',
+  '_DWWSSSWWDD_', // F-holes (S)
+  '_DWWSSSWWD__', // Bridge / Tailpiece (C)
+  '_DWWWSWWWD__', // Chinrest (C)
+  '__DWWSWWWD__', // Bottom curve
+  '____DDD_____', // End pin
+];
+
+// Viola — 11 wide × 22 tall, slightly wider body than violin
+const SPRITE_VIOLA = [
+   '____DDD_____', // Peg tips
+  '__DDDDDDD___', // Top pegs
+  '____DDD_____', // Peg box
+  '__DDDDDDD___', // Bottom pegs
+  '____SSS_____', // Neck top
+  '____SSS_____', // Neck
+  '____SSS_____', // Neck
+  '____SSS_____', // Neck base
+  '____SSS_____', // Neck base
+  '____SSS_____', // Added neck length for scale
+  '__DWSSSWD___', // Shoulders
+  '_DDWSSSWDD__', // Upper bout (Widened)
+  '_DWWSSSWWD__', 
+  '_DWWSSSWWD__', 
+  '__DDSSSDD___', // Waist (C-bouts)
+  '__DDSSSDD___',
+  '_DWWWWWWWWD_', // Lower bout
+  'DWWWSSSWWWD_', // Lower bout widening
+  'DWWWWWWWWWD_', // Extra body depth row
+  'DWWWSSSWWWWD', // F-holes (S)
+  'DWWWSSSWWWDD', // Bridge / Tailpiece (C)
+  'CDWWWSWWWWDC', // Chinrest (C)
+  'CDWWWSWWWWDC', // Chinrest (C)
+  '_DDWWSWWWDD_', // Bottom curve
+  '__DWWWWWDD__', // Rounded out base
+  '____DDD_____', // End pin
+];
+
+// Cello — 12 wide × 26 tall, notably bigger
+const SPRITE_CELLO = [
+  '______DDD_______', // Peg tips
+  '______DDD_______', // Peg tips
+  '____DDDDDDD_____', // Top pegs
+  '____DDDDDDD_____', // Top pegs
+  '______DDD_______', // Peg box
+  '______DDD_______', // Peg box
+  '____DDDDDDD_____', // Bottom pegs
+  '____DDDDDDD_____', // Bottom pegs
+  '______SSS_______', // Neck top
+  '______SSS_______', // Neck top
+  '______SSS_______', // Neck
+  '______SSS_______', // Neck
+  '______SSS_______', // Neck
+  '______SSS_______', // Neck base
+  '______SSS_______', // Added neck length for scale
+  '____DWSSSWD_____', // Shoulders
+  '____DWSSSWD_____', // Shoulders
+  '___DDWSSSWDD____', // Upper bout (Widened)
+  '___DDWSSSWDD____', // Upper bout (Widened)
+  '___DWWSSSWWD____', 
+  '___DWWSSSWWD____', 
+  '___DWWSSSWWD____',
+  '___DWWSSSWWD____',
+  '____DDSSSDD_____', // Waist (C-bouts)
+  '____DDSSSDD_____', // Waist (C-bouts)
+  '____DDSSSDD_____',
+  '____DDSSSDD_____',
+  '___DWWWWWWWWD___', // Lower bout
+  '___DWWWWWWWWD___', // Lower bout
+  '__DWWWSSSWWWD___', // Lower bout widening
+  '__DWWWSSSWWWD___', // Lower bout widening
+  '__DWWWWWWWWWD___', // Extra body depth row
+  '__DWWWWWWWWWWD__', // Extra body depth row
+  '__DWWWSSSWWWWD__', // F-holes (S)
+  '__DWWWSSSWWWWD__', // F-holes (S)
+  '__DWWWSSSWWWWD__', // Bridge / Tailpiece (C)
+  '__DWWWSSSWWWWD__', // Bridge / Tailpiece (C)
+  '__CDWWWSWWWWWC__', // Chinrest (C)
+  '__CDWWWSWWWWDC__', // Chinrest (C)
+  '___DDWWSWWWDD___', // Bottom curve
+  '____DWWWWWDD____', // Rounded out base
+  '______DDD_______', // End pin
+];
+
+// Double Bass — 13 wide × 28 tall, widest & tallest
+const SPRITE_BASS = [
+  '________DDD_______', // Peg tips
+  '________DDD_________', // Peg tips
+  '_______DDDDD________', // Top pegs
+  '_______DDDDD________', // Top pegs
+  '________DDD_________', // Peg box
+  '________DDD_________', // Peg box
+  '_______DDDDD________', // Bottom pegs
+  '_______DDDDD________', // Bottom pegs
+  '________SSS_________', // Neck top
+  '________SSS_________', // Neck top
+  '________SSS_________', // Neck
+  '________SSS_________', // Neck
+  '________SSS_________', // Neck
+  '________SSS_________', // Neck
+  '________SSS_________', // Neck
+  '________SSS_________', // Neck
+  '________SSS_________', // Neck
+  '________SSS_________', // Neck
+  '________SSS_________', // Neck base
+  '________SSS_________', // Added neck length for scale
+  '_____DWWSSSWWD_______', // Shoulders
+  '_____DWWSSSWWD_______', // Shoulders
+  '____DDWWSSSWWDD______', // Upper bout (Widened)
+  '____DDWWSSSWWDD______', // Upper bout (Widened)
+  '____DWWWSSSWWWD______', 
+  '____DWWWSSSWWWD______', 
+  '___DWWWWSSSWWWWD_____', 
+  '___DWWWWSSSWWWWD_____', 
+  '____DWWWSSSWWWD______',
+  '____DWWWSSSWWWD______',
+  '_____DDWSSSWDD_______', // Waist (C-bouts)
+  '_____DDWSSSWDD_______', // Waist (C-bouts)
+  '_____DDWSSSWDD_______',
+  '_____DDWSSSWDD_______',
+  '____DWWWWWWWWWD______', // Lower bout
+  '____DWWWWWWWWWD______', // Lower bout
+  '___DWWWWWWWWWWWD_____', // Lower bout widening
+  '___DWWWWSSSWWWWD____', // Lower bout widening
+  '___DWWWWSSSWWWWD____', // Extra body depth row
+  '___DWWWWWWWWWWWD____', // Extra body depth row
+  '__DWWWWWWWWWWWWWD____', // F-holes (S)
+  '__DWWWWWWWWWWWWWD____', // F-holes (S)
+  '__DWWWWWSSSWWWWWD____', // F-holes (S)
+  '__DWWWWWSSSWWWWWD____', // F-holes (S)
+  '__DWWWWWSSSWWWWWD____', // F-holes (S)
+  '___DWWWWSSSWWWWWD_____', // Bridge / Tailpiece (C)
+  '___DWWWWSSSWWWWWD_____', // Bridge / Tailpiece (C)
+  '____DWWWSSSWWWWW_____', // Chinrest (C)
+  '____DWWWSSSWWDD_____', // Chinrest (C)
+  '____DWWWWSWWWWD_______', // Bottom curve
+  '_____DWWWSWWWD______', // Rounded out base
+  '_______DDDDD_________', // End pin
+];
+
+const instrColorMap = { W:'W', D:'D', L:'L', N:'N', G:'G', S:'S', I:'I', C:'C', B:'B', R:'R', _:null };
+
+function drawInstrumentSprite(sprite, cx, cy) {
+  const cols = sprite[0].length;
+  const rows = sprite.length;
+  const drawW = cols * PX;
+  ctx.save();
+  ctx.translate(cx - drawW / 2, cy);
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+      const ch = sprite[row][col];
+      if (ch === '_') continue;
+      ctx.fillStyle = IC[ch] || '#fff';
+      ctx.fillRect(col * PX, row * PX, PX, PX);
+    }
+  }
+  ctx.restore();
+}
+
+function drawTitleScreen() {
+  ctx.fillStyle = '#0a0a1a';
+  ctx.fillRect(0, 0, W, H);
+
+  // Scanline texture
+  for (let sy = 0; sy < H; sy += 4) {
+    ctx.fillStyle = 'rgba(0,0,0,0.18)';
+    ctx.fillRect(0, sy, W, 2);
+  }
+
+  // Title
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#ffe066';
+  ctx.font = '22px "Press Start 2P"';
+  ctx.fillText('STAFF HERO', W / 2, 58);
+
+  // Subtitle flicker
+  ctx.fillStyle = '#aaddff';
+  ctx.font = '8px "Press Start 2P"';
+  ctx.fillText('A NOTE READING ADVENTURE', W / 2, 84);
+
+  // Divider
+  ctx.strokeStyle = '#ffe066';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(60, 100); ctx.lineTo(W - 60, 100);
+  ctx.stroke();
+
+  // Choose instrument label
+  ctx.fillStyle = '#fff';
+  ctx.font = '10px "Press Start 2P"';
+  ctx.fillText('CHOOSE YOUR INSTRUMENT', W / 2, 126);
+
+  // Instrument buttons — 4 across
+  instrBtns = [];
+  const btnW = 140, btnH = 36, gap = 18;
+  const totalW = INSTRUMENTS.length * btnW + (INSTRUMENTS.length - 1) * gap;
+  const startX = (W - totalW) / 2;
+  const btnY = 330;
+  const spriteMap = { Violin: SPRITE_VIOLIN, Viola: SPRITE_VIOLA, Cello: SPRITE_CELLO, Bass: SPRITE_BASS };
+  INSTRUMENTS.forEach((name, i) => {
+    const bx = startX + i * (btnW + gap);
+    const hovered = hoveredBtn === name;
+    const selected = selectedInstrument === name;
+    // Draw sprite centered above button
+    const sprite = spriteMap[name];
+    const spriteH = sprite.length * PX;
+    const spriteCX = bx + btnW / 2;
+    const spriteCY = btnY - spriteH - 8;
+    // Highlight glow behind selected/hovered instrument
+    if (selected || hovered) {
+      ctx.save();
+      ctx.globalAlpha = 0.15;
+      ctx.fillStyle = selected ? '#ffe066' : '#4466ee';
+      ctx.fillRect(bx, spriteCY - 4, btnW, spriteH + 8);
+      ctx.restore();
+    }
+    drawInstrumentSprite(sprite, spriteCX, spriteCY);
+    drawNesButton(name, bx, btnY, btnW, btnH, hovered, selected);
+    const spriteHitH = sprite.length * PX + 8;
+    instrBtns.push({ label: name, x: bx, y: spriteCY - 4, w: btnW, h: btnH + spriteHitH });
+  });
+
+  // Coming soon note under locked instruments — none currently
+
+  // Bottom hint
+  ctx.fillStyle = '#555';
+  ctx.font = '6px "Press Start 2P"';
+  ctx.fillText('CLICK AN INSTRUMENT TO BEGIN', W / 2, H - 16);
+}
+
+// ─── LEVEL PREVIEW SCREEN ────────────────────────────────────────────────────
+function drawLevelPreviewScreen() {
+  ctx.fillStyle = '#0a0a1a';
+  ctx.fillRect(0, 0, W, H);
+
+  for (let sy = 0; sy < H; sy += 4) {
+    ctx.fillStyle = 'rgba(0,0,0,0.18)';
+    ctx.fillRect(0, sy, W, 2);
+  }
+
+  // Header
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#44ff88';
+  ctx.font = '18px "Press Start 2P"';
+  ctx.fillText(`LEVEL  ${currentLevel}`, W / 2, 36);
+
+  ctx.fillStyle = '#aaddff';
+  ctx.font = '7px "Press Start 2P"';
+  const clefName = selectedInstrument === 'Viola' ? 'ALTO CLEF' : (selectedInstrument === 'Cello' || selectedInstrument === 'Bass' || selectedInstrument === 'Bass') ? 'BASS CLEF' : 'TREBLE CLEF';
+  ctx.fillText(`${selectedInstrument.toUpperCase()}  ·  ${clefName}  ·  D MAJOR`, W / 2, 56);
+
+  // ── Mini staff ──────────────────────────────────────────────────────────────
+  const LS = 14;
+  const staffMidY = 152;
+  const psl = [ // preview staff lines top→bottom: F5,D5,B4,G4,E4
+    staffMidY - LS * 2,
+    staffMidY - LS,
+    staffMidY,
+    staffMidY + LS,
+    staffMidY + LS * 2,
+  ];
+  // Note Y positions — scaled to preview staff, instrument-aware
+  // psl[2] = middle line. Each step = LS/2.
+  const pNoteY_treble = {
+    'D4': psl[4] + LS / 2,
+    'E4': psl[4],
+    'F4': psl[4] - LS / 2,
+    'G4': psl[4] - LS,
+    'A4': psl[4] - LS * 1.5,
+    'B4': psl[4] - LS * 2,
+    'C5': psl[4] - LS * 2.5,
+    'D5': psl[4] - LS * 3,
+  };
+  const pNoteY_alto = {
+    'D4': psl[2] - LS * 0.5,   // 2nd space from bottom
+    'E4': psl[2] - LS * 1.0,   // 4th line
+    'F4': psl[2] - LS * 1.5,   // 4th space
+    'G4': psl[2] - LS * 2.0,   // top line
+    'A4': psl[2] - LS * 2.5,   // space above top line
+    'B4': psl[2] - LS * 3.0,   // first ledger above
+    'C5': psl[2] - LS * 3.5,   // space above first ledger
+    'D5': psl[2] - LS * 4.0,   // second ledger above
+  };
+  // Bass clef preview: middle line psl[2] = D3
+  const pNoteY_bass = {
+    'D3': psl[2],
+    'E3': psl[2] - LS * 0.5,
+    'F3': psl[2] - LS * 1.0,
+    'G3': psl[2] - LS * 1.5,
+    'A3': psl[2] - LS * 2.0,
+    'B3': psl[2] - LS * 2.5,
+    'C4': psl[2] - LS * 3.0,
+    'D4': psl[2] - LS * 3.5,
+  };
+  const pNoteY = selectedInstrument === 'Viola' ? pNoteY_alto : selectedInstrument === 'Cello' || selectedInstrument === 'Bass' ? pNoteY_bass : pNoteY_treble;
+
+  const staffLeft = 70;
+  const staffRight = W - 70;
+
+  // Staff lines
+  ctx.strokeStyle = '#ffe066';
+  ctx.lineWidth = 1.2;
+  for (let li = 0; li < 5; li++) {
+    ctx.beginPath();
+    ctx.moveTo(staffLeft, psl[li]);
+    ctx.lineTo(staffRight, psl[li]);
+    ctx.stroke();
+  }
+
+  // Clef — treble, alto, or bass
+  ctx.save();
+  ctx.fillStyle = '#ffe066';
+  if (selectedInstrument === 'Viola') {
+    ctx.font = `${LS * 5.2}px serif`;
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('𝄡', staffLeft + 4, psl[2] + 5);
+  } else if (selectedInstrument === 'Cello' || selectedInstrument === 'Bass') {
+    ctx.font = `${LS * 4.2 * 1.1576}px serif`;
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    // Bass clef: position so the F-dot aligns with psl[1] (2nd line from top = A3)
+    ctx.fillText('𝄢', staffLeft + 4, psl[1] + LS * 0.1 + 11);
+  } else {
+    ctx.font = `${LS * 7.5}px serif`;
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillText('𝄞', staffLeft + 4, psl[3] + LS * 1.2);
+  }
+  ctx.restore();
+
+  // Key signature sharps (same staff positions work for both clefs in D major visually)
+  ctx.save();
+  ctx.fillStyle = '#ffe066';
+  ctx.font = `bold ${LS * 1.6}px serif`;
+  ctx.textAlign = 'center';
+  ctx.fillText('♯', staffLeft + 54, psl[0] + LS * 0.6);
+  ctx.fillText('♯', staffLeft + 66, psl[2] - LS * 0.5 + LS * 0.6);
+  ctx.restore();
+
+  // Notes for this level, tightly centered
+  const levelSet2 = selectedInstrument === 'Cello' || selectedInstrument === 'Bass' ? CELLO_LEVELS : LEVELS;
+  const levelPitches = levelSet2[currentLevel].pitches;
+  const NOTE_GAP = levelPitches.length <= 5 ? 36 : 28; // tighter for 8 notes
+  const totalNotesW = (levelPitches.length - 1) * NOTE_GAP;
+  const notesStartX = W / 2 - totalNotesW / 2;
+
+  levelPitches.forEach((pitch, i) => {
+    const nx = notesStartX + i * NOTE_GAP;
+    const ny = pNoteY[pitch];
+
+    // Ledger lines for alto clef notes above the staff in preview
+    if (selectedInstrument === 'Viola') {
+      ctx.strokeStyle = '#ffe066';
+      ctx.lineWidth = 1;
+      if (pitch === 'B4') {
+        const ly = psl[0] - LS;
+        ctx.beginPath(); ctx.moveTo(nx - 10, ly); ctx.lineTo(nx + 10, ly); ctx.stroke();
+      }
+      if (pitch === 'C5') {
+        const ly = psl[0] - LS;
+        ctx.beginPath(); ctx.moveTo(nx - 10, ly); ctx.lineTo(nx + 10, ly); ctx.stroke();
+      }
+      if (pitch === 'D5') {
+        [psl[0] - LS, psl[0] - LS * 2].forEach(ly => {
+          ctx.beginPath(); ctx.moveTo(nx - 10, ly); ctx.lineTo(nx + 10, ly); ctx.stroke();
+        });
+      }
+    }
+    // Ledger lines for bass clef notes above the staff in preview
+    if (selectedInstrument === 'Cello' || selectedInstrument === 'Bass') {
+      ctx.strokeStyle = '#ffe066';
+      ctx.lineWidth = 1;
+      if (pitch === 'C4' || pitch === 'D4') {
+        const ly = psl[0] - LS;
+        ctx.beginPath(); ctx.moveTo(nx - 10, ly); ctx.lineTo(nx + 10, ly); ctx.stroke();
+      }
+    }
+
+    // Notehead
+    ctx.save();
+    ctx.fillStyle = '#ffe066';
+    ctx.strokeStyle = '#cc9900';
+    ctx.lineWidth = 1;
+    ctx.translate(nx, ny);
+    ctx.rotate(-0.3);
+    ctx.beginPath();
+    ctx.ellipse(0, 0, 9, 6, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+
+    // Note name below staff
+    ctx.fillStyle = '#aaddff';
+    ctx.font = '8px "Press Start 2P"';
+    ctx.textAlign = 'center';
+    ctx.fillText(PITCH_DISPLAY[pitch], nx, psl[4] + LS * 2.2);
+  });
+
+  // Double bar at right end
+  ctx.save();
+  ctx.strokeStyle = '#ffe066';
+  const dbx = staffRight - 6;
+  ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(dbx, psl[0]); ctx.lineTo(dbx, psl[4]); ctx.stroke();
+  ctx.lineWidth = 5;
+  ctx.beginPath(); ctx.moveTo(dbx + 6, psl[0]); ctx.lineTo(dbx + 6, psl[4]); ctx.stroke();
+  ctx.restore();
+
+  // START button
+  const sbW = 160, sbH = 38;
+  const sbX = W / 2 - sbW / 2;
+  const sbY = H - 62;
+  drawNesButton('START', sbX, sbY, sbW, sbH, hoveredBtn === 'START', false);
+  startBtn = { x: sbX, y: sbY, w: sbW, h: sbH };
+
+  ctx.fillStyle = '#555';
+  ctx.font = '6px "Press Start 2P"';
+  ctx.textAlign = 'center';
+  ctx.fillText('OR PRESS ENTER', W / 2, H - 12);
+}
+function lerp(a, b, t) { return a + (b - a) * t; }
+function easeInOut(t) { return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t; }
+
+// Parabolic arc between two points
+function arcY(startY, endY, t, arcHeight) {
+  const base = lerp(startY, endY, t);
+  return base - arcHeight * Math.sin(Math.PI * t);
+}
+
+// ─── GAME LOOP ────────────────────────────────────────────────────────────────
+let lastTime = 0;
+
+function update(dt) {
+  if (gameState !== 'playing') return;
+  if (gameOver || levelComplete) return;
+
+  // ── Count-in: Ready / Go ──────────────────────────────────────────────────
+  if (countIn) {
+    const BEAT_DUR = 60 / BPM; // one quarter-note beat = ~0.714s
+    const ac = getAudioCtx();
+    const elapsed = ac.currentTime - countInStartTime;
+    const newBeat = Math.floor(elapsed / BEAT_DUR) + 1; // beat 1, 2, 3...
+    if (newBeat !== countInBeat) {
+      countInBeat = newBeat;
+    }
+    if (elapsed >= BEAT_DUR * 2) {
+      // Two beats done — unlock
+      countIn = false;
+    }
+    return; // don't tick timer or update hero during count-in
+  }
+
+  elapsedTime += dt;
+
+  if (hero.state === 'flip') {
+    hero.flipT += dt * 1.1;  // ~0.9s total flip
+    if (hero.flipT >= 1) {
+      hero.flipT = 1;
+      hero.state = 'idle';
+      hero.x = hero.flipStartX;
+      hero.y = hero.flipStartY;
+      finalTime = elapsedTime;
+      levelComplete = true;
+      stopBackingTrack();
+      showSubmitPanel();
+    }
+  }
+
+  if (hero.state === 'bounce') {
+    hero.bounceT += dt * 1.4; // speed of bounce
+    if (hero.bounceT >= 1) {
+      hero.bounceT = 1;
+      hero.state = 'idle';
+      // Snap to position above next note
+      const targetNote = hero.bounceTarget;
+      hero.x = targetNote.x;
+      hero.y = targetNote.y - HERO_H - HERO_GAP;
+    }
+    const t = easeInOut(hero.bounceT);
+    hero.x = lerp(hero.bounceStartX, hero.bounceTarget.x, t);
+    hero.y = arcY(hero.bounceStartY, hero.bounceTarget.y - HERO_H - HERO_GAP, hero.bounceT, 45);
+
+    // Walk frame animation
+    hero.frameTimer += dt;
+    if (hero.frameTimer > 0.15) {
+      hero.frame = 1 - hero.frame;
+      hero.frameTimer = 0;
+    }
+  }
+
+  if (hero.state === 'shake') {
+    hero.shakeTimer -= dt;
+    hero.shakeX = Math.sin(hero.shakeTimer * 60) * 5;
+    if (hero.shakeTimer <= 0) {
+      hero.state = 'idle';
+      hero.shakeX = 0;
+    }
+  }
+
+  // Camera: smoothly follow hero
+  const targetCam = hero.x - W * 0.35;
+  camera = lerp(camera, Math.max(0, targetCam), dt * 6);
+
+  // Particles
+  updateParticles(dt);
+}
+
+
+function draw(dt) { 
+  // 2. Add the reset to stop the text from shifting
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+
+  if (gameState === 'title') { drawTitleScreen(); return; }
+  if (gameState === 'levelPreview') { drawLevelPreviewScreen(); return; }
+
+  // ── playing ──
+  ctx.fillStyle = '#0a0a1a';
+  ctx.fillRect(0, 0, W, H);
+
+  // Staff lines (end at double bar)
+  drawStaff(camera);
+
+  // Clef (pinned to left once scrolling begins)
+  const clefX = Math.max(8, 16 - camera);
+  drawClef(clefX);
+
+  // Key signature
+  drawKeySignature(clefX + 64);
+
+  // Notes
+  for (const note of notes) {
+    drawNote(note, camera);
+  }
+
+  // Double bar line
+  drawDoubleBarLine(camera);
+
+  // Particles and Bouncing Labels
+  drawParticles(camera);
+  updateAndDrawLabels(dt, camera); // Now works because dt is defined in the header
+
+  // Hero
+  {
+    const hsx = hero.x - camera + hero.shakeX - HERO_W;
+    let hsy = hero.y;
+    const sprite = hero.frame === 0 ? SPRITE_IDLE : SPRITE_WALK;
+    const spriteW = sprite[0].length * PX;
+    const spriteH = sprite.length * PX;
+
+    if (hero.state === 'flip') {
+      const ft = hero.flipT;
+      hsy = hero.flipStartY - Math.sin(Math.PI * ft) * 70;
+      const angle = ft * Math.PI * 2;
+      ctx.save();
+      ctx.translate(hsx + spriteW / 2, hsy + spriteH / 2);
+      ctx.rotate(angle);
+      drawSprite(sprite, -spriteW / 2, -spriteH / 2, false);
+      ctx.restore();
+    } else {
+      drawSprite(sprite, hsx, hsy, false);
+    }
+  }
+  
+  // HUD
+  drawHUD();
+
+  // Count-in overlay
+  if (countIn && countInBeat >= 1) {
+    const label = countInBeat === 1 ? 'READY' : 'GO!';
+    const color = countInBeat === 1 ? '#ffe066' : '#44ff88';
+    ctx.save();
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    // Pulsing scale: starts big, shrinks as the beat ages
+    const BEAT_DUR = 60 / BPM;
+    const ac = getAudioCtx();
+    const beatAge = (ac.currentTime - countInStartTime) % BEAT_DUR; // 0..BEAT_DUR
+    const scale = 1.4 - 0.4 * (beatAge / BEAT_DUR); // 1.4 → 1.0 over the beat
+    ctx.translate(W / 2, H / 2);
+    ctx.scale(scale, scale);
+    ctx.fillStyle = color;
+    ctx.font = '36px "Press Start 2P"';
+    // Shadow
+    ctx.fillStyle = 'rgba(0,0,0,0.5)';
+    ctx.fillText(label, 3, 3);
+    ctx.fillStyle = color;
+    ctx.fillText(label, 0, 0);
+    ctx.restore();
+  }
+
+  // Game Over / Level Complete overlays
+  if (gameOver) {
+    ctx.fillStyle = 'rgba(0,0,0,0.7)';
+    ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = '#ff4444';
+    ctx.font = '20px "Press Start 2P"';
+    ctx.textAlign = 'center';
+    ctx.fillText('GAME OVER', W / 2, H / 2 - 36);
+    ctx.font = '8px "Press Start 2P"';
+    ctx.fillStyle = '#fff';
+    ctx.fillText(`SCORE:  ${score}`, W / 2, H / 2 - 2);
+    ctx.fillStyle = '#aaffaa';
+    ctx.fillText(`TIME:   ${formatTime(finalTime)}`, W / 2, H / 2 + 18);
+    ctx.fillStyle = '#ffe066';
+    ctx.fillText('PRESS ENTER TO RETRY', W / 2, H / 2 + 44);
+  }
+
+  if (levelComplete) {
+    ctx.fillStyle = 'rgba(0,0,0,0.82)';
+    ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = '#44ff88';
+    ctx.font = '18px "Press Start 2P"';
+    ctx.textAlign = 'center';
+    ctx.fillText('LEVEL CLEAR!', W / 2, H / 2 - 52);
+    ctx.font = '8px "Press Start 2P"';
+    ctx.fillStyle = '#fff';
+    ctx.fillText(`SCORE:  ${score}`, W / 2, H / 2 - 18);
+    ctx.fillStyle = '#aaffaa';
+    ctx.fillText(`TIME:   ${formatTime(finalTime)}`, W / 2, H / 2 + 2);
+
+    // Menu button (left) and Next Level button (right)
+    const btnW = 160, btnH = 38, gap = 24;
+    const totalBtnW = btnW * 2 + gap;
+    const btnY = H / 2 + 28;
+    const menuX = W / 2 - totalBtnW / 2;
+    const nextX  = menuX + btnW + gap;
+
+    drawNesButton('MENU',       menuX, btnY, btnW, btnH, hoveredBtn === 'MENU', false);
+    menuBtn = { x: menuX, y: btnY, w: btnW, h: btnH };
+
+    const activeLevels = selectedInstrument === 'Cello' || selectedInstrument === 'Bass' ? CELLO_LEVELS : LEVELS;
+    const hasNextLevel = activeLevels[currentLevel + 1] !== undefined;
+    drawNesButton('NEXT LEVEL', nextX, btnY, btnW, btnH, hoveredBtn === 'NEXT', !hasNextLevel);
+    nextLevelBtn = { x: nextX, y: btnY, w: btnW, h: btnH, enabled: hasNextLevel };
+
+    if (!hasNextLevel) {
+      ctx.fillStyle = '#555';
+      ctx.font = '6px "Press Start 2P"';
+      ctx.textAlign = 'center';
+      ctx.fillText('COMING SOON', nextX + btnW / 2, btnY + btnH + 12);
+    }
+  }
+}
+
+function gameLoop(now) {
+  // Calculate the time difference in seconds
+  const dt = Math.min(0.1, (now - lastTime) / 1000);
+  lastTime = now;
+
+  update(dt);
+  draw(dt); // Pass dt to draw so labels and particles can move
+
+  requestAnimationFrame(gameLoop);
+}
+requestAnimationFrame(gameLoop);
+
+// ─── INPUT ────────────────────────────────────────────────────────────────────
+
+// Mouse helpers
+function getCanvasPos(e) {
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = W / rect.width;
+  const scaleY = H / rect.height;
+  return {
+    x: (e.clientX - rect.left) * scaleX,
+    y: (e.clientY - rect.top) * scaleY,
+  };
+}
+
+function hitTest(pos, btn) {
+  return pos.x >= btn.x && pos.x <= btn.x + btn.w &&
+         pos.y >= btn.y && pos.y <= btn.y + btn.h;
+}
+
+canvas.addEventListener('mousemove', (e) => {
+  const pos = getCanvasPos(e);
+  hoveredBtn = null;
+  if (gameState === 'title') {
+    for (const btn of instrBtns) {
+      if (hitTest(pos, btn)) { hoveredBtn = btn.label; break; }
+    }
+  } else if (gameState === 'levelPreview') {
+    if (startBtn && hitTest(pos, startBtn)) hoveredBtn = 'START';
+  } else if (gameState === 'playing') {
+    if (levelComplete) {
+      if (menuBtn && hitTest(pos, menuBtn)) hoveredBtn = 'MENU';
+      else if (nextLevelBtn && nextLevelBtn.enabled && hitTest(pos, nextLevelBtn)) hoveredBtn = 'NEXT';
+    } else {
+      for (const btn of noteBtns) {
+        if (hitTest(pos, btn)) { hoveredBtn = `NOTE_${btn.pitch}`; break; }
+      }
+    }
+  }
+  canvas.style.cursor = hoveredBtn ? 'pointer' : 'default';
+});
+
+canvas.addEventListener('click', (e) => {
+  const pos = getCanvasPos(e);
+
+  if (gameState === 'title') {
+    for (const btn of instrBtns) {
+      if (hitTest(pos, btn)) {
+        if (btn.label === 'Violin' || btn.label === 'Viola' || btn.label === 'Cello' || btn.label === 'Bass') {
+          selectedInstrument = btn.label;
+          currentLevel = 1;
+          gameState = 'levelPreview';
+          hoveredBtn = null;
+        }
+        return;
+      }
+    }
+  } else if (gameState === 'levelPreview') {
+    if (startBtn && hitTest(pos, startBtn)) startPlaying();
+  } else if (gameState === 'playing') {
+    if (levelComplete) {
+      if (menuBtn && hitTest(pos, menuBtn)) {
+        currentLevel = 1;
+        score = 0;
+        hideSubmitPanel();
+        gameState = 'title';
+        hoveredBtn = null;
+      } else if (nextLevelBtn && nextLevelBtn.enabled && hitTest(pos, nextLevelBtn)) {
+        currentLevel++;
+        hideSubmitPanel();
+        gameState = 'levelPreview';
+        hoveredBtn = null;
+      }
+    } else {
+      for (const btn of noteBtns) {
+        if (hitTest(pos, btn)) { handlePitchInput(btn.pitch); return; }
+      }
+    }
+  }
+});
+
+// Touch support for note buttons (prevents 300ms click delay on Chromebooks)
+canvas.addEventListener('touchstart', (e) => {
+  if (gameState !== 'playing' || levelComplete || countIn || gameOver) return;
+  e.preventDefault();
+  const touch = e.changedTouches[0];
+  const pos = getCanvasPos(touch);
+  for (const btn of noteBtns) {
+    if (hitTest(pos, btn)) { handlePitchInput(btn.pitch); return; }
+  }
+}, { passive: false });
+
+// ─── NOTE INPUT HANDLER (keyboard + buttons share this) ───────────────────────
+
+// Called by keyboard — matches on letter only (D accepts both D4 and D5)
+function handleNoteInput(key) {
+  if (gameState !== 'playing') return;
+  if (gameOver || levelComplete) return;
+  if (countIn) return;
+  if (hero.state !== 'idle' && hero.state !== 'bounce') return;
+  if (currentNoteIdx >= notes.length) return;
+
+  const currentNote = notes[currentNoteIdx];
+  const correct = key.toUpperCase() === currentNote.name;
+  resolveInput(correct, currentNote);
+}
+
+// Called by on-screen buttons — matches on full pitch (D4 ≠ D5)
+function handlePitchInput(pitch) {
+  if (gameState !== 'playing') return;
+  if (gameOver || levelComplete) return;
+  if (countIn) return;
+  if (hero.state !== 'idle' && hero.state !== 'bounce') return;
+  if (currentNoteIdx >= notes.length) return;
+
+  const currentNote = notes[currentNoteIdx];
+  const correct = pitch === currentNote.pitch;
+  resolveInput(correct, currentNote);
+}
+
+// Shared resolution logic
+function resolveInput(correct, currentNote) {
+  const bigHit = correct && isOnBeat();
+  let labelText = "";
+  let labelColor = "";
+
+  if (correct) {
+    playNoteSound(currentNote.pitch, bigHit);
+    score += (bigHit ? 150 : 100);
+    currentNote.answered = true;
+    spawnExplosion(currentNote.x, currentNote.y, bigHit);
+
+    labelText = bigHit ? "+150" : "+100";
+    labelColor = bigHit ? "#fff" : "#ffe066";
+
+    currentNoteIdx++;
+
+    const nextNote = notes[currentNoteIdx];
+    if (nextNote) {
+      // Bounce to the next note
+      hero.state = 'bounce';
+      hero.bounceStartX = hero.x;
+      hero.bounceStartY = hero.y;
+      hero.bounceTarget = nextNote;
+      hero.bounceT = 0;
+      hero.frameTimer = 0;
+    } else {
+      // Last note answered — do the victory flip
+      hero.state = 'flip';
+      hero.flipStartX = hero.x;
+      hero.flipStartY = hero.y;
+      hero.flipT = 0;
+    }
+  } else {
+    hearts--;
+    score = Math.max(0, score - 50); // Penalty logic
+    hero.state = 'shake';
+    hero.shakeTimer = 0.4;
+    
+    labelText = "-50";
+    labelColor = "#ff4444";
+
+    if (hearts <= 0) {
+      gameOver = true;
+      finalTime = elapsedTime;
+      stopBackingTrack();
+      showSubmitPanel();
+    }
+  }
+
+  // PUSH THE LABEL (This creates the animation object)
+  floatingLabels.push({
+    x: currentNote.x,
+    y: currentNote.y - 20,
+    text: labelText,
+    color: labelColor,
+    vx: (Math.random() - 0.5) * 100, // Random left/right burst
+    vy: -200,                        // Initial jump up
+    life: 1.0                        // Lasts 1 second
+  });
+}
+
+
+window.addEventListener('keydown', (e) => {
+  // Title screen
+  if (gameState === 'title') {
+    if (e.key === 'Enter' && selectedInstrument) gameState = 'levelPreview';
+    return;
+  }
+
+  // Level preview
+  if (gameState === 'levelPreview') {
+    if (e.key === 'Enter') startPlaying();
+    return;
+  }
+
+  // Playing
+  if (e.key === 'Enter') {
+    if (gameOver) { score = 0; hideSubmitPanel(); resetGame(); return; }
+    if (levelComplete) {
+      const activeLevels = selectedInstrument === 'Cello' || selectedInstrument === 'Bass' ? CELLO_LEVELS : LEVELS;
+      if (activeLevels[currentLevel + 1]) { currentLevel++; hideSubmitPanel(); gameState = 'levelPreview'; }
+      else { currentLevel = 1; score = 0; hideSubmitPanel(); gameState = 'title'; }
+    }
+    return;
+  }
+
+  if (gameOver || levelComplete || countIn) return;
+
+  const key = e.key.toUpperCase();
+  if (key.length !== 1 || key < 'A' || key > 'G') return;
+  e.preventDefault();
+  handleNoteInput(key);
+});
+
+// ─── START PLAYING ────────────────────────────────────────────────────────────
+function startPlaying() {
+  gameState = 'playing';
+  hoveredBtn = null;
+  canvas.style.cursor = 'default';
+  resetGameState();
+  // Start music immediately and begin count-in
+  startBackingTrack();
+  countInStartTime = getAudioCtx().currentTime;
+  countIn = true;
+  countInBeat = 0;
+}
+
+// ─── RESET ────────────────────────────────────────────────────────────────────
+function resetGameState() {
+  stopBackingTrack();
+  notes = generateLevel();
+  currentNoteIdx = 0;
+  camera = 0;
+  hearts = 6;
+  gameOver = false;
+  levelComplete = false;
+  countIn = true;
+  countInBeat = 0;
+  countInStartTime = 0;
+  elapsedTime = 0;
+  finalTime = 0;
+  particles = [];
+  DOUBLE_BAR_X = notes[notes.length - 1].x + NOTE_SPACING * 0.7;
+  hero.x = notes[0].x;
+  hero.y = notes[0].y - HERO_H - HERO_GAP;
+  hero.state = 'idle';
+  hero.shakeX = 0;
+  hero.frame = 0;
+  hero.bounceT = 0;
+  hero.flipT = 0;
+}
+
+function resetGame() {
+  // After level complete/game over, go back to level preview
+  gameState = 'levelPreview';
+}
+
+// Focus canvas on load
+window.addEventListener('load', () => { canvas.focus(); });
+</script>
+</body>
+</html>
