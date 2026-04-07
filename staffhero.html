@@ -178,14 +178,29 @@ const STAFF_BOTTOM = staffLines[4];
 // Lines (bottom→top): E4 G4 B4 D5 F5
 // Spaces (bottom→top): F4 A4 C5 E5
 const NOTE_Y_TREBLE = {
+  'G3': STAFF_BOTTOM + LINE_SPACING * 2.5,      // space below 2nd ledger line below staff
+  'A3': STAFF_BOTTOM + LINE_SPACING * 2.0,      // 2nd ledger line below staff
+  'B3': STAFF_BOTTOM + LINE_SPACING * 1.5,      // space below 1st ledger line below staff
+  'C4': STAFF_BOTTOM + LINE_SPACING * 1.0,      // 1st ledger line below staff
   'D4': STAFF_BOTTOM + LINE_SPACING / 2,        // space below bottom line
   'E4': STAFF_BOTTOM,                            // line 5 (bottom)
-  'F4': STAFF_BOTTOM - LINE_SPACING / 2,        // first space (F#4)
+  'F4': STAFF_BOTTOM - LINE_SPACING / 2,        // first space
   'G4': STAFF_BOTTOM - LINE_SPACING,            // line 4
-  'A4': STAFF_BOTTOM - LINE_SPACING * 1.5,      // second space
+  'Ab4': STAFF_BOTTOM - LINE_SPACING * 1.5,     // 2nd space (Ab4 = same position as A4)
+  'A4': STAFF_BOTTOM - LINE_SPACING * 1.5,      // 2nd space
+  'Bb4': STAFF_BOTTOM - LINE_SPACING * 2,       // line 3 (same position as B4)
   'B4': STAFF_BOTTOM - LINE_SPACING * 2,        // line 3
-  'C5': STAFF_BOTTOM - LINE_SPACING * 2.5,      // third space (C#5)
+  'C#5': STAFF_BOTTOM - LINE_SPACING * 2.5,     // 3rd space (C#5 for D major strings)
+  'C5':  STAFF_BOTTOM - LINE_SPACING * 2.5,      // 3rd space (C natural for flute Bb major)
   'D5': STAFF_BOTTOM - LINE_SPACING * 3,        // line 2
+  'Eb5': STAFF_BOTTOM - LINE_SPACING * 3.5,     // 2nd space from top
+  'F5': STAFF_BOTTOM - LINE_SPACING * 4,        // top line
+  'G5': STAFF_BOTTOM - LINE_SPACING * 4.5,      // space above top line
+  'Ab5': STAFF_BOTTOM - LINE_SPACING * 5,       // 1st ledger line above
+  'A5':  STAFF_BOTTOM - LINE_SPACING * 5,       // 1st ledger line above (same position as Ab5)
+  'Bb5': STAFF_BOTTOM - LINE_SPACING * 5.5,     // space above 1st ledger
+  'E5':  STAFF_BOTTOM - LINE_SPACING * 3.5,     // 4th space (between D5 and F5)
+  'F#5': STAFF_BOTTOM - LINE_SPACING * 4,       // top line (same position as F5, sharp by key sig)
 };
 
 // ── Alto clef note Y positions ────────────────────────────────────────────────
@@ -193,13 +208,22 @@ const NOTE_Y_TREBLE = {
 // Spaces (bottom→top): G3 B3 D4 F4 (then above staff: A4 space, B4, C5, D5)
 // Middle line (staffLines[2]) = C4. Each diatonic step = LINE_SPACING/2 upward.
 const NOTE_Y_ALTO = {
+  'C3': staffLines[4] + LINE_SPACING * 1.5,   // space below 1st ledger line below staff
+  'D3': staffLines[4] + LINE_SPACING * 1.0,   // 1st ledger line below staff
+  'E3': staffLines[4] + LINE_SPACING * 0.5,   // space below bottom line (F3)
+  'F3': staffLines[4],                          // bottom line of alto staff (F3)
+  'G3': staffLines[3] + LINE_SPACING * 0.5,   // space below A3 line (below staff)
+  'A3': staffLines[3],                          // 2nd line from bottom (A3)
+  'B3': staffLines[2] + LINE_SPACING * 0.5,    // space between A3 and C4 lines
+  'C4': staffLines[2],                          // middle line (C4)
   'D4': staffLines[2] - LINE_SPACING * 0.5,   // 2nd space from bottom (D4)
   'E4': staffLines[2] - LINE_SPACING * 1.0,   // 4th line (E4)
   'F4': staffLines[2] - LINE_SPACING * 1.5,   // 4th space (F#4)
   'G4': staffLines[2] - LINE_SPACING * 2.0,   // top line (G4)
   'A4': staffLines[2] - LINE_SPACING * 2.5,   // space above top line
   'B4': staffLines[2] - LINE_SPACING * 3.0,   // first ledger line above
-  'C5': staffLines[2] - LINE_SPACING * 3.5,   // space above first ledger
+  'C#5': staffLines[2] - LINE_SPACING * 3.5,  // space above first ledger (C# for D major)
+  'C5':  staffLines[2] - LINE_SPACING * 3.5,   // space above first ledger (C natural)
   'D5': staffLines[2] - LINE_SPACING * 4.0,   // second ledger line above
 };
 
@@ -208,6 +232,15 @@ const NOTE_Y_ALTO = {
 // Spaces (bottom→top): A2 C3 E3 G3
 // Middle line (staffLines[2]) = D3. Each diatonic step = LINE_SPACING/2 upward.
 const NOTE_Y_BASS = {
+  'C2': staffLines[4] + LINE_SPACING * 2.0,   // 2nd ledger line below bass staff
+  'D2': staffLines[4] + LINE_SPACING * 1.5,   // space below 1st ledger line below
+  'E2': staffLines[4] + LINE_SPACING * 1.0,   // 1st ledger line below bass staff
+  'F2': staffLines[4] + LINE_SPACING * 0.5,   // space below G2 (bottom line)
+  'F#2': staffLines[4] + LINE_SPACING * 0.5,  // same position as F2 (sharp by key sig)
+  'G2': staffLines[4],                         // bottom line (G2)
+  'A2': staffLines[4] - LINE_SPACING * 0.5,   // space above bottom line
+  'B2': staffLines[3],                         // 2nd line from bottom (B2)
+  'C3': staffLines[3] - LINE_SPACING * 0.5,   // space between B2 and D3
   'D3': staffLines[2],                         // middle line (3rd line)
   'E3': staffLines[2] - LINE_SPACING * 0.5,   // 3rd space
   'F3': staffLines[2] - LINE_SPACING * 1.0,   // 4th line (F#3)
@@ -229,34 +262,125 @@ function getNoteYMap() {
 function getNoteY(pitch) { return getNoteYMap()[pitch]; }
 
 // ─── LEVEL DEFINITIONS ────────────────────────────────────────────────────────
-const LEVELS = {
-  1: { pitches: ['D4','E4','F4'],                              tonic: 'D4' },
-  2: { pitches: ['D4','E4','F4','G4','A4'],                    tonic: 'D4' },
-  3: { pitches: ['D4','E4','F4','G4','A4','B4','C5','D5'],     tonic: 'D4' },
+const VIOLIN_LEVELS = {
+  1: { pitches: ['D4','E4','F4'],                              tonic: 'D4', keySig: 'D',
+       rows: [['D4','E4','F4']] },
+  2: { pitches: ['D4','E4','F4','G4','A4'],                    tonic: 'D4', keySig: 'D',
+       rows: [['D4','E4','F4','G4','A4']] },
+  3: { pitches: ['D4','E4','F4','G4','A4','B4','C#5','D5'],    tonic: 'D4', keySig: 'D',
+       rows: [['A4','B4','C#5','D5'], ['D4','E4','F4','G4']] },
+  4: { pitches: ['G3','A3','B3','C4'],                         tonic: 'G3', keySig: 'G',
+       rows: [['G3','A3','B3','C4']] },
+  5: { pitches: ['G3','A3','B3','C4','D4','E4','F4','G4','A4','B4','C5','D5'], tonic: 'G3', keySig: 'G',
+       rows: [['A4','B4','C5','D5'], ['D4','E4','F4','G4'], ['G3','A3','B3','C4']] },
+  6: { pitches: ['E5','F#5','G5','A5'],                        tonic: 'E5', keySig: 'G',
+       rows: [['E5','F#5','G5','A5']] },
 };
+const VIOLA_LEVELS = {
+  1: { pitches: ['D4','E4','F4'],                              tonic: 'D4', keySig: 'D',
+       rows: [['D4','E4','F4']] },
+  2: { pitches: ['D4','E4','F4','G4','A4'],                    tonic: 'D4', keySig: 'D',
+       rows: [['D4','E4','F4','G4','A4']] },
+  3: { pitches: ['D4','E4','F4','G4','A4','B4','C#5','D5'],    tonic: 'D4', keySig: 'D',
+       rows: [['A4','B4','C#5','D5'], ['D4','E4','F4','G4']] },
+  4: { pitches: ['G3','A3','B3','C4'],                         tonic: 'G3', keySig: 'G',
+       rows: [['G3','A3','B3','C4']] },
+  5: { pitches: ['G3','A3','B3','C4','D4','E4','F4','G4','A4','B4','C5','D5'], tonic: 'G3', keySig: 'G',
+       rows: [['A4','B4','C5','D5'], ['D4','E4','F4','G4'], ['G3','A3','B3','C4']] },
+  6: { pitches: ['C3','D3','E3','F3'],                         tonic: 'C3', keySig: 'C',
+       rows: [['C3','D3','E3','F3']] },
+};
+// Keep LEVELS as alias for any legacy references
+const LEVELS = VIOLIN_LEVELS;
+
 const CELLO_LEVELS = {
-  1: { pitches: ['D3','E3','F3'],                           tonic: 'D3' },
-  2: { pitches: ['D3','E3','F3','G3','A3'],                 tonic: 'D3' },
-  3: { pitches: ['D3','E3','F3','G3','A3','B3','C4','D4'],  tonic: 'D3' },
+  1: { pitches: ['D3','E3','F3'],                           tonic: 'D3', keySig: 'D',
+       rows: [['D3','E3','F3']] },
+  2: { pitches: ['D3','E3','F3','G3','A3'],                 tonic: 'D3', keySig: 'D',
+       rows: [['D3','E3','F3','G3','A3']] },
+  3: { pitches: ['D3','E3','F3','G3','A3','B3','C4','D4'],  tonic: 'D3', keySig: 'D',
+       rows: [['A3','B3','C4','D4'], ['D3','E3','F3','G3']] },
+  4: { pitches: ['G2','A2','B2','C3'],                      tonic: 'G2', keySig: 'G',
+       rows: [['G2','A2','B2','C3']] },
+  5: { pitches: ['G2','A2','B2','C3','D3','E3','F3','G3','A3','B3','C4','D4'], tonic: 'G2', keySig: 'G',
+       rows: [['A3','B3','C4','D4'], ['D3','E3','F3','G3'], ['G2','A2','B2','C3']] },
+  6: { pitches: ['C2','D2','E2','F2'],                      tonic: 'C2', keySig: 'C',
+       rows: [['C2','D2','E2','F2']] },
+};
+const BASS_LEVELS = {
+  // Bass tuned E-A-D-G (low→high). Button rows top→bottom: G string, D string, A string, E string.
+  1: { pitches: ['D3','E3','F3'],                           tonic: 'D3', keySig: 'D',
+       rows: [['D3','E3','F3']] },
+  2: { pitches: ['D3','E3','F3','G3','A3'],                 tonic: 'D3', keySig: 'D',
+       rows: [['G3','A3'], ['D3','E3','F3']] },
+  3: { pitches: ['D3','E3','F3','G3','A3','B3','C4','D4'],  tonic: 'D3', keySig: 'D',
+       rows: [['G3','A3','B3','C4','D4'], ['D3','E3','F3']] },
+  4: { pitches: ['G2','A2','B2','C3'],                      tonic: 'G2', keySig: 'G',
+       rows: [['G2','A2','B2','C3']] },
+  5: { pitches: ['G2','A2','B2','C3','D3','E3','F3','G3','A3','B3','C4','D4'], tonic: 'G2', keySig: 'G',
+       rows: [['G2','A2','B2','C3','D3'], ['D3','E3','F3'], ['A3','B3','C4']] },
+  6: { pitches: ['G2','F#2','E2'],                          tonic: 'G2', keySig: 'G',
+       rows: [['E2','F#2','G2']] },
 };
 // Display names (accidentals implied by D Major key signature)
-const PITCH_DISPLAY = {
-  D4:'D', E4:'E', F4:'F#', G4:'G', A4:'A', B4:'B', C5:'C#', D5:'D',
-  D3:'D', E3:'E', F3:'F#', G3:'G', A3:'A', B3:'B', C4:'C#', D4b:'D',
+// Pitch display — keySig-aware so C4 shows as C in G major and C# in D major
+const PITCH_DISPLAY_D = {
+  G2:'G', A2:'A', B2:'B', C3:'C',
+  D3:'D', E3:'E', F3:'F#', G3:'G', A3:'A', B3:'B', C4:'C#', D4:'D',
+  E4:'E', F4:'F#', G4:'G', A4:'A', B4:'B', 'C#5':'C#', D5:'D',
 };
+const PITCH_DISPLAY_G = {
+  G2:'G', A2:'A', B2:'B', C3:'C', 'F#2':'F#',
+  D3:'D', E3:'E', F3:'F#', G3:'G', A3:'A', B3:'B', C4:'C',
+  D4:'D', E4:'E', F4:'F#', G4:'G', A4:'A', B4:'B', C5:'C', 'C#5':'C', D5:'D',
+  E5:'E', 'F#5':'F#', G5:'G', A5:'A',
+};
+const PITCH_DISPLAY_Bb = {
+  Ab4:'Ab', Bb4:'Bb', C5:'C', D5:'D', Eb5:'Eb', F5:'F', G5:'G', Ab5:'Ab', Bb5:'Bb',
+};
+const PITCH_DISPLAY_C = {
+  C2:'C', D2:'D', E2:'E', F2:'F',
+  C3:'C', D3:'D', E3:'E', F3:'F', G3:'G', A3:'A', B3:'B',
+  C4:'C', D4:'D', E4:'E', F4:'F', G4:'G', A4:'A', B4:'B',
+  C5:'C', D5:'D', E5:'E', F5:'F', G5:'G', A5:'A', B5:'B',
+};
+function getLevelSet() {
+  if (selectedInstrument === 'Cello') return CELLO_LEVELS;
+  if (selectedInstrument === 'Bass')  return BASS_LEVELS;
+  if (selectedInstrument === 'Viola') return VIOLA_LEVELS;
+  return VIOLIN_LEVELS;
+}
+function getPitchDisplay(pitch) {
+  const levelDef = getLevelSet()[currentLevel];
+  const keySig = levelDef && levelDef.keySig;
+  if (keySig === 'Bb') return PITCH_DISPLAY_Bb[pitch] || pitch[0];
+  if (keySig === 'G')  return PITCH_DISPLAY_G[pitch]  || PITCH_DISPLAY_C[pitch] || pitch[0];
+  if (keySig === 'C')  return PITCH_DISPLAY_C[pitch]  || pitch[0];
+  return PITCH_DISPLAY_D[pitch] || pitch[0];
+}
+// Keep PITCH_DISPLAY as alias for backwards compat in non-dynamic contexts
+const PITCH_DISPLAY = PITCH_DISPLAY_D;
 // Which pitches get an extra gap AFTER them in the button row (visual grouping)
-const EXTRA_GAP_AFTER = new Set(['G4', 'G3']); // gap between G and A
+const EXTRA_GAP_AFTER = new Set(['G4', 'G3', 'G2', 'G5']); // gap between G and A (all octaves)
 
 // ─── AUDIO ────────────────────────────────────────────────────────────────────
 // Frequencies for D4, E4, F#4 etc. (violin/viola) and D3, E3, F#3 etc. (cello)
 const NOTE_FREQ = {
   'D4': 293.66, 'E4': 329.63, 'F4': 369.99,
-  'G4': 392.00, 'A4': 440.00, 'B4': 493.88,
-  'C5': 554.37, 'D5': 587.33,
-  // Cello — one octave below violin
+  'G4': 392.00, 'Ab4': 415.30, 'A4': 440.00, 'Bb4': 466.16, 'B4': 493.88,
+  'C5': 523.25, 'C#5': 554.37, 'D5': 587.33, 'Eb5': 622.25, 'F5': 698.46,
+  'G5': 783.99, 'Ab5': 830.61, 'Bb5': 932.33,
+  // Cello/Bass level 1-3 and Violin/Viola level 4
   'D3': 146.83, 'E3': 164.81, 'F3': 185.00,
   'G3': 196.00, 'A3': 220.00, 'B3': 246.94,
   'C4': 261.63,
+  // Cello/Bass level 4 — one octave below violin level 4
+  'G2':  98.00, 'A2': 110.00, 'B2': 123.47, 'C3': 130.81,
+  // Level 6 additions
+  'E5': 659.25, 'F#5': 739.99, 'A5': 880.00,   // Violin level 6
+  'D3': 146.83,                                   // Viola level 6 (D3 in alto context)
+  'F#2': 92.50, 'F2': 87.31,                     // Bass level 6
+  'C2':  65.41, 'D2':  73.42, 'E2': 82.41,       // Cello level 6
 };
 
 let audioCtx = null;
@@ -301,18 +425,31 @@ function playNoteSound(pitch, big = false) {
 }
 
 // ─── BACKING TRACK ────────────────────────────────────────────────────────────
-// D4-A4-D5-A4 looping as eighth notes at 84 BPM
-// Eighth note duration = 60 / 84 / 2 = 0.357s
+// Pattern: tonic-fifth-tonic'-fifth looping as eighth notes at 84 BPM
 const BPM            = 84;
 const EIGHTH_DUR     = 60 / BPM / 2;          // ~0.357s per eighth note
-const BACKING_FREQS  = [293.66, 440.00, 587.33, 440.00]; // D4, A4, D5, A4
-const LOOKAHEAD_MS   = 25.0;   // how often the scheduler fires (ms)
-const SCHEDULE_AHEAD = 0.1;    // how far ahead to schedule (seconds)
+const LOOKAHEAD_MS   = 25.0;
+const SCHEDULE_AHEAD = 0.1;
+
+// Backing patterns per key signature: [tonic, fifth, tonic-octave-up, fifth]
+const BACKING_PATTERNS = {
+  'D':  [293.66, 440.00, 587.33, 440.00], // D4, A4, D5, A4
+  'G':  [196.00, 293.66, 392.00, 293.66], // G3, D4, G4, D4
+  'Bb': [233.08, 349.23, 466.16, 349.23], // Bb3, F4, Bb4, F4
+  'C':  [261.63, 392.00, 523.25, 392.00], // C4, G4, C5, G4
+};
+
+function getBackingFreqs() {
+  const levelDef = getLevelSet()[currentLevel];
+  const keySig = levelDef ? levelDef.keySig : 'D';
+  return BACKING_PATTERNS[keySig] || BACKING_PATTERNS['D'];
+}
 
 let backingActive    = false;
 let backingNoteIdx   = 0;
 let nextNoteTime     = 0;
 let backingInterval  = null;
+let currentBackingFreqs = BACKING_PATTERNS['D'];
 let floatingLabels = []; // Array to hold {x, y, text, color, vx, vy, life}	
 
 function scheduleBackingNote(freq, time) {
@@ -338,7 +475,7 @@ function scheduleBackingNote(freq, time) {
 function backingScheduler() {
   const ac = getAudioCtx();
   while (nextNoteTime < ac.currentTime + SCHEDULE_AHEAD) {
-    scheduleBackingNote(BACKING_FREQS[backingNoteIdx % BACKING_FREQS.length], nextNoteTime);
+    scheduleBackingNote(currentBackingFreqs[backingNoteIdx % currentBackingFreqs.length], nextNoteTime);
     backingNoteIdx++;
     nextNoteTime += EIGHTH_DUR;
   }
@@ -348,6 +485,7 @@ function startBackingTrack() {
   if (backingActive) return;
   backingActive  = true;
   backingNoteIdx = 0;
+  currentBackingFreqs = getBackingFreqs();
   nextNoteTime   = getAudioCtx().currentTime + 0.02;
   backingInterval = setInterval(backingScheduler, LOOKAHEAD_MS);
 }
@@ -380,7 +518,7 @@ const CLEF_WIDTH = 120;  // space reserved for clef + key sig
 const LEVEL_LENGTH = 25;
 
 function generateLevel() {
-  const levelSet = selectedInstrument === 'Cello' || selectedInstrument === 'Bass' ? CELLO_LEVELS : LEVELS;
+  const levelSet = getLevelSet();
   const levelDef = levelSet[currentLevel];
   const pitches = levelDef.pitches;
   const tonic = levelDef.tonic;
@@ -419,11 +557,19 @@ let gameState = 'title';
 let currentLevel = 1;
 let selectedInstrument = null;
 let hoveredBtn = null;
+let devMenuOpen = false;  // secret level-jump panel
+let devLevelBtns = [];    // hit-test rects for dev level buttons
+let levelSelectBtns = []; // hit-test rects for level select cards
+let levelSelectBackBtn = null;
+let otherLevelsBtn = null;  // level preview 'Other Levels' button
 
 const INSTRUMENTS = ['Violin', 'Viola', 'Cello', 'Bass'];
 let instrBtns = [];
 let startBtn = null;
 let menuBtn = null;       // level complete screen
+let retryBtn = null;      // game over screen
+let goMenuBtn = null;     // game over MENU button
+let inGameMenuBtn = null; // in-game top-left
 let nextLevelBtn = null;  // level complete screen
 
 // ─── GAME STATE ───────────────────────────────────────────────────────────────
@@ -640,31 +786,34 @@ function drawClef(x) {
   else drawTrebleClef(x);
 }
 
-// ─── KEY SIGNATURE (D Major: F# and C#) ──────────────────────────────────────
-// Sharp positions differ between treble, alto, and bass clef
+// ─── KEY SIGNATURE ────────────────────────────────────────────────────────────
+// D Major (levels 1-3): F# and C#. G Major (violin level 4): F# only. Bb Major (flute): Bb and Eb.
 function drawKeySignature(x) {
+  const levelDef = getLevelSet()[currentLevel];
+  const keySig = levelDef ? levelDef.keySig : 'D';
   ctx.save();
   ctx.fillStyle = '#ffe066';
-  ctx.font = `bold ${LINE_SPACING * 1.6}px serif`;
+  ctx.font = `bold ${LINE_SPACING * 1.9}px serif`;
   ctx.textAlign = 'center';
-  ctx.textBaseline = 'alphabetic'; // Add this to lock the vertical anchor
+  ctx.textBaseline = 'alphabetic';
 
-  if (selectedInstrument === 'Viola') {
-    // Alto clef D major key signature:
-    // F# on the top line (G4, staffLines[0])
-    // C# on the third line (C4, staffLines[2]) — one step above = staffLines[2] - LS/2
-    ctx.fillText('♯', x,      staffLines[0] + LINE_SPACING * 0.6);
-    ctx.fillText('♯', x + 14, staffLines[2] - LINE_SPACING * 0.5 + LINE_SPACING * 0.6);
+  if (keySig === 'C') {
+    // C major — no sharps or flats, draw nothing
+  } else if (keySig === 'Bb') {
+    // Treble clef Bb major: Bb on middle line (staffLines[2]), Eb on top space (staffLines[0]+LS*0.5)
+    ctx.fillText('♭', x,      staffLines[2] + LINE_SPACING * 0.75); // Bb
+    ctx.fillText('♭', x + 14, staffLines[0] + LINE_SPACING * 0.75); // Eb
+  } else if (selectedInstrument === 'Viola') {
+    ctx.fillText('♯', x,      staffLines[0] + LINE_SPACING * 0.9); // F#
+    if (keySig !== 'G') ctx.fillText('♯', x + 14, staffLines[2] - LINE_SPACING * 0.1 + LINE_SPACING * 0.6); // C#
   } else if (selectedInstrument === 'Cello' || selectedInstrument === 'Bass') {
-    // Bass clef D major key signature:
-    // F# on the 4th line from bottom (staffLines[1] = A3 line, F3 is staffLines[3])
-    // C# two steps below F# = staffLines[1] + LINE_SPACING (space between lines 1 and 2)
-    ctx.fillText('♯', x,      staffLines[3] + LINE_SPACING * 0.6); // F# on 4th line
-    ctx.fillText('♯', x + 14, staffLines[1] + LINE_SPACING * 0.6); // C# on 2nd line
+    // Bass clef: F# on 4th line (staffLines[1]), C# on middle line only for D major
+    ctx.fillText('♯', x,      staffLines[1] + LINE_SPACING * 0.57); // F# always
+    if (keySig !== 'G') ctx.fillText('♯', x + 15, staffLines[2] + LINE_SPACING * 0.9); // C# only D major
   } else {
-    // Treble clef D major key signature
-    ctx.fillText('♯', x,      staffLines[0] + LINE_SPACING * 0.6);
-    ctx.fillText('♯', x + 14, staffLines[2] - LINE_SPACING * 0.5 + LINE_SPACING * 0.6);
+    // Treble clef sharps
+    ctx.fillText('♯', x,      staffLines[0] + LINE_SPACING * 0.4); // F#
+    if (keySig !== 'G') ctx.fillText('♯', x + 14, staffLines[2] - LINE_SPACING * 0.6 + LINE_SPACING * 0.6); // C#
   }
   ctx.restore();
 }
@@ -674,6 +823,65 @@ function drawNote(note, camX) {
   const sx = note.x - camX;
   const sy = note.y;
   if (sx < -30 || sx > W + 30) return;
+
+  // Ledger lines below staff for violin level 4 (G3, A3, B3, C4)
+  if (selectedInstrument === 'Violin' || selectedInstrument === null || (!['Viola','Cello','Bass'].includes(selectedInstrument))) {
+    const bottomLine = staffLines[4]; // E4 line
+    const col = note.answered ? '#555' : '#ffe066';
+    ctx.strokeStyle = col;
+    ctx.lineWidth = 1.5;
+    // C4 sits ON the first ledger line below
+    if (note.pitch === 'C4') {
+      const ly = bottomLine + LINE_SPACING;
+      ctx.beginPath(); ctx.moveTo(sx - 13, ly); ctx.lineTo(sx + 13, ly); ctx.stroke();
+    }
+    // B3 sits in the space below the first ledger — ledger must still be shown
+    if (note.pitch === 'B3') {
+      const ly = bottomLine + LINE_SPACING;
+      ctx.beginPath(); ctx.moveTo(sx - 13, ly); ctx.lineTo(sx + 13, ly); ctx.stroke();
+    }
+    // A3 sits ON the second ledger line below — draw both ledgers
+    if (note.pitch === 'A3') {
+      const ly1 = bottomLine + LINE_SPACING;
+      const ly2 = bottomLine + LINE_SPACING * 2;
+      ctx.beginPath(); ctx.moveTo(sx - 13, ly1); ctx.lineTo(sx + 13, ly1); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(sx - 13, ly2); ctx.lineTo(sx + 13, ly2); ctx.stroke();
+    }
+    // G3 sits in the space below the second ledger — draw both ledgers
+    if (note.pitch === 'G3') {
+      const ly1 = bottomLine + LINE_SPACING;
+      const ly2 = bottomLine + LINE_SPACING * 2;
+      ctx.beginPath(); ctx.moveTo(sx - 13, ly1); ctx.lineTo(sx + 13, ly1); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(sx - 13, ly2); ctx.lineTo(sx + 13, ly2); ctx.stroke();
+    }
+  }
+
+  // Ledger lines above the treble staff (flute: Ab5/Bb5; violin: A5)
+  if (selectedInstrument === 'Violin') {
+    const topLine = staffLines[0]; // F5 line
+    const col = note.answered ? '#555' : '#ffe066';
+    ctx.strokeStyle = col;
+    ctx.lineWidth = 1.5;
+    const needsLedger1 = ['Ab5','Bb5','A5'].includes(note.pitch);
+    if (needsLedger1) {
+      const ly = topLine - LINE_SPACING;
+      ctx.beginPath(); ctx.moveTo(sx - 13, ly); ctx.lineTo(sx + 13, ly); ctx.stroke();
+    }
+  }
+
+  // Ledger lines BELOW alto staff for viola level 6 (C3, D3 need ledger lines)
+  if (selectedInstrument === 'Viola') {
+    const altoBtm = staffLines[4]; // F3 bottom line
+    const colA = note.answered ? '#555' : '#ffe066';
+    ctx.strokeStyle = colA;
+    ctx.lineWidth = 1.5;
+    if (note.pitch === 'D3') { // 1st ledger below
+      ctx.beginPath(); ctx.moveTo(sx - 13, altoBtm + LINE_SPACING); ctx.lineTo(sx + 13, altoBtm + LINE_SPACING); ctx.stroke();
+    }
+    if (note.pitch === 'C3') { // space below 1st ledger — still show ledger
+      ctx.beginPath(); ctx.moveTo(sx - 13, altoBtm + LINE_SPACING); ctx.lineTo(sx + 13, altoBtm + LINE_SPACING); ctx.stroke();
+    }
+  }
 
   // Ledger lines for alto clef notes above the staff
   if (selectedInstrument === 'Viola') {
@@ -686,8 +894,8 @@ function drawNote(note, camX) {
       const ly = topLine - LINE_SPACING;
       ctx.beginPath(); ctx.moveTo(sx - 13, ly); ctx.lineTo(sx + 13, ly); ctx.stroke();
     }
-    // C5 (C#) sits in the space ABOVE the first ledger — ledger must still be shown
-    if (note.pitch === 'C5') {
+    // C#5 sits in the space ABOVE the first ledger — ledger must still be shown
+    if (note.pitch === 'C#5') {
       const ly = topLine - LINE_SPACING;
       ctx.beginPath(); ctx.moveTo(sx - 13, ly); ctx.lineTo(sx + 13, ly); ctx.stroke();
     }
@@ -697,6 +905,24 @@ function drawNote(note, camX) {
       const ly2 = topLine - LINE_SPACING * 2;
       ctx.beginPath(); ctx.moveTo(sx - 13, ly1); ctx.lineTo(sx + 13, ly1); ctx.stroke();
       ctx.beginPath(); ctx.moveTo(sx - 13, ly2); ctx.lineTo(sx + 13, ly2); ctx.stroke();
+    }
+  }
+
+  // Ledger lines BELOW bass staff for cello level 6 (C2, D2, E2)
+  if (selectedInstrument === 'Cello') {
+    const bassBtm = staffLines[4]; // G2 bottom line
+    const colB = note.answered ? '#555' : '#ffe066';
+    ctx.strokeStyle = colB;
+    ctx.lineWidth = 1.5;
+    if (note.pitch === 'E2') {
+      ctx.beginPath(); ctx.moveTo(sx - 13, bassBtm + LINE_SPACING); ctx.lineTo(sx + 13, bassBtm + LINE_SPACING); ctx.stroke();
+    }
+    if (note.pitch === 'D2') {
+      ctx.beginPath(); ctx.moveTo(sx - 13, bassBtm + LINE_SPACING); ctx.lineTo(sx + 13, bassBtm + LINE_SPACING); ctx.stroke();
+    }
+    if (note.pitch === 'C2') {
+      ctx.beginPath(); ctx.moveTo(sx - 13, bassBtm + LINE_SPACING); ctx.lineTo(sx + 13, bassBtm + LINE_SPACING); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(sx - 13, bassBtm + LINE_SPACING * 2); ctx.lineTo(sx + 13, bassBtm + LINE_SPACING * 2); ctx.stroke();
     }
   }
 
@@ -777,6 +1003,14 @@ function drawHUD() {
     drawHeart(hx, 18, full, half);
   }
 
+  // In-game MENU button (below score, top-left)
+  if (!gameOver && !levelComplete) {
+    const mbW = 60, mbH = 20;
+    const mbX = 10, mbY = 32;
+    drawNesButton('MENU', mbX, mbY, mbW, mbH, hoveredBtn === 'MENU_INGAME', false);
+    inGameMenuBtn = { x: mbX, y: mbY, w: mbW, h: mbH };
+  }
+
   // Note buttons — drawn on canvas, large touch targets
   if (!gameOver && !levelComplete && !countIn && currentNoteIdx < notes.length) {
     drawNoteButtons();
@@ -787,49 +1021,54 @@ function drawHUD() {
 let noteBtns = []; // hit-test rects, rebuilt each frame
 
 function drawNoteButtons() {
-  const levelSet = selectedInstrument === 'Cello' || selectedInstrument === 'Bass' ? CELLO_LEVELS : LEVELS;
-  const levelPitches = levelSet[currentLevel].pitches;
-  // Scale button width down slightly for larger note sets so they all fit
-  const btnW = levelPitches.length <= 5 ? 80 : 66;
-  const btnH = 56;
-  const gap = 12;
-  const extraGap = 20; // additional space after G4
+  const levelSet = getLevelSet();
+  const levelDef = levelSet[currentLevel];
+  const rows = levelDef.rows || [levelDef.pitches]; // fall back to single row
 
-  // Calculate total width accounting for extra gap
-  const extraGapCount = levelPitches.filter(p => EXTRA_GAP_AFTER.has(p)).length;
-  const totalW = levelPitches.length * btnW
-               + (levelPitches.length - 1) * gap
-               + extraGapCount * extraGap;
-  const btnY = H - 80;
+  const btnW = 80;
+  const btnH = 46;
+  const gapX = 10;
+  const gapY = 8;
+  const totalRows = rows.length;
+
+  // Bottom of canvas area available for buttons
+  const bottomPad = 12;
+  const gridH = totalRows * btnH + (totalRows - 1) * gapY;
+  const gridTop = H - bottomPad - gridH;
 
   noteBtns = [];
-  let curX = (W - totalW) / 2;
 
-  levelPitches.forEach((pitch, i) => {
-    const bx = curX;
-    const label = PITCH_DISPLAY[pitch];
-    const hovered = hoveredBtn === `NOTE_${pitch}`;
+  // Left-align all rows to the same X as the widest row
+  const maxRowW = Math.max(...rows.map(r => r.length * btnW + (r.length - 1) * gapX));
+  const startX = (W - maxRowW) / 2;
 
-    // Shadow
-    ctx.fillStyle = '#000';
-    ctx.fillRect(bx + 3, btnY + 3, btnW, btnH);
-    // Body
-    ctx.fillStyle = hovered ? '#4466ee' : '#1a1a3a';
-    ctx.fillRect(bx, btnY, btnW, btnH);
-    // Border
-    ctx.strokeStyle = '#ffe066';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(bx, btnY, btnW, btnH);
-    // Label
-    ctx.fillStyle = '#fff';
-    ctx.font = `${btnW <= 66 ? 11 : 14}px "Press Start 2P"`;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(label, bx + btnW / 2, btnY + btnH / 2);
+  rows.forEach((rowPitches, rowIdx) => {
+    const btnY = gridTop + rowIdx * (btnH + gapY);
 
-    noteBtns.push({ pitch, name: pitch[0], x: bx, y: btnY, w: btnW, h: btnH });
+    rowPitches.forEach((pitch, colIdx) => {
+      const bx = startX + colIdx * (btnW + gapX);
+      const label = getPitchDisplay(pitch);
+      const hovered = hoveredBtn === `NOTE_${pitch}`;
 
-    curX += btnW + gap + (EXTRA_GAP_AFTER.has(pitch) ? extraGap : 0);
+      // Shadow
+      ctx.fillStyle = '#000';
+      ctx.fillRect(bx + 3, btnY + 3, btnW, btnH);
+      // Body
+      ctx.fillStyle = hovered ? '#4466ee' : '#1a1a3a';
+      ctx.fillRect(bx, btnY, btnW, btnH);
+      // Border
+      ctx.strokeStyle = '#ffe066';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(bx, btnY, btnW, btnH);
+      // Label
+      ctx.fillStyle = '#fff';
+      ctx.font = '13px "Press Start 2P"';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(label, bx + btnW / 2, btnY + btnH / 2);
+
+      noteBtns.push({ pitch, name: pitch[0], x: bx, y: btnY, w: btnW, h: btnH });
+    });
   });
 }
 
@@ -860,7 +1099,7 @@ function drawDoubleBarLine(camX) {
 let particles = [];
 
 const PARTICLE_COLORS = [
-  '#ffe066', '#ffffff', '#ff6644', '#44ffaa', '#66aaff', '#ff44bb', '#ffaa22'
+  '#ffe066', '#ffcc00', '#ffffff', '#cc99ff', '#9933ff', '#bb66ff', '#fff4cc'
 ];
 
 function spawnExplosion(worldX, worldY, big = false) {
@@ -1129,6 +1368,7 @@ const SPRITE_BASS = [
   '_______DDDDD_________', // End pin
 ];
 
+
 const instrColorMap = { W:'W', D:'D', L:'L', N:'N', G:'G', S:'S', I:'I', C:'C', B:'B', R:'R', _:null };
 
 function drawInstrumentSprite(sprite, cx, cy) {
@@ -1146,6 +1386,295 @@ function drawInstrumentSprite(sprite, cx, cy) {
     }
   }
   ctx.restore();
+}
+
+
+
+// ─── SHARED MINI STAFF DRAWING ────────────────────────────────────────────────
+// Draws staff + clef + key sig + lowest & highest noteheads joined by a line.
+function drawMiniStaff(instrument, levelDef, staffCX, staffMidY, LS) {
+  if (!levelDef) return;
+  const pitches = levelDef.pitches;
+  const keySig  = levelDef.keySig || 'D';
+
+  const psl = [
+    staffMidY - LS * 2,
+    staffMidY - LS,
+    staffMidY,
+    staffMidY + LS,
+    staffMidY + LS * 2,
+  ];
+
+  const pNoteY_treble = {
+    'G3': psl[4]+LS*2.5, 'A3': psl[4]+LS*2, 'B3': psl[4]+LS*1.5,
+    'C4': psl[4]+LS, 'D4': psl[4]+LS*.5, 'E4': psl[4],
+    'F4': psl[4]-LS*.5, 'G4': psl[4]-LS, 'Ab4': psl[4]-LS*1.5,
+    'A4': psl[4]-LS*1.5, 'Bb4': psl[4]-LS*2, 'B4': psl[4]-LS*2,
+    'C#5': psl[4]-LS*2.5, 'C5': psl[4]-LS*2.5, 'D5': psl[4]-LS*3,
+    'Eb5': psl[4]-LS*3.5, 'E5': psl[4]-LS*3.5,
+    'F5': psl[4]-LS*4, 'F#5': psl[4]-LS*4,
+    'G5': psl[4]-LS*4.5, 'Ab5': psl[4]-LS*5, 'A5': psl[4]-LS*5,
+    'Bb5': psl[4]-LS*5.5,
+  };
+  const pNoteY_alto = {
+    'C3': psl[4]+LS*1.5, 'D3': psl[4]+LS, 'E3': psl[4]+LS*.5, 'F3': psl[4],
+    'G3': psl[3]+LS*.5, 'A3': psl[3], 'B3': psl[2]+LS*.5, 'C4': psl[2],
+    'D4': psl[2]-LS*.5, 'E4': psl[2]-LS, 'F4': psl[2]-LS*1.5,
+    'G4': psl[2]-LS*2, 'A4': psl[2]-LS*2.5, 'B4': psl[2]-LS*3,
+    'C#5': psl[2]-LS*3.5, 'C5': psl[2]-LS*3.5, 'D5': psl[2]-LS*4,
+  };
+  const pNoteY_bass = {
+    'C2': psl[4]+LS*2, 'D2': psl[4]+LS*1.5, 'E2': psl[4]+LS, 'F2': psl[4]+LS*.5,
+    'F#2': psl[4]+LS*.5, 'G2': psl[4], 'A2': psl[4]-LS*.5, 'B2': psl[3],
+    'C3': psl[3]-LS*.5, 'D3': psl[2], 'E3': psl[2]-LS*.5, 'F3': psl[2]-LS,
+    'G3': psl[2]-LS*1.5, 'A3': psl[2]-LS*2, 'B3': psl[2]-LS*2.5,
+    'C4': psl[2]-LS*3, 'D4': psl[2]-LS*3.5,
+  };
+  const pNoteY = instrument === 'Viola' ? pNoteY_alto
+               : (instrument === 'Cello' || instrument === 'Bass') ? pNoteY_bass
+               : pNoteY_treble;
+
+  // Staff geometry
+  const CLEF_W = 44, NOTE_PAD = 20;
+  const staffW = CLEF_W + NOTE_PAD * 2 + 60; // fixed width — just two notes
+  const staffLeft  = staffCX - staffW / 2;
+  const staffRight = staffLeft + staffW;
+  const loX = staffLeft + CLEF_W + NOTE_PAD;
+  const hiX = staffRight - NOTE_PAD;
+  const kx  = staffLeft + 18;
+
+  // Staff lines
+  ctx.strokeStyle = '#ffe066';
+  ctx.lineWidth = 1;
+  for (let li = 0; li < 5; li++) {
+    ctx.beginPath();
+    ctx.moveTo(staffLeft, psl[li]);
+    ctx.lineTo(staffRight, psl[li]);
+    ctx.stroke();
+  }
+
+  // Clef
+  ctx.save();
+  ctx.fillStyle = '#ffe066';
+  ctx.textAlign = 'left';
+  if (instrument === 'Viola') {
+    ctx.font = `${LS * 5.2}px serif`;
+    ctx.textBaseline = 'middle';
+    ctx.fillText('𝄡', staffLeft + 1, psl[2] + 2);
+  } else if (instrument === 'Cello' || instrument === 'Bass') {
+    ctx.font = `${LS * 4.2 * 1.1576}px serif`;
+    ctx.textBaseline = 'middle';
+    ctx.fillText('𝄢', staffLeft + 1, psl[1] + LS * 0.1 + 7);
+  } else {
+    ctx.font = `${LS * 7.5}px serif`;
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillText('𝄞', staffLeft + 1, psl[3] + LS * 1.2);
+  }
+  ctx.restore();
+
+  // Key signature
+  ctx.save();
+  ctx.fillStyle = '#ffe066';
+  ctx.font = `bold ${LS * 1.9}px serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'alphabetic';
+  if (keySig === 'Bb') {
+    ctx.fillText('♭', kx,     psl[2] + LS * 0.75);
+    ctx.fillText('♭', kx + 9, psl[0] + LS * 0.75);
+  } else if (keySig === 'G') {
+    if (instrument === 'Viola')                         ctx.fillText('♯', kx, psl[0] + LS * 0.9);
+    else if (instrument === 'Cello' || instrument === 'Bass') ctx.fillText('♯', kx, psl[1] + LS * 0.57);
+    else                                                ctx.fillText('♯', kx, psl[0] + LS * 0.4);
+  } else if (keySig === 'D') {
+    if (instrument === 'Viola') {
+      ctx.fillText('♯', kx, psl[0]+LS*0.9); ctx.fillText('♯', kx+9, psl[2]-LS*0.1+LS*0.6);
+    } else if (instrument === 'Cello' || instrument === 'Bass') {
+      ctx.fillText('♯', kx, psl[1]+LS*0.57); ctx.fillText('♯', kx+10, psl[2]+LS*0.9);
+    } else {
+      ctx.fillText('♯', kx, psl[0]+LS*0.4); ctx.fillText('♯', kx+9, psl[2]-LS*0.6+LS*0.6);
+    }
+  }
+  ctx.restore();
+
+  // Draw lowest and highest notes only
+  const loPitch = pitches[0];
+  const hiPitch = pitches[pitches.length - 1];
+  const loY = pNoteY[loPitch];
+  const hiY = pNoteY[hiPitch];
+  if (loY === undefined || hiY === undefined) return;
+
+  // Ledger lines helper
+  function ledger(x, y) {
+    // Draw a ledger line at y if it's outside the staff
+    if (y > psl[4] + LS * 0.4 || y < psl[0] - LS * 0.4) {
+      ctx.strokeStyle = '#ffe066';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(x - 9, y);
+      ctx.lineTo(x + 9, y);
+      ctx.stroke();
+    }
+    // Second ledger if needed
+    if (y > psl[4] + LS * 1.6) {
+      ctx.beginPath(); ctx.moveTo(x-9, psl[4]+LS); ctx.lineTo(x+9, psl[4]+LS); ctx.stroke();
+    }
+    if (y < psl[0] - LS * 1.6) {
+      ctx.beginPath(); ctx.moveTo(x-9, psl[0]-LS); ctx.lineTo(x+9, psl[0]-LS); ctx.stroke();
+    }
+  }
+
+  ledger(loX, loY);
+  ledger(hiX, hiY);
+
+  // Connecting line between the two noteheads
+  ctx.strokeStyle = '#ffe066';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([3, 3]);
+  ctx.beginPath();
+  ctx.moveTo(loX + 7, loY);
+  ctx.lineTo(hiX - 7, hiY);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Noteheads
+  [{ x: loX, y: loY }, { x: hiX, y: hiY }].forEach(({ x, y }) => {
+    ctx.save();
+    ctx.fillStyle = '#ffe066';
+    ctx.strokeStyle = '#cc9900';
+    ctx.lineWidth = 1;
+    ctx.translate(x, y);
+    ctx.rotate(-0.3);
+    ctx.beginPath();
+    ctx.ellipse(0, 0, 7, 4.5, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+  });
+}
+
+// ─── LEVEL SELECT SCREEN ──────────────────────────────────────────────────────
+function displayPitch(pitch, keySig) {
+  // Format a pitch name for display given a key signature
+  const maps = { D: PITCH_DISPLAY_D, G: PITCH_DISPLAY_G, Bb: PITCH_DISPLAY_Bb, C: PITCH_DISPLAY_C };
+  const map = maps[keySig] || PITCH_DISPLAY_D;
+  return map[pitch] || pitch.replace(/[0-9]/g, ''); // strip octave number
+}
+
+function getLevelRangeStr(levelDef) {
+  if (!levelDef) return '';
+  const p = levelDef.pitches;
+  const keySig = levelDef.keySig || 'D';
+  if (p.length === 0) return '';
+  if (p.length === 1) return displayPitch(p[0], keySig);
+  const first = displayPitch(p[0], keySig);
+  const last  = displayPitch(p[p.length - 1], keySig);
+  // Strip octave digits for display, add octave only when ambiguous
+  const p0oct = p[0].replace(/[^0-9]/g, '');
+  const pNOct = p[p.length - 1].replace(/[^0-9]/g, '');
+  const firstFull = first + p0oct;
+  const lastFull  = last  + pNOct;
+  return firstFull + ' – ' + lastFull;
+}
+
+function drawLevelSelectScreen() {
+  ctx.fillStyle = '#0a0a1a';
+  ctx.fillRect(0, 0, W, H);
+  for (let sy = 0; sy < H; sy += 4) {
+    ctx.fillStyle = 'rgba(0,0,0,0.18)';
+    ctx.fillRect(0, sy, W, 2);
+  }
+
+  // Header
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#ffe066';
+  ctx.font = '16px "Press Start 2P"';
+  ctx.fillText(selectedInstrument.toUpperCase(), W / 2, 42);
+  ctx.fillStyle = '#aaddff';
+  ctx.font = '7px "Press Start 2P"';
+  ctx.fillText('SELECT A LEVEL', W / 2, 64);
+
+  // Divider
+  ctx.strokeStyle = '#ffe066';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(60, 76); ctx.lineTo(W - 60, 76);
+  ctx.stroke();
+
+  // Level cards
+  const levels = getLevelSet();
+  const levelNums = Object.keys(levels).map(Number).sort((a,b) => a - b);
+  const cols = Math.min(levelNums.length, 3);  // max 3 columns → 2 rows for 6 levels
+  const rows = Math.ceil(levelNums.length / cols);
+  const cardW = 230, cardH = 62, cardGapX = 14, cardGapY = 12;
+  const gridW = cols * cardW + (cols - 1) * cardGapX;
+  const gridH = rows * cardH + (rows - 1) * cardGapY;
+  const gridX = W / 2 - gridW / 2;
+  const gridY = 96 + (H - 96 - 60 - gridH) / 2; // vertically centre between divider and back btn
+
+  levelSelectBtns = [];
+
+  levelNums.forEach((lvl, idx) => {
+    const col = idx % cols;
+    const row = Math.floor(idx / cols);
+    const cx = gridX + col * (cardW + cardGapX);
+    const cy = gridY + row * (cardH + cardGapY);
+    const hovered = hoveredBtn === `LVLSEL_${lvl}`;
+    const levelDef = levels[lvl];
+    const keySigName = !levelDef ? '' :
+      levelDef.keySig === 'G'  ? 'G Major' :
+      levelDef.keySig === 'Bb' ? 'Bb Major' :
+      levelDef.keySig === 'C'  ? 'C Major' : 'D Major';
+
+    // Shadow
+    ctx.fillStyle = '#000';
+    ctx.fillRect(cx + 3, cy + 3, cardW, cardH);
+    // Body
+    ctx.fillStyle = hovered ? '#1e2a5a' : '#1a1a3a';
+    ctx.fillRect(cx, cy, cardW, cardH);
+    // Border
+    ctx.strokeStyle = hovered ? '#fff' : '#ffe066';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(cx, cy, cardW, cardH);
+
+    // Level number (top left)
+    ctx.fillStyle = '#ffe066';
+    ctx.font = '9px "Press Start 2P"';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'top';
+    ctx.fillText(`Level ${lvl}`, cx + 10, cy + 8);
+
+    // Key sig (top right)
+    ctx.fillStyle = '#aaddff';
+    ctx.font = '6px "Press Start 2P"';
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'top';
+    ctx.fillText(keySigName, cx + cardW - 10, cy + 10);
+
+    // Range text centred in card
+    if (levelDef) {
+      const p = levelDef.pitches;
+      const keySig = levelDef.keySig || 'D';
+      const loLabel = displayPitch(p[0], keySig) + p[0].replace(/[^0-9]/g,'');
+      const hiLabel = displayPitch(p[p.length-1], keySig) + p[p.length-1].replace(/[^0-9]/g,'');
+      const rangeText = loLabel + ' – ' + hiLabel;
+      ctx.fillStyle = '#fff';
+      ctx.font = '11px "Press Start 2P"';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(rangeText, cx + cardW / 2, cy + cardH / 2 + 4);
+    }
+
+    levelSelectBtns.push({ level: lvl, x: cx, y: cy, w: cardW, h: cardH });
+  });
+
+  // Back button
+  const bbW = 120, bbH = 30;
+  const bbX = W / 2 - bbW / 2;
+  const bbY = H - 46;
+  drawNesButton('BACK', bbX, bbY, bbW, bbH, hoveredBtn === 'LVLSEL_BACK', false);
+  levelSelectBackBtn = { x: bbX, y: bbY, w: bbW, h: bbH };
+
+
 }
 
 function drawTitleScreen() {
@@ -1181,42 +1710,49 @@ function drawTitleScreen() {
   ctx.font = '10px "Press Start 2P"';
   ctx.fillText('CHOOSE YOUR INSTRUMENT', W / 2, 126);
 
-  // Instrument buttons — 4 across
+  // ── Row 1: Violin, Viola, Cello, Bass (with sprites) ───────────────────────
   instrBtns = [];
-  const btnW = 140, btnH = 36, gap = 18;
-  const totalW = INSTRUMENTS.length * btnW + (INSTRUMENTS.length - 1) * gap;
-  const startX = (W - totalW) / 2;
-  const btnY = 330;
+  const btnW = 140, gap = 18;
+  const padding = 10;
+  const labelH = 20;
   const spriteMap = { Violin: SPRITE_VIOLIN, Viola: SPRITE_VIOLA, Cello: SPRITE_CELLO, Bass: SPRITE_BASS };
+  const maxSpriteH = Math.max(...INSTRUMENTS.map(n => spriteMap[n].length * PX));
+  const cardH = padding + labelH + padding + maxSpriteH + padding;
+  const row1TotalW = INSTRUMENTS.length * btnW + (INSTRUMENTS.length - 1) * gap;
+  const row1StartX = (W - row1TotalW) / 2;
+  const row1Y = 145;
+
   INSTRUMENTS.forEach((name, i) => {
-    const bx = startX + i * (btnW + gap);
+    const bx = row1StartX + i * (btnW + gap);
     const hovered = hoveredBtn === name;
     const selected = selectedInstrument === name;
-    // Draw sprite centered above button
     const sprite = spriteMap[name];
-    const spriteH = sprite.length * PX;
+
+    ctx.fillStyle = '#000';
+    ctx.fillRect(bx + 3, row1Y + 3, btnW, cardH);
+    ctx.fillStyle = selected ? '#ffe066' : hovered ? '#1e2a5a' : '#1a1a3a';
+    ctx.fillRect(bx, row1Y, btnW, cardH);
+    ctx.strokeStyle = selected ? '#fff' : '#ffe066';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(bx, row1Y, btnW, cardH);
+
+    ctx.fillStyle = selected ? '#000' : '#fff';
+    ctx.font = '9px "Press Start 2P"';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    ctx.fillText(name, bx + btnW / 2, row1Y + padding);
+
     const spriteCX = bx + btnW / 2;
-    const spriteCY = btnY - spriteH - 8;
-    // Highlight glow behind selected/hovered instrument
-    if (selected || hovered) {
-      ctx.save();
-      ctx.globalAlpha = 0.15;
-      ctx.fillStyle = selected ? '#ffe066' : '#4466ee';
-      ctx.fillRect(bx, spriteCY - 4, btnW, spriteH + 8);
-      ctx.restore();
-    }
+    const spriteCY = row1Y + padding + labelH + padding;
     drawInstrumentSprite(sprite, spriteCX, spriteCY);
-    drawNesButton(name, bx, btnY, btnW, btnH, hovered, selected);
-    const spriteHitH = sprite.length * PX + 8;
-    instrBtns.push({ label: name, x: bx, y: spriteCY - 4, w: btnW, h: btnH + spriteHitH });
+
+    instrBtns.push({ label: name, x: bx, y: row1Y, w: btnW, h: cardH });
   });
+
 
   // Coming soon note under locked instruments — none currently
 
-  // Bottom hint
-  ctx.fillStyle = '#555';
-  ctx.font = '6px "Press Start 2P"';
-  ctx.fillText('CLICK AN INSTRUMENT TO BEGIN', W / 2, H - 16);
+
 }
 
 // ─── LEVEL PREVIEW SCREEN ────────────────────────────────────────────────────
@@ -1237,8 +1773,13 @@ function drawLevelPreviewScreen() {
 
   ctx.fillStyle = '#aaddff';
   ctx.font = '7px "Press Start 2P"';
-  const clefName = selectedInstrument === 'Viola' ? 'ALTO CLEF' : (selectedInstrument === 'Cello' || selectedInstrument === 'Bass' || selectedInstrument === 'Bass') ? 'BASS CLEF' : 'TREBLE CLEF';
-  ctx.fillText(`${selectedInstrument.toUpperCase()}  ·  ${clefName}  ·  D MAJOR`, W / 2, 56);
+  const clefName = selectedInstrument === 'Viola' ? 'ALTO CLEF' : (selectedInstrument === 'Cello' || selectedInstrument === 'Bass') ? 'BASS CLEF' : 'TREBLE CLEF';
+  const _previewLS = getLevelSet()[currentLevel];
+  const _keySigName = !_previewLS ? 'D MAJOR' :
+    _previewLS.keySig === 'G'  ? 'G MAJOR' :
+    _previewLS.keySig === 'Bb' ? 'Bb MAJOR' :
+    _previewLS.keySig === 'C'  ? 'C MAJOR' : 'D MAJOR';
+  ctx.fillText(`${selectedInstrument.toUpperCase()}  ·  ${clefName}  ·  ${_keySigName}`, W / 2, 56);
 
   // ── Mini staff ──────────────────────────────────────────────────────────────
   const LS = 14;
@@ -1253,27 +1794,60 @@ function drawLevelPreviewScreen() {
   // Note Y positions — scaled to preview staff, instrument-aware
   // psl[2] = middle line. Each step = LS/2.
   const pNoteY_treble = {
+    'G3': psl[4] + LS * 2.5,
+    'A3': psl[4] + LS * 2.0,
+    'B3': psl[4] + LS * 1.5,
+    'C4': psl[4] + LS * 1.0,
     'D4': psl[4] + LS / 2,
     'E4': psl[4],
     'F4': psl[4] - LS / 2,
     'G4': psl[4] - LS,
+    'Ab4': psl[4] - LS * 1.5,
     'A4': psl[4] - LS * 1.5,
+    'Bb4': psl[4] - LS * 2,
     'B4': psl[4] - LS * 2,
-    'C5': psl[4] - LS * 2.5,
+    'C#5': psl[4] - LS * 2.5,
+    'C5':  psl[4] - LS * 2.5,
     'D5': psl[4] - LS * 3,
+    'Eb5': psl[4] - LS * 3.5,
+    'F5':  psl[4] - LS * 4,
+    'G5':  psl[4] - LS * 4.5,
+    'Ab5': psl[4] - LS * 5,
+    'A5':  psl[4] - LS * 5,
+    'Bb5': psl[4] - LS * 5.5,
+    'E5':  psl[4] - LS * 3.5,
+    'F#5': psl[4] - LS * 4,
   };
   const pNoteY_alto = {
+    'C3': psl[4] + LS * 1.5,   // space below 1st ledger below alto staff
+    'D3': psl[4] + LS * 1.0,   // 1st ledger line below alto staff
+    'E3': psl[4] + LS * 0.5,   // space below bottom line (F3)
+    'F3': psl[4],               // bottom line of alto staff
+    'G3': psl[3] + LS * 0.5,   // space below A3 line
+    'A3': psl[3],               // 2nd line from bottom (A3)
+    'B3': psl[2] + LS * 0.5,   // space between A3 and C4
+    'C4': psl[2],               // middle line (C4)
     'D4': psl[2] - LS * 0.5,   // 2nd space from bottom
     'E4': psl[2] - LS * 1.0,   // 4th line
     'F4': psl[2] - LS * 1.5,   // 4th space
     'G4': psl[2] - LS * 2.0,   // top line
     'A4': psl[2] - LS * 2.5,   // space above top line
     'B4': psl[2] - LS * 3.0,   // first ledger above
-    'C5': psl[2] - LS * 3.5,   // space above first ledger
+    'C#5': psl[2] - LS * 3.5,  // space above first ledger
+    'C5':  psl[2] - LS * 3.5,
     'D5': psl[2] - LS * 4.0,   // second ledger above
   };
-  // Bass clef preview: middle line psl[2] = D3
+  // Bass clef preview: bottom line psl[4]=G2, psl[3]=B2, psl[2]=D3, psl[1]=F3, psl[0]=A3
   const pNoteY_bass = {
+    'C2':  psl[4] + LS * 2.0,  // 2nd ledger below bass staff
+    'D2':  psl[4] + LS * 1.5,  // space below 1st ledger
+    'E2':  psl[4] + LS * 1.0,  // 1st ledger line below bass staff
+    'F2':  psl[4] + LS * 0.5,  // space below G2 bottom line
+    'F#2': psl[4] + LS * 0.5,  // same position as F2
+    'G2': psl[4],
+    'A2': psl[4] - LS * 0.5,
+    'B2': psl[3],
+    'C3': psl[3] - LS * 0.5,
     'D3': psl[2],
     'E3': psl[2] - LS * 0.5,
     'F3': psl[2] - LS * 1.0,
@@ -1283,10 +1857,20 @@ function drawLevelPreviewScreen() {
     'C4': psl[2] - LS * 3.0,
     'D4': psl[2] - LS * 3.5,
   };
-  const pNoteY = selectedInstrument === 'Viola' ? pNoteY_alto : selectedInstrument === 'Cello' || selectedInstrument === 'Bass' ? pNoteY_bass : pNoteY_treble;
+  const pNoteY = selectedInstrument === 'Viola' ? pNoteY_alto : (selectedInstrument === 'Cello' || selectedInstrument === 'Bass') ? pNoteY_bass : pNoteY_treble;
 
-  const staffLeft = 70;
-  const staffRight = W - 70;
+  // Size staff to fit notes — clef+keysig need ~80px on the left, 36px padding on the right
+  const _previewLevelSet = getLevelSet();
+  const _previewPitches = _previewLevelSet[currentLevel].pitches;
+  const _previewNoteGap = _previewPitches.length <= 5 ? 36 : 28;
+  const _previewTotalW = (_previewPitches.length - 1) * _previewNoteGap;
+  const CLEF_KEYSIG_W = 125;
+  const NOTE_PADDING = 36;
+  const staffWidth = CLEF_KEYSIG_W + _previewTotalW + NOTE_PADDING;
+  const staffLeft = W / 2 - staffWidth / 2;
+  const _previewNotesStartX = staffLeft + CLEF_KEYSIG_W;
+  const _previewLastNoteX = _previewNotesStartX + (_previewPitches.length - 1) * _previewNoteGap;
+  const staffRight = _previewLastNoteX + NOTE_PADDING;
 
   // Staff lines
   ctx.strokeStyle = '#ffe066';
@@ -1320,25 +1904,50 @@ function drawLevelPreviewScreen() {
   }
   ctx.restore();
 
-  // Key signature sharps (same staff positions work for both clefs in D major visually)
+  // Key signature sharps — per-instrument, matching drawKeySignature() positions
+  // Preview uses LS=14 vs game LINE_SPACING=18; x anchor is staffLeft+54 (≈ clefX+64 equivalent)
   ctx.save();
   ctx.fillStyle = '#ffe066';
-  ctx.font = `bold ${LS * 1.6}px serif`;
+  ctx.font = `bold ${LS * 1.9}px serif`;
   ctx.textAlign = 'center';
-  ctx.fillText('♯', staffLeft + 54, psl[0] + LS * 0.6);
-  ctx.fillText('♯', staffLeft + 66, psl[2] - LS * 0.5 + LS * 0.6);
+  ctx.textBaseline = 'alphabetic';
+  const kx = staffLeft + 54; // base x for first sharp
+  const _previewKeySig = (_previewLevelSet[currentLevel] && _previewLevelSet[currentLevel].keySig) || 'D';
+  if (_previewKeySig === 'C') {
+    // C major — no sharps or flats
+  } else if (_previewKeySig === 'Bb') {
+    ctx.fillText('♭', kx,      psl[2] + LS * 0.75); // Bb on middle line
+    ctx.fillText('♭', kx + 14, psl[0] + LS * 0.75); // Eb on top space
+  } else if (selectedInstrument === 'Viola') {
+    ctx.fillText('♯', kx,      psl[0] + LS * 0.9);
+    if (_previewKeySig !== 'G') ctx.fillText('♯', kx + 14, psl[2] - LS * 0.1 + LS * 0.6);
+  } else if (selectedInstrument === 'Cello' || selectedInstrument === 'Bass') {
+    ctx.fillText('♯', kx,      psl[1] + LS * 0.57); // F# always
+    if (_previewKeySig !== 'G') ctx.fillText('♯', kx + 15, psl[2] + LS * 0.9); // C# only D major
+  } else {
+    ctx.fillText('♯', kx,      psl[0] + LS * 0.4);
+    if (_previewKeySig !== 'G') ctx.fillText('♯', kx + 14, psl[2] - LS * 0.6 + LS * 0.6);
+  }
   ctx.restore();
 
-  // Notes for this level, tightly centered
-  const levelSet2 = selectedInstrument === 'Cello' || selectedInstrument === 'Bass' ? CELLO_LEVELS : LEVELS;
-  const levelPitches = levelSet2[currentLevel].pitches;
-  const NOTE_GAP = levelPitches.length <= 5 ? 36 : 28; // tighter for 8 notes
-  const totalNotesW = (levelPitches.length - 1) * NOTE_GAP;
-  const notesStartX = W / 2 - totalNotesW / 2;
+  // Notes for this level — use positions already calculated above
+  const levelSet2 = _previewLevelSet;
+  const levelPitches = _previewPitches;
+  const NOTE_GAP = _previewNoteGap;
+  const notesStartX = _previewNotesStartX;
 
   levelPitches.forEach((pitch, i) => {
     const nx = notesStartX + i * NOTE_GAP;
     const ny = pNoteY[pitch];
+
+    // Ledger lines BELOW alto staff for viola level 6 in preview
+    if (selectedInstrument === 'Viola') {
+      ctx.strokeStyle = '#ffe066';
+      ctx.lineWidth = 1;
+      if (pitch === 'D3' || pitch === 'C3') {
+        ctx.beginPath(); ctx.moveTo(nx - 10, psl[4] + LS); ctx.lineTo(nx + 10, psl[4] + LS); ctx.stroke();
+      }
+    }
 
     // Ledger lines for alto clef notes above the staff in preview
     if (selectedInstrument === 'Viola') {
@@ -1348,7 +1957,7 @@ function drawLevelPreviewScreen() {
         const ly = psl[0] - LS;
         ctx.beginPath(); ctx.moveTo(nx - 10, ly); ctx.lineTo(nx + 10, ly); ctx.stroke();
       }
-      if (pitch === 'C5') {
+      if (pitch === 'C#5' || pitch === 'C5') {
         const ly = psl[0] - LS;
         ctx.beginPath(); ctx.moveTo(nx - 10, ly); ctx.lineTo(nx + 10, ly); ctx.stroke();
       }
@@ -1358,6 +1967,43 @@ function drawLevelPreviewScreen() {
         });
       }
     }
+    // Ledger lines above staff for flute (Ab5, Bb5) and violin (A5)
+    if (selectedInstrument === 'Violin') {
+      ctx.strokeStyle = '#ffe066';
+      ctx.lineWidth = 1;
+      if (['Ab5','Bb5','A5'].includes(pitch)) {
+        const ly = psl[0] - LS;
+        ctx.beginPath(); ctx.moveTo(nx - 10, ly); ctx.lineTo(nx + 10, ly); ctx.stroke();
+      }
+    }
+
+    // Ledger lines below staff for violin level 4 (G3, A3, B3, C4)
+    if (selectedInstrument === 'Violin' || selectedInstrument === null || (!['Viola','Cello','Bass'].includes(selectedInstrument))) {
+      ctx.strokeStyle = '#ffe066';
+      ctx.lineWidth = 1;
+      const pBottomLine = psl[4];
+      if (pitch === 'C4' || pitch === 'B3') {
+        ctx.beginPath(); ctx.moveTo(nx - 10, pBottomLine + LS); ctx.lineTo(nx + 10, pBottomLine + LS); ctx.stroke();
+      }
+      if (pitch === 'A3' || pitch === 'G3') {
+        ctx.beginPath(); ctx.moveTo(nx - 10, pBottomLine + LS); ctx.lineTo(nx + 10, pBottomLine + LS); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(nx - 10, pBottomLine + LS * 2); ctx.lineTo(nx + 10, pBottomLine + LS * 2); ctx.stroke();
+      }
+    }
+
+    // Ledger lines BELOW bass staff for cello level 6 in preview
+    if (selectedInstrument === 'Cello') {
+      ctx.strokeStyle = '#ffe066';
+      ctx.lineWidth = 1;
+      if (pitch === 'E2' || pitch === 'D2') {
+        ctx.beginPath(); ctx.moveTo(nx - 10, psl[4] + LS); ctx.lineTo(nx + 10, psl[4] + LS); ctx.stroke();
+      }
+      if (pitch === 'C2') {
+        ctx.beginPath(); ctx.moveTo(nx - 10, psl[4] + LS); ctx.lineTo(nx + 10, psl[4] + LS); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(nx - 10, psl[4] + LS * 2); ctx.lineTo(nx + 10, psl[4] + LS * 2); ctx.stroke();
+      }
+    }
+
     // Ledger lines for bass clef notes above the staff in preview
     if (selectedInstrument === 'Cello' || selectedInstrument === 'Bass') {
       ctx.strokeStyle = '#ffe066';
@@ -1385,7 +2031,7 @@ function drawLevelPreviewScreen() {
     ctx.fillStyle = '#aaddff';
     ctx.font = '8px "Press Start 2P"';
     ctx.textAlign = 'center';
-    ctx.fillText(PITCH_DISPLAY[pitch], nx, psl[4] + LS * 2.2);
+    ctx.fillText(getPitchDisplay(pitch), nx, Math.max(psl[4], ny) + LS * 1.8);
   });
 
   // Double bar at right end
@@ -1398,17 +2044,56 @@ function drawLevelPreviewScreen() {
   ctx.beginPath(); ctx.moveTo(dbx + 6, psl[0]); ctx.lineTo(dbx + 6, psl[4]); ctx.stroke();
   ctx.restore();
 
-  // START button
-  const sbW = 160, sbH = 38;
-  const sbX = W / 2 - sbW / 2;
+  // START + OTHER LEVELS buttons
+  const sbW = 160, sbH = 38, sbGap = 20;
+  const olW = 140;
+  const totalBtnW = sbW + sbGap + olW;
+  const sbX = W / 2 - totalBtnW / 2;
+  const olX = sbX + sbW + sbGap;
   const sbY = H - 62;
   drawNesButton('START', sbX, sbY, sbW, sbH, hoveredBtn === 'START', false);
   startBtn = { x: sbX, y: sbY, w: sbW, h: sbH };
+  drawNesButton('OTHER LEVELS', olX, sbY, olW, sbH, hoveredBtn === 'OTHER_LEVELS', false);
+  otherLevelsBtn = { x: olX, y: sbY, w: olW, h: sbH };
 
   ctx.fillStyle = '#555';
   ctx.font = '6px "Press Start 2P"';
   ctx.textAlign = 'center';
-  ctx.fillText('OR PRESS ENTER', W / 2, H - 12);
+  ctx.fillText('OR PRESS ENTER', sbX + sbW / 2, H - 12);
+
+  // ── Secret level-jump panel (Shift+Cmd+L) ──────────────────────────────────
+  if (devMenuOpen) {
+    const activeLevels = getLevelSet();
+    const levelNums = Object.keys(activeLevels).map(Number);
+    const dbW = 60, dbH = 28, dbGap = 10;
+    const totalDbW = levelNums.length * dbW + (levelNums.length - 1) * dbGap;
+    const dbStartX = W / 2 - totalDbW / 2;
+    const dbY = 16;
+
+    // Panel background
+    ctx.save();
+    ctx.fillStyle = 'rgba(0,0,0,0.85)';
+    ctx.fillRect(dbStartX - 14, dbY - 10, totalDbW + 28, dbH + 28);
+    ctx.strokeStyle = '#ff44bb';
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(dbStartX - 14, dbY - 10, totalDbW + 28, dbH + 28);
+
+    // Label
+    ctx.fillStyle = '#ff44bb';
+    ctx.font = '6px "Press Start 2P"';
+    ctx.textAlign = 'center';
+    ctx.fillText('DEV: JUMP TO LEVEL', W / 2, dbY + dbH + 14);
+    ctx.restore();
+
+    devLevelBtns = [];
+    levelNums.forEach((lvl, i) => {
+      const bx = dbStartX + i * (dbW + dbGap);
+      const hov = hoveredBtn === `DEV_LVL_${lvl}`;
+      const sel = lvl === currentLevel;
+      drawNesButton(`L${lvl}`, bx, dbY, dbW, dbH, hov, sel);
+      devLevelBtns.push({ level: lvl, x: bx, y: dbY, w: dbW, h: dbH });
+    });
+  }
 }
 function lerp(a, b, t) { return a + (b - a) * t; }
 function easeInOut(t) { return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t; }
@@ -1463,6 +2148,7 @@ function update(dt) {
     if (hero.bounceT >= 1) {
       hero.bounceT = 1;
       hero.state = 'idle';
+      hero.frame = 0;
       // Snap to position above next note
       const targetNote = hero.bounceTarget;
       hero.x = targetNote.x;
@@ -1480,11 +2166,12 @@ function update(dt) {
     }
   }
 
-  if (hero.state === 'shake') {
+  // Shake runs independently — can overlap with bounce
+  if (hero.shakeTimer > 0) {
     hero.shakeTimer -= dt;
     hero.shakeX = Math.sin(hero.shakeTimer * 60) * 5;
     if (hero.shakeTimer <= 0) {
-      hero.state = 'idle';
+      if (hero.state === 'shake') hero.state = 'idle';
       hero.shakeX = 0;
     }
   }
@@ -1503,6 +2190,7 @@ function draw(dt) {
   ctx.setTransform(1, 0, 0, 1, 0, 0);
 
   if (gameState === 'title') { drawTitleScreen(); return; }
+  if (gameState === 'levelSelect') { drawLevelSelectScreen(); return; }
   if (gameState === 'levelPreview') { drawLevelPreviewScreen(); return; }
 
   // ── playing ──
@@ -1535,7 +2223,7 @@ function draw(dt) {
   {
     const hsx = hero.x - camera + hero.shakeX - HERO_W;
     let hsy = hero.y;
-    const sprite = hero.frame === 0 ? SPRITE_IDLE : SPRITE_WALK;
+    const sprite = hero.state === 'bounce' && hero.frame === 1 ? SPRITE_WALK : SPRITE_IDLE;
     const spriteW = sprite[0].length * PX;
     const spriteH = sprite.length * PX;
 
@@ -1593,8 +2281,17 @@ function draw(dt) {
     ctx.fillText(`SCORE:  ${score}`, W / 2, H / 2 - 2);
     ctx.fillStyle = '#aaffaa';
     ctx.fillText(`TIME:   ${formatTime(finalTime)}`, W / 2, H / 2 + 18);
-    ctx.fillStyle = '#ffe066';
-    ctx.fillText('PRESS ENTER TO RETRY', W / 2, H / 2 + 44);
+
+    // Retry + Menu buttons
+    const goBtnW = 160, goBtnH = 38, goBtnGap = 24;
+    const goTotalW = goBtnW * 2 + goBtnGap;
+    const goBtnY = H / 2 + 40;
+    const retryX = W / 2 - goTotalW / 2;
+    const goMenuX = retryX + goBtnW + goBtnGap;
+    drawNesButton('RETRY', retryX, goBtnY, goBtnW, goBtnH, hoveredBtn === 'RETRY', false);
+    retryBtn = { x: retryX, y: goBtnY, w: goBtnW, h: goBtnH };
+    drawNesButton('MENU', goMenuX, goBtnY, goBtnW, goBtnH, hoveredBtn === 'MENU_GO', false);
+    goMenuBtn = { x: goMenuX, y: goBtnY, w: goBtnW, h: goBtnH };
   }
 
   if (levelComplete) {
@@ -1620,7 +2317,7 @@ function draw(dt) {
     drawNesButton('MENU',       menuX, btnY, btnW, btnH, hoveredBtn === 'MENU', false);
     menuBtn = { x: menuX, y: btnY, w: btnW, h: btnH };
 
-    const activeLevels = selectedInstrument === 'Cello' || selectedInstrument === 'Bass' ? CELLO_LEVELS : LEVELS;
+    const activeLevels = getLevelSet();
     const hasNextLevel = activeLevels[currentLevel + 1] !== undefined;
     drawNesButton('NEXT LEVEL', nextX, btnY, btnW, btnH, hoveredBtn === 'NEXT', !hasNextLevel);
     nextLevelBtn = { x: nextX, y: btnY, w: btnW, h: btnH, enabled: hasNextLevel };
@@ -1671,15 +2368,32 @@ canvas.addEventListener('mousemove', (e) => {
     for (const btn of instrBtns) {
       if (hitTest(pos, btn)) { hoveredBtn = btn.label; break; }
     }
+  } else if (gameState === 'levelSelect') {
+    for (const btn of levelSelectBtns) {
+      if (hitTest(pos, btn)) { hoveredBtn = `LVLSEL_${btn.level}`; break; }
+    }
+    if (levelSelectBackBtn && hitTest(pos, levelSelectBackBtn)) hoveredBtn = 'LVLSEL_BACK';
   } else if (gameState === 'levelPreview') {
+    if (devMenuOpen) {
+      for (const btn of devLevelBtns) {
+        if (hitTest(pos, btn)) { hoveredBtn = `DEV_LVL_${btn.level}`; break; }
+      }
+    }
     if (startBtn && hitTest(pos, startBtn)) hoveredBtn = 'START';
+    if (otherLevelsBtn && hitTest(pos, otherLevelsBtn)) hoveredBtn = 'OTHER_LEVELS';
   } else if (gameState === 'playing') {
-    if (levelComplete) {
+    if (gameOver) {
+      if (retryBtn && hitTest(pos, retryBtn)) hoveredBtn = 'RETRY';
+      else if (goMenuBtn && hitTest(pos, goMenuBtn)) hoveredBtn = 'MENU_GO';
+    } else if (levelComplete) {
       if (menuBtn && hitTest(pos, menuBtn)) hoveredBtn = 'MENU';
       else if (nextLevelBtn && nextLevelBtn.enabled && hitTest(pos, nextLevelBtn)) hoveredBtn = 'NEXT';
     } else {
-      for (const btn of noteBtns) {
-        if (hitTest(pos, btn)) { hoveredBtn = `NOTE_${btn.pitch}`; break; }
+      if (inGameMenuBtn && hitTest(pos, inGameMenuBtn)) { hoveredBtn = 'MENU_INGAME'; }
+      else {
+        for (const btn of noteBtns) {
+          if (hitTest(pos, btn)) { hoveredBtn = `NOTE_${btn.pitch}`; break; }
+        }
       }
     }
   }
@@ -1701,15 +2415,59 @@ canvas.addEventListener('click', (e) => {
         return;
       }
     }
+  } else if (gameState === 'levelSelect') {
+    if (levelSelectBackBtn && hitTest(pos, levelSelectBackBtn)) {
+      gameState = 'title';
+      hoveredBtn = null;
+      return;
+    }
+    for (const btn of levelSelectBtns) {
+      if (hitTest(pos, btn)) {
+        currentLevel = btn.level;
+        gameState = 'levelPreview';
+        hoveredBtn = null;
+        return;
+      }
+    }
   } else if (gameState === 'levelPreview') {
+    if (devMenuOpen) {
+      for (const btn of devLevelBtns) {
+        if (hitTest(pos, btn)) {
+          currentLevel = btn.level;
+          devMenuOpen = false;
+          hoveredBtn = null;
+          return;
+        }
+      }
+    }
     if (startBtn && hitTest(pos, startBtn)) startPlaying();
+    if (otherLevelsBtn && hitTest(pos, otherLevelsBtn)) {
+      gameState = 'levelSelect';
+      hoveredBtn = null;
+    }
   } else if (gameState === 'playing') {
-    if (levelComplete) {
+    if (gameOver) {
+      if (retryBtn && hitTest(pos, retryBtn)) {
+        // Retry — keep score from previous levels, replay current level
+        hideSubmitPanel();
+        resetGame();
+        hoveredBtn = null;
+        return;
+      }
+      if (goMenuBtn && hitTest(pos, goMenuBtn)) {
+        currentLevel = 1;
+        score = 0;
+        hideSubmitPanel();
+        gameState = 'levelSelect';
+        hoveredBtn = null;
+        return;
+      }
+    } else if (levelComplete) {
       if (menuBtn && hitTest(pos, menuBtn)) {
         currentLevel = 1;
         score = 0;
         hideSubmitPanel();
-        gameState = 'title';
+        gameState = 'levelSelect';
         hoveredBtn = null;
       } else if (nextLevelBtn && nextLevelBtn.enabled && hitTest(pos, nextLevelBtn)) {
         currentLevel++;
@@ -1718,6 +2476,15 @@ canvas.addEventListener('click', (e) => {
         hoveredBtn = null;
       }
     } else {
+      if (inGameMenuBtn && hitTest(pos, inGameMenuBtn)) {
+        currentLevel = 1;
+        score = 0;
+        stopBackingTrack();
+        hideSubmitPanel();
+        gameState = 'levelSelect';
+        hoveredBtn = null;
+        return;
+      }
       for (const btn of noteBtns) {
         if (hitTest(pos, btn)) { handlePitchInput(btn.pitch); return; }
       }
@@ -1800,7 +2567,8 @@ function resolveInput(correct, currentNote) {
   } else {
     hearts--;
     score = Math.max(0, score - 50); // Penalty logic
-    hero.state = 'shake';
+    // Only switch to shake if not bouncing — if bouncing, shake runs alongside it
+    if (hero.state !== 'bounce') hero.state = 'shake';
     hero.shakeTimer = 0.4;
     
     labelText = "-50";
@@ -1834,19 +2602,32 @@ window.addEventListener('keydown', (e) => {
     return;
   }
 
+  // Level select
+  if (gameState === 'levelSelect') {
+    if (e.key === 'Escape') { gameState = 'title'; return; }
+    return;
+  }
+
   // Level preview
   if (gameState === 'levelPreview') {
+    // Secret dev shortcut: Shift+Cmd+L (or Shift+Ctrl+L on Windows)
+    if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key === 'L') {
+      e.preventDefault();
+      devMenuOpen = !devMenuOpen;
+      return;
+    }
+    if (e.key === 'Escape' && devMenuOpen) { devMenuOpen = false; return; }
     if (e.key === 'Enter') startPlaying();
     return;
   }
 
   // Playing
   if (e.key === 'Enter') {
-    if (gameOver) { score = 0; hideSubmitPanel(); resetGame(); return; }
+    if (gameOver) { hideSubmitPanel(); resetGame(); return; }
     if (levelComplete) {
-      const activeLevels = selectedInstrument === 'Cello' || selectedInstrument === 'Bass' ? CELLO_LEVELS : LEVELS;
+      const activeLevels = getLevelSet();
       if (activeLevels[currentLevel + 1]) { currentLevel++; hideSubmitPanel(); gameState = 'levelPreview'; }
-      else { currentLevel = 1; score = 0; hideSubmitPanel(); gameState = 'title'; }
+      else { currentLevel = 1; score = 0; hideSubmitPanel(); gameState = 'levelSelect'; }
     }
     return;
   }
@@ -1861,6 +2642,7 @@ window.addEventListener('keydown', (e) => {
 
 // ─── START PLAYING ────────────────────────────────────────────────────────────
 function startPlaying() {
+  devMenuOpen = false;
   gameState = 'playing';
   hoveredBtn = null;
   canvas.style.cursor = 'default';
