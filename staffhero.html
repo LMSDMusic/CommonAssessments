@@ -30,7 +30,7 @@
   #submitPanel {
     display: none;
     position: absolute;
-    bottom: -54px;
+    bottom: -62px;
     left: 50%;
     transform: translateX(-50%);
     background: #0a0a1a;
@@ -119,14 +119,12 @@ submitBtn.addEventListener('click', async () => {
       score,
       level: currentLevel,
       instrument: selectedInstrument,
-      timestamp: new Date().toISOString(),
     };
     const form = new URLSearchParams();
     form.append('name',       payload.name);
     form.append('score',      payload.score);
     form.append('level',      payload.level);
     form.append('instrument', payload.instrument);
-    form.append('timestamp',  payload.timestamp);
     await fetch(APPS_SCRIPT_URL, {
       method: 'POST',
       mode: 'no-cors',
@@ -151,7 +149,7 @@ playerNameInput.addEventListener('keydown', (e) => {
 // ─── CANVAS SETUP ─────────────────────────────────────────────────────────────
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
-const W = 800, H = 420;
+const W = 920, H = 520;
 canvas.width = W;
 canvas.height = H;
 
@@ -163,8 +161,8 @@ canvas.height = H;
 // ALTO CLEF   lines bottom→top: F3, A3, C4, E4, G4
 //   Middle C (C4) sits on the MIDDLE line (staffLines[2])
 
-const LINE_SPACING = 18;
-const STAFF_TOP = 110;
+const LINE_SPACING = 21;
+const STAFF_TOP = 90;
 const staffLines = [
   STAFF_TOP,
   STAFF_TOP + LINE_SPACING,
@@ -265,42 +263,50 @@ function getNoteY(pitch) { return getNoteYMap()[pitch]; }
 const VIOLIN_LEVELS = {
   1: { pitches: ['D4','E4','F4'],                              tonic: 'D4', keySig: 'D',
        rows: [['D4','E4','F4']],
-       rowLabels: ['D String'] },
+       rowLabels: ['D String'], title: 'D, E, F#' },
   2: { pitches: ['D4','E4','F4','G4','A4'],                    tonic: 'D4', keySig: 'D',
        rows: [['A4'], ['D4','E4','F4','G4']],
-       rowLabels: ['A String', 'D String'] },
+       rowLabels: ['A String', 'D String'], title: 'D String + A' },
   3: { pitches: ['D4','E4','F4','G4','A4','B4','C#5','D5'],    tonic: 'D4', keySig: 'D',
        rows: [['A4','B4','C#5','D5'], ['D4','E4','F4','G4']],
-       rowLabels: ['A String', 'D String'] },
+       rowLabels: ['A String', 'D String'], title: 'D & A Strings' },
   4: { pitches: ['G3','A3','B3','C4'],                         tonic: 'G3', keySig: 'G',
        rows: [['G3','A3','B3','C4']],
-       rowLabels: ['G String'] },
+       rowLabels: ['G String'], title: 'G String' },
   5: { pitches: ['G3','A3','B3','C4','D4','E4','F4','G4','A4','B4','C5','D5'], tonic: 'G3', keySig: 'G',
        rows: [['A4','B4','C5','D5'], ['D4','E4','F4','G4'], ['G3','A3','B3','C4']],
-       rowLabels: ['A String', 'D String', 'G String'] },
+       rowLabels: ['A String', 'D String', 'G String'], title: 'G, D, A Strings' },
   6: { pitches: ['E5','F#5','G5','A5'],                        tonic: 'E5', keySig: 'G',
        rows: [['E5','F#5','G5','A5']],
-       rowLabels: ['E String'] },
+       rowLabels: ['E String'], title: 'E String' },
+  7: { pitches: ['G3','A3','B3','C4','D4','E4','F4','G4','A4','B4','C5','D5','E5','F#5','G5','A5'],
+       tonic: 'G3', keySig: 'G',
+       rows: [['E5','F#5','G5','A5'], ['A4','B4','C5','D5'], ['D4','E4','F4','G4'], ['G3','A3','B3','C4']],
+       rowLabels: ['E String', 'A String', 'D String', 'G String'], title: 'All Strings' },
 };
 const VIOLA_LEVELS = {
   1: { pitches: ['D4','E4','F4'],                              tonic: 'D4', keySig: 'D',
        rows: [['D4','E4','F4']],
-       rowLabels: ['D String'] },
+       rowLabels: ['D String'], title: 'D, E, F#' },
   2: { pitches: ['D4','E4','F4','G4','A4'],                    tonic: 'D4', keySig: 'D',
        rows: [['A4'], ['D4','E4','F4','G4']],
-       rowLabels: ['A String', 'D String'] },
+       rowLabels: ['A String', 'D String'], title: 'D String + A' },
   3: { pitches: ['D4','E4','F4','G4','A4','B4','C#5','D5'],    tonic: 'D4', keySig: 'D',
        rows: [['A4','B4','C#5','D5'], ['D4','E4','F4','G4']],
-       rowLabels: ['A String', 'D String'] },
+       rowLabels: ['A String', 'D String'], title: 'D & A Strings' },
   4: { pitches: ['G3','A3','B3','C4'],                         tonic: 'G3', keySig: 'G',
        rows: [['G3','A3','B3','C4']],
-       rowLabels: ['G String'] },
+       rowLabels: ['G String'], title: 'G String' },
   5: { pitches: ['G3','A3','B3','C4','D4','E4','F4','G4','A4','B4','C5','D5'], tonic: 'G3', keySig: 'G',
        rows: [['A4','B4','C5','D5'], ['D4','E4','F4','G4'], ['G3','A3','B3','C4']],
-       rowLabels: ['A String', 'D String', 'G String'] },
+       rowLabels: ['A String', 'D String', 'G String'], title: 'G, D, A Strings' },
   6: { pitches: ['C3','D3','E3','F3'],                         tonic: 'C3', keySig: 'C',
        rows: [['C3','D3','E3','F3']],
-       rowLabels: ['C String'] },
+       rowLabels: ['C String'], title: 'C String' },
+  7: { pitches: ['C3','D3','E3','F3','G3','A3','B3','C4','D4','E4','F4','G4','A4','B4','C5','D5'],
+       tonic: 'C3', keySig: 'C',
+       rows: [['A4','B4','C5','D5'], ['D4','E4','F4','G4'], ['G3','A3','B3','C4'], ['C3','D3','E3','F3']],
+       rowLabels: ['A String', 'D String', 'G String', 'C String'], title: 'All Strings' },
 };
 // Keep LEVELS as alias for any legacy references
 const LEVELS = VIOLIN_LEVELS;
@@ -308,48 +314,56 @@ const LEVELS = VIOLIN_LEVELS;
 const CELLO_LEVELS = {
   1: { pitches: ['D3','E3','F3'],                           tonic: 'D3', keySig: 'D',
        rows: [['D3','E3','F3']],
-       rowLabels: ['D String'] },
+       rowLabels: ['D String'], title: 'D, E, F#' },
   2: { pitches: ['D3','E3','F3','G3','A3'],                 tonic: 'D3', keySig: 'D',
        rows: [['A3'], ['D3','E3','F3','G3']],
-       rowLabels: ['A String', 'D String'] },
+       rowLabels: ['A String', 'D String'], title: 'D String + A' },
   3: { pitches: ['D3','E3','F3','G3','A3','B3','C4','D4'],  tonic: 'D3', keySig: 'D',
        rows: [['A3','B3','C4','D4'], ['D3','E3','F3','G3']],
-       rowLabels: ['A String', 'D String'] },
+       rowLabels: ['A String', 'D String'], title: 'D & A Strings' },
   4: { pitches: ['G2','A2','B2','C3'],                      tonic: 'G2', keySig: 'G',
        rows: [['G2','A2','B2','C3']],
-       rowLabels: ['G String'] },
+       rowLabels: ['G String'], title: 'G String' },
   5: { pitches: ['G2','A2','B2','C3','D3','E3','F3','G3','A3','B3','C4','D4'], tonic: 'G2', keySig: 'G',
        rows: [['A3','B3','C4','D4'], ['D3','E3','F3','G3'], ['G2','A2','B2','C3']],
-       rowLabels: ['A String', 'D String', 'G String'] },
+       rowLabels: ['A String', 'D String', 'G String'], title: 'G, D, A Strings' },
   6: { pitches: ['C2','D2','E2','F2'],                      tonic: 'C2', keySig: 'C',
        rows: [['C2','D2','E2','F2']],
-       rowLabels: ['C String'] },
+       rowLabels: ['C String'], title: 'C String' },
+  7: { pitches: ['C2','D2','E2','F2','G2','A2','B2','C3','D3','E3','F3','G3','A3','B3','C4','D4'],
+       tonic: 'C2', keySig: 'C',
+       rows: [['A3','B3','C4','D4'], ['D3','E3','F3','G3'], ['G2','A2','B2','C3'], ['C2','D2','E2','F2']],
+       rowLabels: ['A String', 'D String', 'G String', 'C String'], title: 'All Strings' },
 };
 const BASS_LEVELS = {
   // Bass tuned E-A-D-G (low→high). Rows top→bottom: G string, D string, A string, E string.
   1: { pitches: ['D3','E3','F3'],                           tonic: 'D3', keySig: 'D',
        rows: [['D3','E3','F3']],
-       rowLabels: ['D String'] },
+       rowLabels: ['D String'], title: 'D, E, F#' },
   2: { pitches: ['D3','E3','F3','G3','A3'],                 tonic: 'D3', keySig: 'D',
        rows: [['G3','A3'], ['D3','E3','F3']],
-       rowLabels: ['G String', 'D String'] },
+       rowLabels: ['G String', 'D String'], title: 'D String + A' },
   3: { pitches: ['D3','E3','F3','G3','A3','B3','C4','D4'],  tonic: 'D3', keySig: 'D',
        rows: [['G3','A3','B3','C4','D4'], ['D3','E3','F3']],
-       rowLabels: ['G String', 'D String'] },
+       rowLabels: ['G String', 'D String'], title: 'D & G Strings' },
   4: { pitches: ['G2','A2','B2','C3'],                      tonic: 'G2', keySig: 'G',
        rows: [['G2','A2','B2','C3']],
-       rowLabels: ['G String'] },
+       rowLabels: ['G String'], title: 'A String + G' },
   5: { pitches: ['A2','B2','C3','E3','F3','G3','A3','B3','C4','D4'], tonic: 'G3', keySig: 'G',
        rows: [['G3','A3','B3','C4','D4'], ['E3','F3','G3'], ['A2','B2','C3']],
-       rowLabels: ['G String', 'D String', 'A String'] },
+       rowLabels: ['G String', 'D String', 'A String'], title: 'G, D, A Strings + G' },
   6: { pitches: ['G2','F#2','E2'],                          tonic: 'G2', keySig: 'G',
        rows: [['E2','F#2','G2']],
-       rowLabels: ['E String'] },
+       rowLabels: ['E String'], title: 'E String' },
+  7: { pitches: ['E2','F#2','G2','A2','B2','C3','D3','E3','F3','G3','A3','B3','C4','D4'],
+       tonic: 'D3', keySig: 'D',
+       rows: [['G3','A3','B3','C4','D4'], ['D3','E3','F3'], ['A2','B2','C3'], ['E2','F#2','G2']],
+       rowLabels: ['G String', 'D String', 'A String', 'E String'], title: 'All Strings' },
 };
 // Display names (accidentals implied by D Major key signature)
 // Pitch display — keySig-aware so C4 shows as C in G major and C# in D major
 const PITCH_DISPLAY_D = {
-  G2:'G', A2:'A', B2:'B', C3:'C',
+  G2:'G', A2:'A', B2:'B', C3:'C', 'F#2':'F#',
   D3:'D', E3:'E', F3:'F#', G3:'G', A3:'A', B3:'B', C4:'C#', D4:'D',
   E4:'E', F4:'F#', G4:'G', A4:'A', B4:'B', 'C#5':'C#', D5:'D',
 };
@@ -537,8 +551,8 @@ function isOnBeat() {
 }
 
 
-const NOTE_SPACING = 90; // horizontal pixels between notes
-const CLEF_WIDTH = 120;  // space reserved for clef + key sig
+const NOTE_SPACING = 104; // horizontal pixels between notes
+const CLEF_WIDTH = 138;  // space reserved for clef + key sig
 const LEVEL_LENGTH = 25;
 
 function generateLevel() {
@@ -567,7 +581,7 @@ function generateLevel() {
     notes.push({
       pitch,
       name: pitch[0],   // first letter: D, E, F, G, A
-      x: CLEF_WIDTH + 60 + i * NOTE_SPACING,
+      x: CLEF_WIDTH + 70 + i * NOTE_SPACING,
       y: getNoteY(pitch),
       answered: false,
     });
@@ -621,8 +635,8 @@ function formatTime(s) {
 
 // ─── HERO ─────────────────────────────────────────────────────────────────────
 // Hero state
-const HERO_W = 16, HERO_H = 32;
-const HERO_GAP = 10; // px above the notehead centre
+const HERO_W = 18, HERO_H = 36;
+const HERO_GAP = 12; // px above the notehead centre
 
 // For notes below the staff, land the hero on the bottom staff line instead
 const BELOW_STAFF_TREBLE = new Set(['G3','A3','B3','C4']);
@@ -935,8 +949,8 @@ function drawNote(note, camX) {
       const ly = topLine - LINE_SPACING;
       ctx.beginPath(); ctx.moveTo(sx - 13, ly); ctx.lineTo(sx + 13, ly); ctx.stroke();
     }
-    // C#5 sits in the space ABOVE the first ledger — ledger must still be shown
-    if (note.pitch === 'C#5') {
+    // C#5/C5 sits in the space ABOVE the first ledger — ledger must still be shown
+    if (note.pitch === 'C#5' || note.pitch === 'C5') {
       const ly = topLine - LINE_SPACING;
       ctx.beginPath(); ctx.moveTo(sx - 13, ly); ctx.lineTo(sx + 13, ly); ctx.stroke();
     }
@@ -1021,17 +1035,17 @@ function drawHUD() {
   ctx.font = '8px "Press Start 2P"';
   ctx.textAlign = 'left';
   ctx.textBaseline = 'top'; // Standardize the baseline for the top bar
-  ctx.fillText(`SCORE: ${score}`, 10, 20);
+  ctx.fillText(`SCORE: ${score}`, 10, 8);
 
   // Timer (top center)
   ctx.textAlign = 'center';
   ctx.fillStyle = '#aaffaa';
-  ctx.fillText(formatTime(levelComplete || gameOver ? finalTime : elapsedTime), W / 2, 20);
+  ctx.fillText(formatTime(levelComplete || gameOver ? finalTime : elapsedTime), W / 2, 8);
 
   // Note counter (below timer)
   ctx.fillStyle = '#ffe066';
   ctx.font = '7px "Press Start 2P"';
-  ctx.fillText(`NOTE ${Math.min(currentNoteIdx + 1, LEVEL_LENGTH)} / ${LEVEL_LENGTH}`, W / 2, 34);
+  ctx.fillText(`NOTE ${Math.min(currentNoteIdx + 1, LEVEL_LENGTH)} / ${LEVEL_LENGTH}`, W / 2, 22);
 
   // Hearts
   const heartStartX = W - 20;
@@ -1041,19 +1055,19 @@ function drawHUD() {
     const halfHeartsForThis = hearts - (totalHearts - 1 - i) * 2;
     const full = halfHeartsForThis >= 2;
     const half = halfHeartsForThis === 1;
-    drawHeart(hx, 18, full, half);
+    drawHeart(hx, 10, full, half);
   }
 
   // In-game MENU button (below score, top-left)
   if (!gameOver && !levelComplete) {
     const mbW = 60, mbH = 20;
-    const mbX = 10, mbY = 32;
+    const mbX = 10, mbY = 24;
     drawNesButton('MENU', mbX, mbY, mbW, mbH, hoveredBtn === 'MENU_INGAME', false);
     inGameMenuBtn = { x: mbX, y: mbY, w: mbW, h: mbH };
   }
 
   // Note buttons — drawn on canvas, large touch targets
-  if (!gameOver && !levelComplete && !countIn && currentNoteIdx < notes.length) {
+  if (!gameOver && !levelComplete && currentNoteIdx < notes.length) {
     drawNoteButtons();
   }
 }
@@ -1076,6 +1090,8 @@ const HALF_STEPS_BY_KEY = {
     'C#5-D5','D5-C#5',
     'C4-D4','D4-C4',
     'C4-D3','D3-C4',
+    'F4-G4','G4-F4',   // F#→G is a half step in D major too
+    'F3-G3','G3-F3',
   ]),
   'G': new Set([
     'B4-C5','C5-B4',
@@ -1095,6 +1111,7 @@ const HALF_STEPS_BY_KEY = {
     'B3-C4','C4-B3',
     'B3-C3','C3-B3',
     'B2-C3','C3-B2',
+    'B2-C2','C2-B2',
   ]),
   'Bb': new Set([
     // Bb major: E→F (Eb→F is whole), B→C (Bb→C is whole)
@@ -1124,13 +1141,13 @@ function drawNoteButtons() {
   const levelDef = levelSet[currentLevel];
   const rows = levelDef.rows || [levelDef.pitches];
 
-  const r = 22;
+  const r = 25;
   const halfGap = 6;   // gap between half-step circles
   const wholeGap = 20; // gap between whole-step circles (double)
-  const rowH = r * 2 + 10;
+  const rowH = r * 2 + 12;
   const totalRows = rows.length;
 
-  const bottomPad = 14;
+  const bottomPad = 16;
   const gridH = (totalRows - 1) * rowH + r * 2;
   const gridTop = H - bottomPad - gridH;
 
@@ -1796,18 +1813,13 @@ function drawLevelSelectScreen() {
     ctx.textBaseline = 'top';
     ctx.fillText(keySigName, cx + cardW - 10, cy + 10);
 
-    // Range text centred in card
-    if (levelDef) {
-      const p = levelDef.pitches;
-      const keySig = levelDef.keySig || 'D';
-      const loLabel = displayPitch(p[0], keySig) + p[0].replace(/[^0-9]/g,'');
-      const hiLabel = displayPitch(p[p.length-1], keySig) + p[p.length-1].replace(/[^0-9]/g,'');
-      const rangeText = loLabel + ' – ' + hiLabel;
+    // Level title centred in card
+    if (levelDef && levelDef.title) {
       ctx.fillStyle = '#fff';
-      ctx.font = '11px "Press Start 2P"';
+      ctx.font = '9px "Press Start 2P"';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText(rangeText, cx + cardW / 2, cy + cardH / 2 + 4);
+      ctx.fillText(levelDef.title, cx + cardW / 2, cy + cardH / 2 + 4);
     }
 
     levelSelectBtns.push({ level: lvl, x: cx, y: cy, w: cardW, h: cardH });
@@ -2831,7 +2843,43 @@ function resetGame() {
 }
 
 // Focus canvas on load
-window.addEventListener('load', () => { canvas.focus(); });
+window.addEventListener('load', () => {
+  canvas.focus();
+
+  // Generate favicon from violin sprite
+  const fav = document.createElement('canvas');
+  fav.width = 32; fav.height = 32;
+  const fctx = fav.getContext('2d');
+
+  // Dark background
+  fctx.fillStyle = '#0a0a1a';
+  fctx.fillRect(0, 0, 32, 32);
+
+  // Draw SPRITE_VIOLIN at 1px per cell, centred
+  const FIC = {
+    W: '#d4860a', D: '#8b4a00', L: '#f5c84a', N: '#c07020',
+    G: '#cccccc', S: '#3a1a00', I: '#e8a030', C: '#222',
+    B: '#f5f5dc', R: '#8b6914',
+  };
+  const cols = SPRITE_VIOLIN[0].length;
+  const rows = SPRITE_VIOLIN.length;
+  const px = 1;
+  const offX = Math.floor((32 - cols * px) / 2);
+  const offY = Math.floor((32 - rows * px) / 2);
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+      const ch = SPRITE_VIOLIN[row][col];
+      if (ch === '_') continue;
+      fctx.fillStyle = FIC[ch] || '#fff';
+      fctx.fillRect(offX + col * px, offY + row * px, px, px);
+    }
+  }
+
+  const link = document.createElement('link');
+  link.rel = 'icon';
+  link.href = fav.toDataURL('image/png');
+  document.head.appendChild(link);
+});
 </script>
 </body>
 </html>
