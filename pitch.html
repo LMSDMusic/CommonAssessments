@@ -5108,15 +5108,15 @@ function nameStripHTML() {
 // ── HASH ROUTING ─────────────────────────────────────────────────
 function setHash(hash) {
   window._settingHash = true;
-  window.location.hash = hash ? '#pitch/' + hash : '#pitch/';
+  window.location.hash = hash ? '#' + hash : '#';
   setTimeout(function() { window._settingHash = false; }, 50);
 }
 
 function navigateToHash(hash) {
   hash = hash.replace(/^#\/?/, '');
-  // Accept both #pitch/... and bare #ensemble/... (backward compat)
+  // Strip legacy pitch/ prefix for backward compatibility
   if (hash.startsWith('pitch/')) hash = hash.slice(6);
-  if (!hash || hash === 'pitch') { renderHome(); return; }
+  if (!hash) { renderHome(); return; }
   var parts       = hash.split('/');
   var ensembleId  = parts[0];
   var grade       = parts[1];
@@ -5155,7 +5155,7 @@ window.addEventListener('hashchange', function() {
 });
 
 // ── INIT ─────────────────────────────────────────────────────────
-if (window.location.hash && window.location.hash !== '#' && window.location.hash !== '#pitch/') {
+if (window.location.hash && window.location.hash !== '#') {
   navigateToHash(window.location.hash);
 } else {
   renderHome();
