@@ -4611,14 +4611,16 @@ function launchQuiz(folderId, quizId) {
   activeQuiz   = activeFolder.quizzes.find(q => q.id === quizId);
   const quizTitle = (activeFolder.subtitle || '') + ' – ' + (activeQuiz ? activeQuiz.title : '');
   window._preQuizGoFn = function() {
-    showPreQuizConfirm(quizTitle, function() {
-      if (activeEnsemble && activeGrade && activeInstrument) {
-        const qm   = folderId.match(/q([0-9])/);
-        const qnum = qm ? 'q' + qm[1] : folderId;
-        const type = quizId.includes('fingering') ? 'finger' : 'notes';
-        setHash(activeEnsemble.id + '/' + activeGrade + '/' + activeInstrument.id + '/' + qnum + '/' + type);
-      }
-      startQuiz(folderId, quizId);
+    requireProfile(function() {
+      showPreQuizConfirm(quizTitle, function() {
+        if (activeEnsemble && activeGrade && activeInstrument) {
+          const qm   = folderId.match(/q([0-9])/);
+          const qnum = qm ? 'q' + qm[1] : folderId;
+          const type = quizId.includes('fingering') ? 'finger' : 'notes';
+          setHash(activeEnsemble.id + '/' + activeGrade + '/' + activeInstrument.id + '/' + qnum + '/' + type);
+        }
+        startQuiz(folderId, quizId);
+      });
     });
   };
   window._preQuizGoFn();
