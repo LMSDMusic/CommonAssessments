@@ -79,6 +79,41 @@
     <button id="submitBtn">SUBMIT</button>
     <span id="submitStatus"></span>
   </div>
+
+  <!-- Settings panel -->
+  <div id="settingsOverlay" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:100;align-items:center;justify-content:center;">
+    <div id="settingsPanel" style="background:#0a0a1a;border:2px solid #ffe066;padding:20px 24px;width:420px;max-height:90vh;overflow-y:auto;font-family:'Press Start 2P',monospace;color:#ffe066;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <span style="font-size:10px;">SETTINGS</span>
+        <button id="settingsClose" style="background:none;border:1px solid #ffe066;color:#ffe066;font-family:'Press Start 2P',monospace;font-size:8px;padding:4px 8px;cursor:pointer;">CLOSE</button>
+      </div>
+
+      <!-- Input mode -->
+      <div style="margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid #333;">
+        <div style="font-size:8px;color:#aaddff;margin-bottom:8px;">INPUT MODE</div>
+        <div style="display:flex;gap:10px;">
+          <button class="mode-btn" id="modeNoteNames" onclick="setInputMode('noteNames')" style="flex:1;padding:8px;font-family:'Press Start 2P',monospace;font-size:7px;cursor:pointer;">NOTE NAMES</button>
+          <button class="mode-btn" id="modeMic" onclick="setInputMode('mic')" style="flex:1;padding:8px;font-family:'Press Start 2P',monospace;font-size:7px;cursor:pointer;">MIC</button>
+        </div>
+      </div>
+
+      <!-- YIN params — only visible in mic mode -->
+      <div id="micParams">
+        <!-- Meter -->
+        <div style="margin-bottom:14px;">
+          <div style="font-size:8px;color:#aaddff;margin-bottom:6px;">SIGNAL METER</div>
+          <canvas id="meterCanvas" width="372" height="60" style="width:100%;border:1px solid #333;background:#000;display:block;"></canvas>
+          <div style="display:flex;justify-content:space-between;margin-top:4px;">
+            <span id="meterFreq" style="font-size:7px;color:#44ff88;">-- Hz</span>
+            <span id="meterNote" style="font-size:9px;color:#ffe066;font-weight:bold;">--</span>
+            <span id="meterRms" style="font-size:7px;color:#aaddff;">RMS: --</span>
+          </div>
+        </div>
+        <div style="font-size:8px;color:#aaddff;margin-bottom:10px;">YIN PARAMETERS</div>
+        <div id="settingsFields"></div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -146,6 +181,360 @@ playerNameInput.addEventListener('keydown', (e) => {
   if (e.key === 'Enter') { e.stopPropagation(); submitBtn.click(); }
 });
 
+
+// ─── SETTINGS & INPUT MODE ────────────────────────────────────────────────────
+let inputMode = 'noteNames'; // 'noteNames' | 'mic'
+let malletOctave = 'high';   // 'high' | 'low' — only used for Mallet Percussion
+
+const MIC_SETTINGS = {
+  yinThreshold:    { label: 'YIN threshold',      value: 0.15,  min: 0.05, max: 0.50, step: 0.01 },
+  minFreq:         { label: 'Min frequency (Hz)',  value: 60,    min: 30,   max: 300,  step: 1    },
+  maxFreq:         { label: 'Max frequency (Hz)',  value: 1200,  min: 300,  max: 4000, step: 10   },
+  rmsThreshold:    { label: 'RMS threshold',       value: 0.001, min: 0.001,max: 0.2,  step: 0.001},
+  gateRelease:     { label: 'Gate release (ms)',   value: 10,    min: 10,   max: 1000, step: 10   },
+  medianWindow:    { label: 'Median window',       value: 1,     min: 1,    max: 15,   step: 1    },
+  noteHold:        { label: 'Note hold (ms)',      value: 20,    min: 20,   max: 500,  step: 10   },
+  legatoThreshold: { label: 'Legato threshold (st)',value: 0.7,  min: 0.1,  max: 2.0,  step: 0.05 },
+  a4ref:           { label: 'A4 reference (Hz)',   value: 440,   min: 415,  max: 466,  step: 0.5  },
+  transpose:       { label: 'Transpose (st)',      value: 0,     min: -12,  max: 12,   step: 1    },
+};
+
+function buildSettingsFields() {
+  const container = document.getElementById('settingsFields');
+  container.innerHTML = '';
+  Object.entries(MIC_SETTINGS).forEach(([key, s]) => {
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;margin-bottom:8px;gap:10px;';
+    row.innerHTML = `
+      <label style="flex:1;font-size:7px;color:#fff;">${s.label}</label>
+      <input type="range" min="${s.min}" max="${s.max}" step="${s.step}" value="${s.value}"
+        style="flex:1;" oninput="MIC_SETTINGS['${key}'].value=parseFloat(this.value);document.getElementById('sv_${key}').textContent=this.value;">
+      <span id="sv_${key}" style="font-size:7px;min-width:40px;text-align:right;color:#aaffaa;">${s.value}</span>
+    `;
+    container.appendChild(row);
+  });
+}
+
+function updateModeButtons() {
+  document.getElementById('modeNoteNames').style.cssText +=
+    inputMode === 'noteNames' ? ';background:#ffe066;color:#000;border:none;' : ';background:#1a1a3a;color:#fff;border:1px solid #ffe066;';
+  document.getElementById('modeMic').style.cssText +=
+    inputMode === 'mic' ? ';background:#ffe066;color:#000;border:none;' : ';background:#1a1a3a;color:#fff;border:1px solid #ffe066;';
+  document.getElementById('micParams').style.display = inputMode === 'mic' ? 'block' : 'none';
+}
+
+function setInputMode(mode) {
+  inputMode = mode;
+  updateModeButtons();
+  if (mode === 'mic') startMicPipeline();
+  else stopMicPipeline();
+}
+
+function openSettings() {
+  buildSettingsFields();
+  updateModeButtons();
+  document.getElementById('settingsOverlay').style.display = 'flex';
+}
+document.getElementById('settingsClose').addEventListener('click', () => {
+  document.getElementById('settingsOverlay').style.display = 'none';
+});
+
+// ─── MIC METER ───────────────────────────────────────────────────────────────
+let meterWaveform = new Float32Array(372); // one sample per pixel
+let meterWavePos = 0;
+let meterRmsVal = 0;
+let meterAnimFrame = null;
+
+function updateMeterLoop() {
+  if (!micActive) return;
+  const canvas = document.getElementById('meterCanvas');
+  if (!canvas) { meterAnimFrame = requestAnimationFrame(updateMeterLoop); return; }
+  const mctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+
+  mctx.fillStyle = '#000';
+  mctx.fillRect(0, 0, W, H);
+
+  // RMS bar background
+  mctx.fillStyle = '#111';
+  mctx.fillRect(0, H - 10, W, 10);
+
+  // RMS bar
+  const rmsNorm = Math.min(1, meterRmsVal / 0.5);
+  const rmsColor = rmsNorm < MIC_SETTINGS.rmsThreshold.value / 0.5 ? '#555' : '#44ff88';
+  mctx.fillStyle = rmsColor;
+  mctx.fillRect(0, H - 10, Math.floor(rmsNorm * W), 10);
+
+  // Waveform
+  mctx.strokeStyle = '#44ff88';
+  mctx.lineWidth = 1;
+  mctx.beginPath();
+  const wH = H - 12;
+  for (let i = 0; i < W; i++) {
+    const idx = (meterWavePos + i) % W;
+    const y = (1 - (meterWaveform[idx] + 1) / 2) * wH;
+    if (i === 0) mctx.moveTo(i, y); else mctx.lineTo(i, y);
+  }
+  mctx.stroke();
+
+  // Threshold line
+  const threshY = (1 - MIC_SETTINGS.rmsThreshold.value / 0.5) * wH;
+  mctx.strokeStyle = '#ff4444';
+  mctx.setLineDash([4, 4]);
+  mctx.beginPath();
+  mctx.moveTo(0, H - 10 - (MIC_SETTINGS.rmsThreshold.value / 0.5) * 10);
+  mctx.lineTo(W, H - 10 - (MIC_SETTINGS.rmsThreshold.value / 0.5) * 10);
+  mctx.stroke();
+  mctx.setLineDash([]);
+
+  // Update text readouts
+  const freqEl = document.getElementById('meterFreq');
+  const noteEl = document.getElementById('meterNote');
+  const rmsEl  = document.getElementById('meterRms');
+  if (freqEl) freqEl.textContent = detectedPitch ? detectedPitch.toFixed(1) + ' Hz' : '-- Hz';
+  if (noteEl) noteEl.textContent = rawDetectedNote || '--';
+  if (rmsEl)  rmsEl.textContent  = 'RMS: ' + meterRmsVal.toFixed(3);
+
+  meterAnimFrame = requestAnimationFrame(updateMeterLoop);
+}
+
+// ─── YIN PITCH DETECTION ──────────────────────────────────────────────────────
+let micStream = null;
+let micSource = null;
+let micProcessor = null;
+let micActive = false;
+let detectedPitch = null;   // Hz or null
+let detectedNote = null;    // closest game pitch or null
+let rawDetectedNote = null; // chromatic note name always shown in meter
+let lastDetectedNote = null;
+let noteHoldTimer = null;
+let gateTimer = null;
+let pitchHistory = [];      // median filter buffer
+
+function yinDetect(buf, sampleRate) {
+  const threshold = MIC_SETTINGS.yinThreshold.value;
+  const N = buf.length;
+  const half = Math.floor(N / 2);
+  const diff = new Float32Array(half);
+
+  // Difference function
+  for (let tau = 1; tau < half; tau++) {
+    let s = 0;
+    for (let i = 0; i < half; i++) {
+      const d = buf[i] - buf[i + tau];
+      s += d * d;
+    }
+    diff[tau] = s;
+  }
+
+  // Cumulative mean normalised difference
+  const cmnd = new Float32Array(half);
+  cmnd[0] = 1;
+  let runSum = 0;
+  for (let tau = 1; tau < half; tau++) {
+    runSum += diff[tau];
+    cmnd[tau] = runSum === 0 ? 0 : diff[tau] * tau / runSum;
+  }
+
+  // Absolute threshold — find first dip below threshold
+  let tau = -1;
+  for (let t = 2; t < half; t++) {
+    if (cmnd[t] < threshold) {
+      while (t + 1 < half && cmnd[t + 1] < cmnd[t]) t++;
+      tau = t;
+      break;
+    }
+  }
+  if (tau === -1) return -1;
+
+  // Parabolic interpolation
+  const x0 = tau > 1 ? tau - 1 : tau;
+  const x2 = tau + 1 < half ? tau + 1 : tau;
+  if (x0 === tau) return sampleRate / (tau <= cmnd[x2] ? tau : x2);
+  if (x2 === tau) return sampleRate / tau;
+  const s0 = cmnd[x0], s1 = cmnd[tau], s2 = cmnd[x2];
+  const refined = tau + (s2 - s0) / (2 * (2 * s1 - s2 - s0));
+  return sampleRate / refined;
+}
+
+function rms(buf) {
+  let sum = 0;
+  for (let i = 0; i < buf.length; i++) sum += buf[i] * buf[i];
+  return Math.sqrt(sum / buf.length);
+}
+
+function freqToPitch(freq) {
+  const a4 = MIC_SETTINGS.a4ref.value;
+  const transpose = MIC_SETTINGS.transpose.value;
+  const semitones = 12 * Math.log2(freq / a4) + 69 + transpose;
+  return semitones;
+}
+
+function midiToName(midi) {
+  const names = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+  const octave = Math.floor(midi / 12) - 1;
+  return names[midi % 12] + octave;
+}
+
+// Map a raw detected midi note name to a game pitch string
+function midiNameToGamePitch(midiName) {
+  // Normalise enharmonics and map to game pitch names
+  const enharmonic = {
+    'C#2':'C#2','Db2':'C#2','D#2':'D#2','Eb2':'Eb2',
+    'F#2':'F#2','Gb2':'F#2','G#2':'Ab2','Ab2':'Ab2',
+    'A#2':'Bb2','Bb2':'Bb2',
+    'C#3':'C#3','Db3':'C#3','D#3':'Eb3','Eb3':'Eb3',
+    'F#3':'F#3','Gb3':'F#3','G#3':'Ab3','Ab3':'Ab3',
+    'A#3':'Bb3','Bb3':'Bb3',
+    'C#4':'C#4','Db4':'C#4','D#4':'Eb4','Eb4':'Eb4',
+    'F#4':'F#4','Gb4':'F#4','G#4':'Ab4','Ab4':'Ab4',
+    'A#4':'Bb4','Bb4':'Bb4',
+    'C#5':'C#5','Db5':'C#5','D#5':'Eb5','Eb5':'Eb5',
+    'F#5':'F#5','Gb5':'F#5','G#5':'Ab5','Ab5':'Ab5',
+    'A#5':'Bb5','Bb5':'Bb5',
+  };
+  return enharmonic[midiName] || midiName;
+}
+
+function medianOf(arr) {
+  const s = [...arr].sort((a,b) => a-b);
+  const m = Math.floor(s.length / 2);
+  return s.length % 2 ? s[m] : (s[m-1] + s[m]) / 2;
+}
+
+function onPitchDetected(gamePitch) {
+  if (!micActive || gameState !== 'playing' || gameOver || levelComplete || countIn) return;
+  if (hero.state !== 'idle' && hero.state !== 'bounce') return;
+  if (currentNoteIdx >= notes.length) return;
+
+  const currentNote = notes[currentNoteIdx];
+  if (gamePitch === currentNote.pitch) {
+    resolveInput(true, currentNote);
+  }
+}
+
+// Find the game pitch closest in semitones to a given frequency (diatonic match)
+function closestGamePitch(freq) {
+  const levelDef = getActiveLevelDef();
+  if (!levelDef) return null;
+  // Clarinet: mic hears concert pitch, but we match against written pitches
+  // Use concertPitches (parallel array) for frequency lookup
+  const writtenPitches = levelDef.pitches;
+  const concertPitches = levelDef.concertPitches || writtenPitches;
+  let best = null, bestDist = Infinity;
+  for (let i = 0; i < writtenPitches.length; i++) {
+    const cFreq = NOTE_FREQ[concertPitches[i]] || NOTE_FREQ[writtenPitches[i]];
+    if (!cFreq) continue;
+    const dist = Math.abs(12 * Math.log2(freq / cFreq));
+    if (dist < bestDist) { bestDist = dist; best = writtenPitches[i]; }
+  }
+  return bestDist <= 0.5 ? best : null;
+}
+
+
+
+function processMicAudio(e) {
+  const buf = e.inputBuffer.getChannelData(0);
+  const sRate = e.inputBuffer.sampleRate; // from micAudioCtx
+  const s = MIC_SETTINGS;
+
+  // Gate: silence check
+  // Feed meter waveform (downsample buf to 372 pixels)
+  const step = Math.max(1, Math.floor(buf.length / 372));
+  for (let i = 0; i < 372; i++) {
+    meterWaveform[meterWavePos] = buf[Math.min(i * step, buf.length - 1)];
+    meterWavePos = (meterWavePos + 1) % 372;
+  }
+  meterRmsVal = rms(buf);
+
+  const level = rms(buf);
+  if (level < s.rmsThreshold.value) {
+    clearTimeout(gateTimer);
+    gateTimer = setTimeout(() => {
+      detectedPitch = null;
+      detectedNote = null;
+      rawDetectedNote = null;
+      pitchHistory = [];
+    }, s.gateRelease.value);
+    return;
+  }
+  clearTimeout(gateTimer);
+
+  const freq = yinDetect(buf, sRate);
+  if (freq < s.minFreq.value || freq > s.maxFreq.value || freq < 0) {
+    detectedPitch = null;
+    return;
+  }
+
+  detectedPitch = freq;
+  pitchHistory.push(freq);
+  if (pitchHistory.length > s.medianWindow.value) pitchHistory.shift();
+
+  const smoothed = medianOf(pitchHistory);
+  // Find the closest game pitch by semitone distance
+  const gamePitch = closestGamePitch(smoothed);
+  detectedNote = gamePitch; // closest level pitch (for game logic)
+
+  // Raw chromatic note for meter display — always show what's being played
+  const rawMidi = Math.round(freqToPitch(smoothed));
+  rawDetectedNote = midiToName(rawMidi);
+
+  if (!gamePitch) return;
+
+  const detectedMidi = freqToPitch(smoothed);
+  const prevMidi = lastDetectedNote && NOTE_FREQ[lastDetectedNote]
+    ? freqToPitch(NOTE_FREQ[lastDetectedNote])
+    : -999;
+  const semDelta = Math.abs(detectedMidi - prevMidi);
+
+  if (semDelta >= s.legatoThreshold.value) {
+    lastDetectedNote = gamePitch;
+    clearTimeout(noteHoldTimer);
+    noteHoldTimer = setTimeout(() => {
+      onPitchDetected(gamePitch);
+    }, s.noteHold.value);
+  }
+}
+
+let micAudioCtx = null;
+
+async function startMicPipeline() {
+  if (micActive) return;
+  try {
+    micStream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false }, video: false });
+    micAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    micSource = micAudioCtx.createMediaStreamSource(micStream);
+    micProcessor = micAudioCtx.createScriptProcessor(2048, 1, 1);
+    micProcessor.onaudioprocess = processMicAudio;
+    micSource.connect(micProcessor);
+    // Connect to a silent gain node (not destination) to keep processor alive without feedback
+    const silentGain = micAudioCtx.createGain();
+    silentGain.gain.value = 0;
+    micProcessor.connect(silentGain);
+    silentGain.connect(micAudioCtx.destination);
+    micActive = true;
+    updateMeterLoop();
+  } catch(err) {
+    alert('Microphone access denied or not available.');
+    inputMode = 'noteNames';
+    updateModeButtons();
+  }
+}
+
+function stopMicPipeline() {
+  micActive = false;
+  clearTimeout(gateTimer);
+  clearTimeout(noteHoldTimer);
+  pitchHistory = [];
+  detectedPitch = null;
+  detectedNote = null;
+  lastDetectedNote = null;
+  if (micProcessor) { micProcessor.disconnect(); micProcessor = null; }
+  if (micSource) { micSource.disconnect(); micSource = null; }
+  if (micStream) { micStream.getTracks().forEach(t => t.stop()); micStream = null; }
+  if (micAudioCtx) { micAudioCtx.close(); micAudioCtx = null; }
+}
+
 // ─── CANVAS SETUP ─────────────────────────────────────────────────────────────
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
@@ -176,13 +565,22 @@ const STAFF_BOTTOM = staffLines[4];
 // Lines (bottom→top): E4 G4 B4 D5 F5
 // Spaces (bottom→top): F4 A4 C5 E5
 const NOTE_Y_TREBLE = {
-  'G3': STAFF_BOTTOM + LINE_SPACING * 2.5,      // space below 2nd ledger line below staff
+  // Clarinet low register — below G3 (deep ledger lines)
+  'C3':  STAFF_BOTTOM + LINE_SPACING * 4.5, // space below 4th ledger
+  'D3':  STAFF_BOTTOM + LINE_SPACING * 4.0, // 4th ledger line below staff
+  'E3':  STAFF_BOTTOM + LINE_SPACING * 3.5, // space below 3rd ledger
+  'F3':  STAFF_BOTTOM + LINE_SPACING * 3.0, // 3rd ledger line below staff
+  'Bb3': STAFF_BOTTOM + LINE_SPACING * 1.5, // same position as B3 (space, 1st ledger area)
+  'Ab3': STAFF_BOTTOM + LINE_SPACING * 2.0,  // same position as A3 (flat)
+  'Eb4': STAFF_BOTTOM,                           // same position as E4 (flat, bottom line)
+  'G3': STAFF_BOTTOM + LINE_SPACING * 2.5,  // space below 2nd ledger line below staff
   'A3': STAFF_BOTTOM + LINE_SPACING * 2.0,      // 2nd ledger line below staff
   'B3': STAFF_BOTTOM + LINE_SPACING * 1.5,      // space below 1st ledger line below staff
   'C4': STAFF_BOTTOM + LINE_SPACING * 1.0,      // 1st ledger line below staff
   'D4': STAFF_BOTTOM + LINE_SPACING / 2,        // space below bottom line
   'E4': STAFF_BOTTOM,                            // line 5 (bottom)
   'F4': STAFF_BOTTOM - LINE_SPACING / 2,        // first space
+  'F#4': STAFF_BOTTOM - LINE_SPACING / 2,       // same position (sharp explicit)
   'G4': STAFF_BOTTOM - LINE_SPACING,            // line 4
   'Ab4': STAFF_BOTTOM - LINE_SPACING * 1.5,     // 2nd space (Ab4 = same position as A4)
   'A4': STAFF_BOTTOM - LINE_SPACING * 1.5,      // 2nd space
@@ -230,6 +628,12 @@ const NOTE_Y_ALTO = {
 // Spaces (bottom→top): A2 C3 E3 G3
 // Middle line (staffLines[2]) = D3. Each diatonic step = LINE_SPACING/2 upward.
 const NOTE_Y_BASS = {
+  // Baritone flat notes
+  'Ab2': staffLines[4] - LINE_SPACING * 0.5,  // same space as A2 (Ab = A-flat)
+  'Bb2': staffLines[3],                         // same line as B2 (Bb = B-flat)
+  'Eb3': staffLines[2] - LINE_SPACING * 0.5,  // same space as E3 (Eb = E-flat)
+  'Ab3': staffLines[2] - LINE_SPACING * 2.0,  // same line as A3 (Ab = A-flat)
+  'Bb3': staffLines[2] - LINE_SPACING * 2.5,  // same space as B3 (Bb = B-flat)
   'C2': staffLines[4] + LINE_SPACING * 2.0,   // 2nd ledger line below bass staff
   'D2': staffLines[4] + LINE_SPACING * 1.5,   // space below 1st ledger line below
   'E2': staffLines[4] + LINE_SPACING * 1.0,   // 1st ledger line below bass staff
@@ -252,8 +656,8 @@ const NOTE_Y_BASS = {
 // Returns the correct Y map for the active instrument
 function getNoteYMap() {
   if (selectedInstrument === 'Viola') return NOTE_Y_ALTO;
-  if (selectedInstrument === 'Cello' || selectedInstrument === 'Bass') return NOTE_Y_BASS;
-  return NOTE_Y_TREBLE;
+  if (selectedInstrument === 'Cello' || selectedInstrument === 'Bass' || selectedInstrument === 'Baritone' || selectedInstrument === 'Trombone') return NOTE_Y_BASS;
+  return NOTE_Y_TREBLE; // Violin, Flute, Clarinet, Trumpet use treble clef
 }
 
 // Convenience — Y for a single pitch given current instrument
@@ -360,40 +764,265 @@ const BASS_LEVELS = {
        rows: [['G3','A3','B3','C4','D4'], ['D3','E3','F3'], ['A2','B2','C3'], ['E2','F#2','G2']],
        rowLabels: ['G String', 'D String', 'A String', 'E String'], title: 'All Strings' },
 };
+const ALTO_SAX_LEVELS = {
+  // Alto sax in Eb — sounds major 6th (9 semitones) below written
+  // Written G major → concert Bb major; C major → Eb major; D major → F major
+  1: { pitches: ['G4','A4','B4'],
+       concertPitches: ['Bb3','C4','D4'],
+       tonic: 'G4', keySig: 'G', concertKeySig: 'Bb',
+       rows: [['G4','A4','B4']],
+       rowLabels: ['Upper register'], title: 'G, A, B' },
+  2: { pitches: ['G4','A4','B4','C5','D5'],
+       concertPitches: ['Bb3','C4','D4','Eb4','F4'],
+       tonic: 'G4', keySig: 'G', concertKeySig: 'Bb',
+       rows: [['G4','A4','B4','C5','D5']],
+       rowLabels: ['Upper register'], title: 'G4 – D5' },
+  3: { pitches: ['G4','A4','B4','C5','D5','E5'],
+       concertPitches: ['Bb3','C4','D4','Eb4','F4','G4'],
+       tonic: 'G4', keySig: 'G', concertKeySig: 'Bb',
+       rows: [['E5'], ['G4','A4','B4','C5','D5']],
+       rowLabels: ['High', 'Main register'], title: 'G4 – E5' },
+  4: { pitches: ['G4','A4','B4','C5','D5','E5','F#5'],
+       concertPitches: ['Bb3','C4','D4','Eb4','F4','G4','A4'],
+       tonic: 'G4', keySig: 'G', concertKeySig: 'Bb',
+       rows: [['E5','F#5'], ['G4','A4','B4','C5','D5']],
+       rowLabels: ['High', 'Main register'], title: 'G4 – F#5' },
+  5: { pitches: ['F4','G4','A4','B4','C5','D5','E5','G5'],
+       concertPitches: ['Ab3','Bb3','C4','D4','Eb4','F4','G4','Bb4'],
+       tonic: 'F4', keySig: 'C', concertKeySig: 'Eb',
+       rows: [['E5','G5'], ['F4','G4','A4','B4','C5','D5']],
+       rowLabels: ['High', 'Main register'], title: 'F4 – G5' },
+  6: { pitches: ['F#4','G4','A4','B4','C5','D5','E5','F#5','G5'],
+       concertPitches: ['A3','Bb3','C4','D4','Eb4','F4','G4','A4','Bb4'],
+       tonic: 'F#4', keySig: 'D', concertKeySig: 'F',
+       rows: [['E5','F#5','G5'], ['F#4','G4','A4','B4','C5','D5']],
+       rowLabels: ['High', 'Main register'], title: 'F#4 – G5' },
+};
+
+const MALLET_HIGH_LEVELS = {
+  // Same ranges as flute — treble clef, non-transposing
+  1: { pitches: ['Bb4', 'C5', 'D5'],
+         tonic: 'Bb4', keySig: 'Bb',
+         rows: [['Bb4', 'C5', 'D5']],
+         rowLabels: ['Low register'], title: 'Bb, C, D' },
+  2: { pitches: ['Bb4', 'C5', 'D5', 'Eb5', 'F5'],
+         tonic: 'Bb4', keySig: 'Bb',
+         rows: [['Bb4', 'C5', 'D5', 'Eb5', 'F5']],
+         rowLabels: ['Low register'], title: 'Bb4 – F5' },
+  3: { pitches: ['Bb4', 'C5', 'D5', 'Eb5', 'F5', 'G5'],
+         tonic: 'Bb4', keySig: 'Bb',
+         rows: [['G5'], ['Bb4', 'C5', 'D5', 'Eb5', 'F5']],
+         rowLabels: ['High register', 'Low register'], title: 'Bb4 – G5' },
+  4: { pitches: ['Ab4', 'Bb4', 'C5', 'D5', 'Eb5', 'F5', 'G5', 'Ab5'],
+         tonic: 'Ab4', keySig: 'Bb',
+         rows: [['Ab5'], ['Bb4', 'C5', 'D5', 'Eb5', 'F5', 'G5'], ['Ab4']],
+         rowLabels: ['High register', 'Middle register', 'Low register'], title: 'Ab4 – Ab5' },
+  5: { pitches: ['Ab4', 'Bb4', 'C5', 'D5', 'Eb5', 'F5', 'G5', 'Ab5'],
+         tonic: 'Ab4', keySig: 'Eb',
+         rows: [['Ab5'], ['Bb4', 'C5', 'D5', 'Eb5', 'F5', 'G5'], ['Ab4']],
+         rowLabels: ['High register', 'Middle register', 'Low register'], title: 'Ab4 – Ab5 (Eb)' },
+  6: { pitches: ['Ab4', 'Bb4', 'C5', 'D5', 'Eb5', 'F5', 'G5', 'Ab5', 'Bb5'],
+         tonic: 'Ab4', keySig: 'Bb',
+         rows: [['Ab5', 'Bb5'], ['Bb4', 'C5', 'D5', 'Eb5', 'F5', 'G5'], ['Ab4']],
+         rowLabels: ['High register', 'Middle register', 'Low register'], title: 'Ab4 – Bb5' },
+  7: { pitches: ['Ab4', 'Bb4', 'C5', 'D5', 'Eb5', 'F5', 'G5', 'Ab5', 'Bb5'],
+         tonic: 'Ab4', keySig: 'Eb',
+         rows: [['Ab5', 'Bb5'], ['Bb4', 'C5', 'D5', 'Eb5', 'F5', 'G5'], ['Ab4']],
+         rowLabels: ['High register', 'Middle register', 'Low register'], title: 'Ab4 – Bb5 (Eb)' },
+};
+
+const MALLET_LOW_LEVELS = {
+  // One octave below high levels — treble clef, non-transposing
+  1: { pitches: ['Bb3', 'C4', 'D4'],
+         tonic: 'Bb3', keySig: 'Bb',
+         rows: [['Bb3', 'C4', 'D4']],
+         rowLabels: ['Low register'], title: 'Bb, C, D' },
+  2: { pitches: ['Bb3', 'C4', 'D4', 'Eb4', 'F4'],
+         tonic: 'Bb3', keySig: 'Bb',
+         rows: [['Bb3', 'C4', 'D4', 'Eb4', 'F4']],
+         rowLabels: ['Low register'], title: 'Bb3 – F4' },
+  3: { pitches: ['Bb3', 'C4', 'D4', 'Eb4', 'F4', 'G4'],
+         tonic: 'Bb3', keySig: 'Bb',
+         rows: [['G4'], ['Bb3', 'C4', 'D4', 'Eb4', 'F4']],
+         rowLabels: ['High register', 'Low register'], title: 'Bb3 – G4' },
+  4: { pitches: ['Ab3', 'Bb3', 'C4', 'D4', 'Eb4', 'F4', 'G4', 'Ab4'],
+         tonic: 'Ab3', keySig: 'Bb',
+         rows: [['Ab4'], ['Bb3', 'C4', 'D4', 'Eb4', 'F4', 'G4'], ['Ab3']],
+         rowLabels: ['High register', 'Middle register', 'Low register'], title: 'Ab3 – Ab3' },
+  5: { pitches: ['Ab3', 'Bb3', 'C4', 'D4', 'Eb4', 'F4', 'G4', 'Ab4'],
+         tonic: 'Ab3', keySig: 'Eb',
+         rows: [['Ab4'], ['Bb3', 'C4', 'D4', 'Eb4', 'F4', 'G4'], ['Ab3']],
+         rowLabels: ['High register', 'Middle register', 'Low register'], title: 'Ab3 – Ab3 (Eb)' },
+  6: { pitches: ['Ab3', 'Bb3', 'C4', 'D4', 'Eb4', 'F4', 'G4', 'Ab4', 'Bb4'],
+         tonic: 'Ab3', keySig: 'Bb',
+         rows: [['Ab4', 'Bb4'], ['Bb3', 'C4', 'D4', 'Eb4', 'F4', 'G4'], ['Ab3']],
+         rowLabels: ['High register', 'Middle register', 'Low register'], title: 'Ab3 – Bb3' },
+  7: { pitches: ['Ab3', 'Bb3', 'C4', 'D4', 'Eb4', 'F4', 'G4', 'Ab4', 'Bb4'],
+         tonic: 'Ab3', keySig: 'Eb',
+         rows: [['Ab4', 'Bb4'], ['Bb3', 'C4', 'D4', 'Eb4', 'F4', 'G4'], ['Ab3']],
+         rowLabels: ['High register', 'Middle register', 'Low register'], title: 'Ab3 – Bb3 (Eb)' },
+};
+
+const BARITONE_LEVELS = {
+  // Baritone — non-transposing, bass clef
+  1: { pitches: ['Bb2','C3','D3'],
+       tonic: 'Bb2', keySig: 'Bb',
+       rows: [['Bb2','C3','D3']],
+       rowLabels: ['Low register'], title: 'Bb, C, D' },
+  2: { pitches: ['Bb2','C3','D3','Eb3','F3'],
+       tonic: 'Bb2', keySig: 'Bb',
+       rows: [['Bb2','C3','D3','Eb3','F3']],
+       rowLabels: ['Low register'], title: 'Bb2 – F3' },
+  3: { pitches: ['Bb2','C3','D3','Eb3','F3','G3'],
+       tonic: 'Bb2', keySig: 'Bb',
+       rows: [['G3'], ['Bb2','C3','D3','Eb3','F3']],
+       rowLabels: ['Upper', 'Lower register'], title: 'Bb2 – G3' },
+  4: { pitches: ['A2','Bb2','C3','D3','Eb3','F3','G3','A3'],
+       tonic: 'F2', keySig: 'F',
+       rows: [['G3','A3'], ['A2','Bb2','C3','D3','Eb3','F3']],
+       rowLabels: ['Upper', 'Lower register'], title: 'A2 – A3' },
+  5: { pitches: ['Ab2','Bb2','C3','D3','Eb3','F3','G3','Ab3'],
+       tonic: 'Eb2', keySig: 'Eb',
+       rows: [['G3','Ab3'], ['Ab2','Bb2','C3','D3','Eb3','F3']],
+       rowLabels: ['Upper', 'Lower register'], title: 'Ab2 – Ab3' },
+  6: { pitches: ['Ab2','Bb2','C3','D3','Eb3','F3','G3','Ab3','Bb3'],
+       tonic: 'Eb2', keySig: 'Eb',
+       rows: [['G3','Ab3','Bb3'], ['Ab2','Bb2','C3','D3','Eb3','F3']],
+       rowLabels: ['Upper', 'Lower register'], title: 'Ab2 – Bb3' },
+};
+
+const CLARINET_LEVELS = {
+  // Clarinet in Bb — written pitch is a whole step above concert pitch
+  // 'pitches' = written (shown on staff & buttons); 'concertPitches' = what mic/backing use
+  1: { pitches: ['C4','D4','E4'],
+       concertPitches: ['Bb3','C4','D4'],
+       tonic: 'C4', keySig: 'C', concertKeySig: 'Bb',
+       rows: [['C4','D4','E4']],
+       rowLabels: ['Throat register'], title: 'C, D, E' },
+  2: { pitches: ['C4','D4','E4','F4','G4'],
+       concertPitches: ['Bb3','C4','D4','Eb4','F4'],
+       tonic: 'C4', keySig: 'C', concertKeySig: 'Bb',
+       rows: [['C4','D4','E4','F4','G4']],
+       rowLabels: ['Throat/Upper'], title: 'C4 – G4' },
+  3: { pitches: ['C4','D4','E4','F4','G4','A4'],
+       concertPitches: ['Bb3','C4','D4','Eb4','F4','G4'],
+       tonic: 'C4', keySig: 'C', concertKeySig: 'Bb',
+       rows: [['A4'], ['C4','D4','E4','F4','G4']],
+       rowLabels: ['Upper register', 'Throat register'], title: 'C4 – A4' },
+  4: { pitches: ['C3','D3','E3','F3','G3','A3','Bb3','B3','C4','D4','E4','F4','G4','A4','B4'],
+       concertPitches: ['Bb2','C3','D3','Eb3','F3','G3','Ab3','A3','Bb3','C4','D4','Eb4','F4','G4','A4'],
+       tonic: 'C3', keySig: 'C', concertKeySig: 'Bb',
+       rows: [['A4','B4'], ['C4','D4','E4','F4','G4','A4'], ['C3','D3','E3','F3','G3','A3','Bb3','B3']],
+       rowLabels: ['Upper register', 'Throat register', 'Lower register'], title: 'C3 – B4' },
+  5: { pitches: ['Bb3','C4','D4','E4','F4','G4','A4','Bb4'],
+       concertPitches: ['Ab3','Bb3','C4','D4','Eb4','F4','G4','Ab4'],
+       tonic: 'Bb3', keySig: 'F', concertKeySig: 'C',
+       rows: [['Bb4'], ['Bb3','C4','D4','E4','F4','G4','A4']],
+       rowLabels: ['Upper register', 'Main register'], title: 'Bb3 – Bb4' },
+  6: { pitches: ['Bb3','C4','D4','E4','F4','G4','A4','Bb4','C5'],
+       concertPitches: ['Ab3','Bb3','C4','D4','Eb4','F4','G4','Ab4','Bb4'],
+       tonic: 'Bb3', keySig: 'F', concertKeySig: 'C',
+       rows: [['Bb4','C5'], ['Bb3','C4','D4','E4','F4','G4','A4']],
+       rowLabels: ['Upper register', 'Main register'], title: 'Bb3 – C5' },
+};
+
+const FLUTE_LEVELS = {
+  1: { pitches: ['Bb4','C5','D5'],
+       tonic: 'Bb4', keySig: 'Bb',
+       rows: [['Bb4','C5','D5']],
+       rowLabels: ['Low register'], title: 'Bb, C, D' },
+  2: { pitches: ['Bb4','C5','D5','Eb5','F5'],
+       tonic: 'Bb4', keySig: 'Bb',
+       rows: [['Bb4','C5','D5','Eb5','F5']],
+       rowLabels: ['Low register'], title: 'Bb4 – F5' },
+  3: { pitches: ['Bb4','C5','D5','Eb5','F5','G5'],
+       tonic: 'Bb4', keySig: 'Bb',
+       rows: [['G5'], ['Bb4','C5','D5','Eb5','F5']],
+       rowLabels: ['High register', 'Low register'], title: 'Bb4 – G5' },
+  4: { pitches: ['Ab4','Bb4','C5','D5','Eb5','F5','G5','Ab5'],
+       tonic: 'Ab4', keySig: 'Eb',
+       rows: [['Ab5'], ['Bb4','C5','D5','Eb5','F5','G5'], ['Ab4']],
+       rowLabels: ['High register', 'Middle register', 'Low register'], title: 'Ab4 – Ab5' },
+  5: { pitches: ['Ab4','Bb4','C5','D5','Eb5','F5','G5','Ab5'],
+       tonic: 'Ab4', keySig: 'Eb',
+       rows: [['Ab5'], ['Bb4','C5','D5','Eb5','F5','G5'], ['Ab4']],
+       rowLabels: ['High register', 'Middle register', 'Low register'], title: 'Ab4 – Ab5 (Eb)' },
+  6: { pitches: ['Ab4','Bb4','C5','D5','Eb5','F5','G5','Ab5','Bb5'],
+       tonic: 'Ab4', keySig: 'Bb',
+       rows: [['Ab5','Bb5'], ['Bb4','C5','D5','Eb5','F5','G5'], ['Ab4']],
+       rowLabels: ['High register', 'Middle register', 'Low register'], title: 'Ab4 – Bb5' },
+  7: { pitches: ['Ab4','Bb4','C5','D5','Eb5','F5','G5','Ab5','Bb5'],
+       tonic: 'Ab4', keySig: 'Eb',
+       rows: [['Ab5','Bb5'], ['Bb4','C5','D5','Eb5','F5','G5'], ['Ab4']],
+       rowLabels: ['High register', 'Middle register', 'Low register'], title: 'Ab4 – Bb5 (Eb)' },
+};
+
 // Display names (accidentals implied by D Major key signature)
 // Pitch display — keySig-aware so C4 shows as C in G major and C# in D major
 const PITCH_DISPLAY_D = {
   G2:'G', A2:'A', B2:'B', C3:'C', 'F#2':'F#',
   D3:'D', E3:'E', F3:'F#', G3:'G', A3:'A', B3:'B', C4:'C#', D4:'D',
-  E4:'E', F4:'F#', G4:'G', A4:'A', B4:'B', 'C#5':'C#', D5:'D',
+  E4:'E', F4:'F#', 'F#4':'F#', G4:'G', A4:'A', B4:'B', 'C#5':'C#', D5:'D',
 };
 const PITCH_DISPLAY_G = {
   G2:'G', A2:'A', B2:'B', C3:'C', 'F#2':'F#',
   D3:'D', E3:'E', F3:'F#', G3:'G', A3:'A', B3:'B', C4:'C',
-  D4:'D', E4:'E', F4:'F#', G4:'G', A4:'A', B4:'B', C5:'C', 'C#5':'C', D5:'D',
+  D4:'D', E4:'E', F4:'F#', 'F#4':'F#', G4:'G', A4:'A', B4:'B', C5:'C', 'C#5':'C', D5:'D',
   E5:'E', 'F#5':'F#', G5:'G', A5:'A',
 };
+const PITCH_DISPLAY_Eb = {
+  Ab4:'Ab', Bb4:'Bb', C5:'C', D5:'D', Eb5:'Eb', F5:'F', G5:'G', Ab5:'Ab', Bb5:'Bb',
+  Ab3:'Ab', Bb3:'Bb', C4:'C', D4:'D', Eb4:'Eb', F4:'F', G4:'G',
+  // Baritone bass range
+  Ab2:'Ab', Bb2:'Bb', C3:'C', D3:'D', Eb3:'Eb', F3:'F', G3:'G', A3:'A',
+};
+
 const PITCH_DISPLAY_Bb = {
   Ab4:'Ab', Bb4:'Bb', C5:'C', D5:'D', Eb5:'Eb', F5:'F', G5:'G', Ab5:'Ab', Bb5:'Bb',
+  C4:'C', D4:'D', Eb4:'Eb', F4:'F', G4:'G',
+  // Baritone bass range
+  Ab2:'Ab', Bb2:'Bb', C3:'C', D3:'D', Eb3:'Eb', F3:'F', G3:'G', Ab3:'Ab', Bb3:'Bb', A3:'A',
 };
+const PITCH_DISPLAY_F = {
+  Bb3:'Bb', C4:'C', D4:'D', E4:'E', F4:'F', G4:'G', A4:'A', Bb4:'Bb', C5:'C',
+  C3:'C', D3:'D', E3:'E', F3:'F', G3:'G', A3:'A', B3:'B',
+  // Baritone bass range
+  A2:'A', Bb2:'Bb', C3:'C', D3:'D', Eb3:'Eb', F3:'F', G3:'G',
+};
+
 const PITCH_DISPLAY_C = {
   C2:'C', D2:'D', E2:'E', F2:'F',
   C3:'C', D3:'D', E3:'E', F3:'F', G3:'G', A3:'A', B3:'B',
-  C4:'C', D4:'D', E4:'E', F4:'F', G4:'G', A4:'A', B4:'B',
+  C4:'C', D4:'D', E4:'E', F4:'F', 'F#4':'F#', G4:'G', A4:'A', B4:'B',
   C5:'C', D5:'D', E5:'E', F5:'F', G5:'G', A5:'A', B5:'B',
 };
+// Returns the effective level def for the current game state
+function getActiveLevelDef() {
+  if (ucActive) return getUcLevelDef();
+  return getLevelSet()[currentLevel];
+}
+
 function getLevelSet() {
   if (selectedInstrument === 'Cello') return CELLO_LEVELS;
   if (selectedInstrument === 'Bass')  return BASS_LEVELS;
   if (selectedInstrument === 'Viola') return VIOLA_LEVELS;
+  if (selectedInstrument === 'Flute') return FLUTE_LEVELS;
+  if (selectedInstrument === 'Clarinet')  return CLARINET_LEVELS;
+  if (selectedInstrument === 'Trumpet')   return CLARINET_LEVELS;
+  if (selectedInstrument === 'Baritone')  return BARITONE_LEVELS;
+  if (selectedInstrument === 'Trombone')   return BARITONE_LEVELS;
+  if (selectedInstrument === 'Alto Sax')   return ALTO_SAX_LEVELS;
+  if (selectedInstrument === 'Mallet Perc') return malletOctave === 'high' ? MALLET_HIGH_LEVELS : MALLET_LOW_LEVELS;
   return VIOLIN_LEVELS;
 }
 function getPitchDisplay(pitch) {
-  const levelDef = getLevelSet()[currentLevel];
+  const levelDef = getActiveLevelDef();
   const keySig = levelDef && levelDef.keySig;
   if (keySig === 'Bb') return PITCH_DISPLAY_Bb[pitch] || pitch[0];
+  if (keySig === 'Eb') return PITCH_DISPLAY_Eb[pitch] || pitch[0];
   if (keySig === 'G')  return PITCH_DISPLAY_G[pitch]  || PITCH_DISPLAY_C[pitch] || pitch[0];
   if (keySig === 'C')  return PITCH_DISPLAY_C[pitch]  || pitch[0];
+  if (keySig === 'F')  return PITCH_DISPLAY_F[pitch]  || PITCH_DISPLAY_C[pitch] || pitch[0];
   return PITCH_DISPLAY_D[pitch] || pitch[0];
 }
 // Keep PITCH_DISPLAY as alias for backwards compat in non-dynamic contexts
@@ -404,7 +1033,7 @@ const EXTRA_GAP_AFTER = new Set(['G4', 'G3', 'G2', 'G5']); // gap between G and 
 // ─── AUDIO ────────────────────────────────────────────────────────────────────
 // Frequencies for D4, E4, F#4 etc. (violin/viola) and D3, E3, F#3 etc. (cello)
 const NOTE_FREQ = {
-  'D4': 293.66, 'E4': 329.63, 'F4': 369.99,
+  'D4': 293.66, 'E4': 329.63, 'F4': 349.23, 'F#4': 369.99,
   'G4': 392.00, 'Ab4': 415.30, 'A4': 440.00, 'Bb4': 466.16, 'B4': 493.88,
   'C5': 523.25, 'C#5': 554.37, 'D5': 587.33, 'Eb5': 622.25, 'F5': 698.46,
   'G5': 783.99, 'Ab5': 830.61, 'Bb5': 932.33,
@@ -414,6 +1043,13 @@ const NOTE_FREQ = {
   'C4': 261.63,
   // Cello/Bass level 4 — one octave below violin level 4
   'G2':  98.00, 'A2': 110.00, 'B2': 123.47, 'C3': 130.81,
+  // Baritone / flat-key notes and low mallet
+  'Ab2': 103.83, 'Bb2': 116.54,
+  'Ab3': 207.65, 'Eb4': 311.13,
+  'Eb3': 155.56, 'Ab3': 207.65, 'Bb3': 233.08,
+  // Clarinet concert pitches (written pitch sounds a whole step lower)                              // concert of written C3
+  'Eb3': 155.56, 'Ab3': 207.65, 'Bb3': 233.08, // concert of written F3, Bb3, C4
+  'Eb4': 311.13,                              // concert of written F4
   // Level 6 additions
   'E5': 659.25, 'F#5': 739.99, 'A5': 880.00,   // Violin level 6
   'D3': 146.83,                                   // Viola level 6 (D3 in alto context)
@@ -429,7 +1065,14 @@ function getAudioCtx() {
 }
 
 function playNoteSound(pitch, big = false) {
-  const freq = NOTE_FREQ[pitch];
+  // Clarinet is transposing — play concert pitch (written pitch - 1 whole step)
+  const levelDef = getLevelSet()[currentLevel];
+  let soundPitch = pitch;
+  if (levelDef && levelDef.concertPitches) {
+    const idx = levelDef.pitches.indexOf(pitch);
+    if (idx >= 0) soundPitch = levelDef.concertPitches[idx];
+  }
+  const freq = NOTE_FREQ[soundPitch] || NOTE_FREQ[pitch];
   if (!freq) return;
   const ac = getAudioCtx();
 
@@ -474,12 +1117,15 @@ const BACKING_PATTERNS = {
   'D':  [293.66, 440.00, 587.33, 440.00], // D4, A4, D5, A4
   'G':  [196.00, 293.66, 392.00, 293.66], // G3, D4, G4, D4
   'Bb': [233.08, 349.23, 466.16, 349.23], // Bb3, F4, Bb4, F4
+  'Eb': [311.13, 466.16, 622.25, 466.16], // Eb4, Bb4, Eb5, Bb4 (treble)
+  // Note: baritone uses same Eb pattern but getBackingFreqs picks by keySig
   'C':  [261.63, 392.00, 523.25, 392.00], // C4, G4, C5, G4
+  'F':  [174.61, 261.63, 349.23, 261.63], // F3, C4, F4, C4
 };
 
 function getBackingFreqs() {
   const levelDef = getLevelSet()[currentLevel];
-  const keySig = levelDef ? levelDef.keySig : 'D';
+  const keySig = levelDef ? (levelDef.concertKeySig || levelDef.keySig) : 'D';
   return BACKING_PATTERNS[keySig] || BACKING_PATTERNS['D'];
 }
 
@@ -489,6 +1135,34 @@ let nextNoteTime     = 0;
 let backingInterval  = null;
 let currentBackingFreqs = BACKING_PATTERNS['D'];
 let floatingLabels = []; // Array to hold {x, y, text, color, vx, vy, life}	
+
+function playClickSound(beat, time) {
+  // Percussive tick-tock — white noise burst, no pitch, won't interfere with mic
+  const ac = getAudioCtx();
+  const bufSize = Math.floor(ac.sampleRate * 0.03);
+  const buf = ac.createBuffer(1, bufSize, ac.sampleRate);
+  const data = buf.getChannelData(0);
+  for (let i = 0; i < bufSize; i++) data[i] = (Math.random() * 2 - 1);
+
+  const source = ac.createBufferSource();
+  source.buffer = buf;
+
+  // Bandpass — higher for tick (beat 1), lower for tock (beat 2)
+  const bp = ac.createBiquadFilter();
+  bp.type = 'bandpass';
+  bp.frequency.value = beat === 0 ? 2200 : 1100;
+  bp.Q.value = 0.8;
+
+  const gain = ac.createGain();
+  gain.gain.setValueAtTime(beat === 0 ? 0.5 : 0.3, time);
+  gain.gain.exponentialRampToValueAtTime(0.0001, time + 0.025);
+
+  source.connect(bp);
+  bp.connect(gain);
+  gain.connect(ac.destination);
+  source.start(time);
+  source.stop(time + 0.03);
+}
 
 function scheduleBackingNote(freq, time) {
   const ac = getAudioCtx();
@@ -546,7 +1220,8 @@ function isOnBeat() {
   const phase = now - lastBeat;               // 0 = right on the beat, EIGHTH_DUR = next beat
   // Distance to nearest beat (could be the last or the upcoming one)
   const distToNearest = Math.min(phase, EIGHTH_DUR - phase);
-  const tolerance = EIGHTH_DUR * 0.12;        // ±12% of an eighth note = tighter window for bonus
+  // Mic mode needs a wider window to account for audio buffer + noteHold latency (~66ms)
+  const tolerance = EIGHTH_DUR * (inputMode === 'mic' ? 0.35 : 0.12);
   return distToNearest < tolerance;
 }
 
@@ -554,6 +1229,86 @@ function isOnBeat() {
 const NOTE_SPACING = 104; // horizontal pixels between notes
 const CLEF_WIDTH = 138;  // space reserved for clef + key sig
 const LEVEL_LENGTH = 25;
+const UC_LEVEL = 'UC'; // sentinel key for Ultimate Challenge
+
+// Ultimate Challenge state
+let ucActive = false;          // true when UC mode is running
+let ucStageIdx = 0;            // index into ucStages[]
+let ucStages = [];             // ordered level keys to progress through
+let ucWindow = [];             // recent 7 answer results: true/false
+let ucNoteCount = 0;           // notes answered so far in UC
+let ucBeatGame = false;        // true when player hits 100,000 pts
+let ucBeatAnimT = 0;           // animation timer for beat-game screen
+const UC_TARGET = 100000;      // score goal
+const UC_WINDOW_SIZE = 7;      // rolling window size
+const UC_PASS_THRESHOLD = 6;   // correct needed to advance stage
+
+const STRING_INSTRUMENTS = new Set(['Violin','Viola','Cello','Bass']);
+function isStringInstrument() { return STRING_INSTRUMENTS.has(selectedInstrument); }
+
+function getUcStages() {
+  // Strings: levels 1,2,3,5,7  Band/perc: all levels 1–N
+  const levelSet = getLevelSet();
+  const allNums = Object.keys(levelSet).map(Number).sort((a,b)=>a-b);
+  if (isStringInstrument()) {
+    return [1,2,3,5,7].filter(n => levelSet[n]);
+  }
+  return allNums;
+}
+
+// Get the active pitch pool for UC (combined pitches of current + all previous stages)
+function getUcPitches() {
+  const levelSet = getLevelSet();
+  const stageKey = ucStages[ucStageIdx];
+  // Use pitches from the current stage level
+  return levelSet[stageKey] ? levelSet[stageKey].pitches : levelSet[ucStages[0]].pitches;
+}
+
+// Get UC level def (for display, clef, key sig etc.) — mirrors current stage
+function getUcLevelDef() {
+  const levelSet = getLevelSet();
+  return levelSet[ucStages[ucStageIdx]] || levelSet[ucStages[0]];
+}
+
+// Returns semitone distance between two pitches using NOTE_FREQ
+// Falls back to a large number if either pitch is not in NOTE_FREQ
+function semitoneDist(pitchA, pitchB) {
+  const fA = NOTE_FREQ[pitchA];
+  const fB = NOTE_FREQ[pitchB];
+  if (!fA || !fB) return 0; // unknown — allow it
+  return Math.abs(12 * Math.log2(fA / fB));
+}
+
+// Filter a pitch list to those within a 5th (7 semitones) of lastPitch
+// Uses 7.01 to handle floating point precision (e.g. A4 from D4 = exactly 7.0)
+// Falls back to closest available if nothing qualifies
+function filterByInterval(pitches, lastPitch, maxSemitones) {
+  if (!lastPitch) return pitches.filter(p => p !== lastPitch);
+  const near = pitches.filter(p => p !== lastPitch && semitoneDist(p, lastPitch) <= maxSemitones + 0.01);
+  if (near.length > 0) return near;
+  // Fallback: pick the closest pitch(es) to lastPitch
+  const withDist = pitches.filter(p => p !== lastPitch)
+    .map(p => ({ p, d: semitoneDist(p, lastPitch) }))
+    .sort((a, b) => a.d - b.d);
+  if (withDist.length === 0) return pitches;
+  // Return all pitches tied for the minimum distance
+  const minDist = withDist[0].d;
+  return withDist.filter(x => x.d <= minDist + 0.5).map(x => x.p);
+}
+
+function generateUcNote(lastPitch) {
+  const pitches = getUcPitches();
+  const pool = filterByInterval(pitches, lastPitch, 7);
+  const pitch = pool[Math.floor(Math.random() * pool.length)];
+  const idx = (notes.length);
+  return {
+    pitch,
+    name: pitch[0],
+    x: CLEF_WIDTH + 70 + idx * NOTE_SPACING,
+    y: getNoteY(pitch),
+    answered: false,
+  };
+}
 
 function generateLevel() {
   const levelSet = getLevelSet();
@@ -565,16 +1320,26 @@ function generateLevel() {
   for (let i = 0; i < LEVEL_LENGTH; i++) {
     let pitch;
     if (i === LEVEL_LENGTH - 1) {
-      // Last note must be the tonic
-      pitch = lastPitch === tonic
-        ? pitches.filter(p => p !== tonic)[Math.floor(Math.random() * (pitches.length - 1))]
-        : tonic;
+      // Last note must be tonic — but only if it's within a 5th; else pick closest to tonic
+      if (lastPitch === tonic) {
+        const alt = filterByInterval(pitches.filter(p => p !== tonic), lastPitch, 7);
+        pitch = alt[Math.floor(Math.random() * alt.length)];
+      } else if (semitoneDist(lastPitch, tonic) <= 7.01) {
+        pitch = tonic;
+      } else {
+        // Tonic is too far — step toward it (pick closest available to tonic)
+        const sorted = pitches.filter(p => p !== lastPitch)
+          .map(p => ({ p, d: semitoneDist(p, tonic) }))
+          .sort((a, b) => a.d - b.d);
+        pitch = sorted[0] ? sorted[0].p : tonic;
+      }
     } else if (i === LEVEL_LENGTH - 2) {
       // Second-to-last must not be the tonic
-      const available = pitches.filter(p => p !== lastPitch && p !== tonic);
+      const base = pitches.filter(p => p !== tonic);
+      const available = filterByInterval(base, lastPitch, 7);
       pitch = available[Math.floor(Math.random() * available.length)];
     } else {
-      const available = pitches.filter(p => p !== lastPitch);
+      const available = filterByInterval(pitches, lastPitch, 7);
       pitch = available[Math.floor(Math.random() * available.length)];
     }
     lastPitch = pitch;
@@ -600,8 +1365,12 @@ let devLevelBtns = [];    // hit-test rects for dev level buttons
 let levelSelectBtns = []; // hit-test rects for level select cards
 let levelSelectBackBtn = null;
 let otherLevelsBtn = null;  // level preview 'Other Levels' button
+let settingsBtn = null;
+let octaveHighBtn = null;
+let octaveLowBtn = null;
+let octaveBackBtn = null;
 
-const INSTRUMENTS = ['Violin', 'Viola', 'Cello', 'Bass'];
+const INSTRUMENTS = ['Violin', 'Viola', 'Cello', 'Bass', 'Flute', 'Clarinet', 'Trumpet', 'Baritone', 'Alto Sax', 'Trombone', 'Mallet Perc'];
 let instrBtns = [];
 let startBtn = null;
 let menuBtn = null;       // level complete screen
@@ -639,7 +1408,7 @@ const HERO_W = 18, HERO_H = 36;
 const HERO_GAP = 12; // px above the notehead centre
 
 // For notes below the staff, land the hero on the bottom staff line instead
-const BELOW_STAFF_TREBLE = new Set(['G3','A3','B3','C4']);
+const BELOW_STAFF_TREBLE = new Set(['G3','A3','B3','Bb3','C4','C3','D3','E3','F3']);
 const BELOW_STAFF_ALTO   = new Set(['C3','D3']);
 const BELOW_STAFF_BASS   = new Set(['C2','D2','E2']);
 
@@ -647,10 +1416,10 @@ function heroLandingY(note) {
   let belowStaff = false;
   if (selectedInstrument === 'Viola') {
     belowStaff = BELOW_STAFF_ALTO.has(note.pitch);
-  } else if (selectedInstrument === 'Cello' || selectedInstrument === 'Bass') {
+  } else if (selectedInstrument === 'Cello' || selectedInstrument === 'Bass' || selectedInstrument === 'Baritone' || selectedInstrument === 'Trombone') {
     belowStaff = BELOW_STAFF_BASS.has(note.pitch);
   } else {
-    belowStaff = BELOW_STAFF_TREBLE.has(note.pitch);
+    belowStaff = BELOW_STAFF_TREBLE.has(note.pitch); // Violin and Flute
   }
   return belowStaff ? staffLines[4] : note.y;
 }
@@ -837,14 +1606,14 @@ function drawBassClef(x) {
 
 function drawClef(x) {
   if (selectedInstrument === 'Viola') drawAltoClef(x);
-  else if (selectedInstrument === 'Cello' || selectedInstrument === 'Bass') drawBassClef(x);
+  else if (selectedInstrument === 'Cello' || selectedInstrument === 'Bass' || selectedInstrument === 'Baritone' || selectedInstrument === 'Trombone') drawBassClef(x);
   else drawTrebleClef(x);
 }
 
 // ─── KEY SIGNATURE ────────────────────────────────────────────────────────────
 // D Major (levels 1-3): F# and C#. G Major (violin level 4): F# only. Bb Major (flute): Bb and Eb.
 function drawKeySignature(x) {
-  const levelDef = getLevelSet()[currentLevel];
+  const levelDef = getActiveLevelDef();
   const keySig = levelDef ? levelDef.keySig : 'D';
   ctx.save();
   ctx.fillStyle = '#ffe066';
@@ -854,6 +1623,20 @@ function drawKeySignature(x) {
 
   if (keySig === 'C') {
     // C major — no sharps or flats, draw nothing
+  } else if (keySig === 'F') {
+    // F major — one flat (Bb) on treble clef middle line
+    if (selectedInstrument === 'Viola') {
+      ctx.fillText('♭', x, staffLines[2] + LINE_SPACING * 0.75); // Bb in alto
+    } else if (selectedInstrument === 'Cello' || selectedInstrument === 'Bass') {
+      ctx.fillText('♭', x, staffLines[2] + LINE_SPACING * 0.9); // Bb in bass
+    } else {
+      ctx.fillText('♭', x, staffLines[2] + LINE_SPACING * 0.75); // Bb in treble
+    }
+  } else if (keySig === 'Eb') {
+    // Eb major — 3 flats: Bb, Eb, Ab (treble clef)
+    ctx.fillText('♭', x,      staffLines[2] + LINE_SPACING * 0.75); // Bb (B4 line)
+    ctx.fillText('♭', x + 14, staffLines[0] + LINE_SPACING * 0.5);  // Eb (top space)
+    ctx.fillText('♭', x + 28, staffLines[2] + LINE_SPACING * 0.5);  // Ab (2nd space)
   } else if (keySig === 'Bb') {
     // Treble clef Bb major: Bb on middle line (staffLines[2]), Eb on top space (staffLines[0]+LS*0.5)
     ctx.fillText('♭', x,      staffLines[2] + LINE_SPACING * 0.75); // Bb
@@ -861,10 +1644,24 @@ function drawKeySignature(x) {
   } else if (selectedInstrument === 'Viola') {
     ctx.fillText('♯', x,      staffLines[0] + LINE_SPACING * 0.9); // F#
     if (keySig !== 'G') ctx.fillText('♯', x + 14, staffLines[2] - LINE_SPACING * 0.1 + LINE_SPACING * 0.6); // C#
-  } else if (selectedInstrument === 'Cello' || selectedInstrument === 'Bass') {
-    // Bass clef: F# on 4th line (staffLines[1]), C# on middle line only for D major
-    ctx.fillText('♯', x,      staffLines[1] + LINE_SPACING * 0.57); // F# always
-    if (keySig !== 'G') ctx.fillText('♯', x + 15, staffLines[2] + LINE_SPACING * 0.9); // C# only D major
+  } else if (selectedInstrument === 'Cello' || selectedInstrument === 'Bass' || selectedInstrument === 'Baritone') {
+    if (keySig === 'Bb') {
+      // Bass clef Bb major: Bb on 2nd line, Eb on 4th line
+      ctx.fillText('♭', x,      staffLines[3] + LINE_SPACING * 0.75); // Bb
+      ctx.fillText('♭', x + 14, staffLines[1] + LINE_SPACING * 0.75); // Eb
+    } else if (keySig === 'Eb') {
+      // Bass clef Eb major: Bb, Eb, Ab
+      ctx.fillText('♭', x,      staffLines[3] + LINE_SPACING * 0.75); // Bb
+      ctx.fillText('♭', x + 14, staffLines[1] + LINE_SPACING * 0.75); // Eb
+      ctx.fillText('♭', x + 28, staffLines[3] + LINE_SPACING * 0.5);  // Ab
+    } else if (keySig === 'F') {
+      // Bass clef F major: Bb on 2nd line
+      ctx.fillText('♭', x,      staffLines[3] + LINE_SPACING * 0.75); // Bb
+    } else {
+      // Bass clef sharps (D/G major for cello/bass)
+      ctx.fillText('♯', x,      staffLines[1] + LINE_SPACING * 0.57); // F# always
+      if (keySig !== 'G') ctx.fillText('♯', x + 15, staffLines[2] + LINE_SPACING * 0.9); // C# only D major
+    }
   } else {
     // Treble clef sharps
     ctx.fillText('♯', x,      staffLines[0] + LINE_SPACING * 0.4); // F#
@@ -880,45 +1677,50 @@ function drawNote(note, camX) {
   if (sx < -30 || sx > W + 30) return;
 
   // Ledger lines below staff for violin level 4 (G3, A3, B3, C4)
-  if (selectedInstrument === 'Violin' || selectedInstrument === null || (!['Viola','Cello','Bass'].includes(selectedInstrument))) {
+  if (selectedInstrument === 'Violin' || selectedInstrument === 'Flute' || selectedInstrument === 'Clarinet' || selectedInstrument === null || (!['Viola','Cello','Bass','Flute','Clarinet','Baritone','Trumpet','Trombone','Alto Sax'].includes(selectedInstrument))) {
     const bottomLine = staffLines[4]; // E4 line
     const col = note.answered ? '#555' : '#ffe066';
     ctx.strokeStyle = col;
     ctx.lineWidth = 1.5;
-    // C4 sits ON the first ledger line below
-    if (note.pitch === 'C4') {
-      const ly = bottomLine + LINE_SPACING;
-      ctx.beginPath(); ctx.moveTo(sx - 13, ly); ctx.lineTo(sx + 13, ly); ctx.stroke();
+    const LL = LINE_SPACING;
+    // Draw ledger lines based on how far below the staff the note sits
+    if (['C4','B3','Bb3'].includes(note.pitch)) {
+      ctx.beginPath(); ctx.moveTo(sx-13, bottomLine+LL); ctx.lineTo(sx+13, bottomLine+LL); ctx.stroke();
     }
-    // B3 sits in the space below the first ledger — ledger must still be shown
-    if (note.pitch === 'B3') {
-      const ly = bottomLine + LINE_SPACING;
-      ctx.beginPath(); ctx.moveTo(sx - 13, ly); ctx.lineTo(sx + 13, ly); ctx.stroke();
+    if (['A3'].includes(note.pitch)) {
+      ctx.beginPath(); ctx.moveTo(sx-13, bottomLine+LL);   ctx.lineTo(sx+13, bottomLine+LL);   ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(sx-13, bottomLine+LL*2); ctx.lineTo(sx+13, bottomLine+LL*2); ctx.stroke();
     }
-    // A3 sits ON the second ledger line below — draw both ledgers
-    if (note.pitch === 'A3') {
-      const ly1 = bottomLine + LINE_SPACING;
-      const ly2 = bottomLine + LINE_SPACING * 2;
-      ctx.beginPath(); ctx.moveTo(sx - 13, ly1); ctx.lineTo(sx + 13, ly1); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(sx - 13, ly2); ctx.lineTo(sx + 13, ly2); ctx.stroke();
+    if (['G3'].includes(note.pitch)) {
+      ctx.beginPath(); ctx.moveTo(sx-13, bottomLine+LL);   ctx.lineTo(sx+13, bottomLine+LL);   ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(sx-13, bottomLine+LL*2); ctx.lineTo(sx+13, bottomLine+LL*2); ctx.stroke();
     }
-    // G3 sits in the space below the second ledger — draw both ledgers
-    if (note.pitch === 'G3') {
-      const ly1 = bottomLine + LINE_SPACING;
-      const ly2 = bottomLine + LINE_SPACING * 2;
-      ctx.beginPath(); ctx.moveTo(sx - 13, ly1); ctx.lineTo(sx + 13, ly1); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(sx - 13, ly2); ctx.lineTo(sx + 13, ly2); ctx.stroke();
+    if (['F3'].includes(note.pitch)) {
+      [1,2,3].forEach(n => { ctx.beginPath(); ctx.moveTo(sx-13, bottomLine+LL*n); ctx.lineTo(sx+13, bottomLine+LL*n); ctx.stroke(); });
+    }
+    if (['E3'].includes(note.pitch)) {
+      [1,2,3].forEach(n => { ctx.beginPath(); ctx.moveTo(sx-13, bottomLine+LL*n); ctx.lineTo(sx+13, bottomLine+LL*n); ctx.stroke(); });
+    }
+    if (['D3'].includes(note.pitch)) {
+      [1,2,3,4].forEach(n => { ctx.beginPath(); ctx.moveTo(sx-13, bottomLine+LL*n); ctx.lineTo(sx+13, bottomLine+LL*n); ctx.stroke(); });
+    }
+    if (['C3'].includes(note.pitch)) {
+      [1,2,3,4].forEach(n => { ctx.beginPath(); ctx.moveTo(sx-13, bottomLine+LL*n); ctx.lineTo(sx+13, bottomLine+LL*n); ctx.stroke(); });
     }
   }
 
   // Ledger lines above the treble staff (flute: Ab5/Bb5; violin: A5)
-  if (selectedInstrument === 'Violin') {
+  if (selectedInstrument === 'Violin' || selectedInstrument === 'Flute') {
     const topLine = staffLines[0]; // F5 line
     const col = note.answered ? '#555' : '#ffe066';
     ctx.strokeStyle = col;
     ctx.lineWidth = 1.5;
     const needsLedger1 = ['Ab5','Bb5','A5'].includes(note.pitch);
     if (needsLedger1) {
+      const ly = topLine - LINE_SPACING;
+      ctx.beginPath(); ctx.moveTo(sx - 13, ly); ctx.lineTo(sx + 13, ly); ctx.stroke();
+    }
+    if (note.pitch === 'Bb5') { // Bb5 is in space above 1st ledger — still draw that ledger
       const ly = topLine - LINE_SPACING;
       ctx.beginPath(); ctx.moveTo(sx - 13, ly); ctx.lineTo(sx + 13, ly); ctx.stroke();
     }
@@ -1015,9 +1817,8 @@ function drawNote(note, camX) {
 
 // ─── STAFF DRAWING ────────────────────────────────────────────────────────────
 function drawStaff(camX) {
-  // Staff ends at the double bar line — no line past it
-  const barSx = Math.max(20, DOUBLE_BAR_X - camX); // pinned position (same as drawDoubleBarLine)
-  const staffEnd = barSx + 10; // a few px past the thin bar so it meets cleanly
+  // In UC mode staff runs the full canvas width; otherwise ends at the double bar
+  const staffEnd = ucActive ? W : Math.max(20, DOUBLE_BAR_X - camX) + 10;
   ctx.strokeStyle = '#ffe066';
   ctx.lineWidth = 1.5;
   for (let i = 0; i < 5; i++) {
@@ -1058,6 +1859,16 @@ function drawHUD() {
     drawHeart(hx, 10, full, half);
   }
 
+  // Mic mode indicator
+  if (inputMode === 'mic') {
+    const micColor = micActive ? '#44ff88' : '#ff4444';
+    ctx.fillStyle = micColor;
+    ctx.font = '7px "Press Start 2P"';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    ctx.fillText(detectedNote ? `♪ ${detectedNote}` : '🎤', W / 2, 30);
+  }
+
   // In-game MENU button (below score, top-left)
   if (!gameOver && !levelComplete) {
     const mbW = 60, mbH = 20;
@@ -1067,7 +1878,7 @@ function drawHUD() {
   }
 
   // Note buttons — drawn on canvas, large touch targets
-  if (!gameOver && !levelComplete && currentNoteIdx < notes.length) {
+  if (!gameOver && !levelComplete && currentNoteIdx < notes.length && inputMode === 'noteNames') {
     drawNoteButtons();
   }
 }
@@ -1103,6 +1914,11 @@ const HALF_STEPS_BY_KEY = {
     'F2-G2','G2-F2',
     'F#5-G5','G5-F#5',
   ]),
+  'F': new Set([
+    'E4-F4','F4-E4', 'E3-F3','F3-E3', 'E5-F5','F5-E5',  // E→F half step
+    'B3-C4','C4-B3', 'B4-C5','C5-B4',                    // B→C half step
+    // Baritone F major: no Bb in scale so B→C is half step, E→F half step
+  ]),
   'C': new Set([
     'E4-F4','F4-E4',
     'E3-F3','F3-E3',
@@ -1114,13 +1930,24 @@ const HALF_STEPS_BY_KEY = {
     'B2-C2','C2-B2',
   ]),
   'Bb': new Set([
-    // Bb major: E→F (Eb→F is whole), B→C (Bb→C is whole)
-    // actual half steps: Bb→C is whole, Eb→F is whole, no standard half steps in this range
+    'D5-Eb5','Eb5-D5',   // D→Eb half step in Bb major
+    'D3-Eb3','Eb3-D3',   // baritone bass range
+    'G3-Ab3','Ab3-G3',   // baritone bass range
+    'G5-Ab5','Ab5-G5',   // G→Ab half step in Bb major
+    'G4-Ab4','Ab4-G4',   // lower octave G→Ab
+  ]),
+  'Eb': new Set([
+    'D5-Eb5','Eb5-D5',   // D→Eb half step in Eb major
+    'D3-Eb3','Eb3-D3',   // baritone bass range
+    'G3-Ab3','Ab3-G3',   // baritone bass range
+    'G2-Ab2','Ab2-G2',   // baritone bass range low
+    'G5-Ab5','Ab5-G5',   // G→Ab half step in Eb major
+    'G4-Ab4','Ab4-G4',   // lower octave G→Ab
   ]),
 };
 
 function isHalfStep(pitchA, pitchB) {
-  const levelDef = getLevelSet()[currentLevel];
+  const levelDef = getActiveLevelDef();
   const keySig = levelDef ? levelDef.keySig : 'D';
   const pairs = HALF_STEPS_BY_KEY[keySig];
   return pairs ? pairs.has(pitchA + '-' + pitchB) : false;
@@ -1137,8 +1964,10 @@ function rowXPositions(rowPitches, r, halfGap, wholeGap) {
 }
 
 function drawNoteButtons() {
-  const levelSet = getLevelSet();
-  const levelDef = levelSet[currentLevel];
+  const levelDef = getActiveLevelDef();
+  if (!levelDef) return;
+  // In UC mode, override pitches with current stage pitches but keep rows/rowLabels from that stage
+  // rows and rowLabels come from the stage level def (already getActiveLevelDef)
   const rows = levelDef.rows || [levelDef.pitches];
 
   const r = 25;
@@ -1371,8 +2200,161 @@ const IC = {
   C: '#222',      // chin rest / tailpiece
   B: '#f5f5dc',   // bow hair (cream)
   R: '#8b6914',   // bow stick
+  K: '#1a1a1a',   // clarinet black body
   _: null,
 };
+
+// Alto Sax — ~14 wide × 22 tall, curved brass body with neck curving up
+// W=brass body, D=dark shadow, L=light highlight, G=silver keys, _=empty
+const SPRITE_ALTO_SAX = [
+  '____WWW________',
+  '___WWWWW_______',
+  '___WWWWWW______',
+  '____WWWWWW_____',
+  '_____WWWWWW____',
+  '______WWWWWW___',
+  '_______WWWGWW__',
+  '______WWWGWWW__',
+  '_____WWWWGWWW__',
+  '____WWWWWGWWW__',
+  '___WWWWWWGWWW__',
+  '__WWWWWWWGWWW__',
+  '__WWWWWWWWWWW__',
+  '__WWWWWWWWWWW__',
+  '__WWWWGWWGWWW__',
+  '__WWWWWWWWWWW__',
+  '__WWWWGWWGWWW__',
+  '__WWWWWWWWWWW__',
+  '___WWWWWWWWW___',
+  '_____WWWWWW____',
+  '_______WWWW____',
+  '_________DD____',
+];
+
+// Mallet Percussion — ~16 wide × 16 tall, marimba/xylophone bars with mallets
+// W=wood bars, D=dark shadow, L=light, G=resonator tube, M=mallet head, _=empty
+const SPRITE_MALLET_PERC = [
+  '________________',
+  '_MM___MM___MM___',
+  '_MM___MM___MM___',
+  '__WWWWWWWWWWW___',
+  '__WLWLWLWLWLW___',
+  '__WWWWWWWWWWW___',
+  '_GWWWWWWWWWWWG__',
+  '_GGGGGGGGGGGG___',
+  '_GG_GG_GG_GG____',
+  '__WWWWWWWWWWWW__',
+  '__WLWLWLWLWLWW__',
+  '__WWWWWWWWWWWW__',
+  '_GWWWWWWWWWWWWG_',
+  '_GGGGGGGGGGGGG__',
+  '_GG_GG_GG_GG____',
+  '________________',
+];
+
+// Trombone — ~22 wide × 10 tall, long slide instrument
+// W=brass body, D=dark, L=light, S=slide, _=empty
+const SPRITE_TROMBONE = [
+  '___WWWWWWWWWWWWWWWWWWWW',
+  '_WWWWWWWWWWWWWWWWWWWWWW',
+  'WWWWWWLLLLLLLLLLLLLLLLWW',
+  'WWWWWWWWWWWWWWWWWWWWWWWW',
+  'WWWWWWWWWWWWWWWWWWWWWWWW',
+  'DDWWWWWWWWWWWWWWWWWWWWWW',
+  'DDWWWWWWWWWWWWWWWWWWWWWW',
+  '_WWWWWLLLLLLLLLLLLLLLLWW',
+  '_WWWWWWWWWWWWWWWWWWWWWWW',
+  '___DDWWWWWWWWWWWWWWWDDWW',
+  '_____DDDDDDDDDDDDDDDDD__',
+];
+
+// Baritone — ~14 wide × 24 tall, upright brass with large bell at top
+// W=brass, D=dark shadow, L=light, G=silver valves, S=outline, _=empty
+const SPRITE_BARITONE = [
+  '__WWWWWWWWWWW__',
+  '_WWWWWWWWWWWWW_',
+  '_WDDDDDDDDDDDW_',
+  '_WWWWWWWWWWWWW_',
+  '__WWWWWWWWWWW__',
+  '___WWWWWWWWW___',
+  '____WWGWGWW____',
+  '____WWGWGWW____',
+  '____WWGWGWW____',
+  '____WWWWWWW____',
+  '____WWWWWWW____',
+  '___WWWWWWWWW___',
+  '___WWWWWWWWW___',
+  '___WWWWWWWWW___',
+  '___WWWWWWWWW___',
+  '___WWWWWWWWW___',
+  '____WWWWWWW____',
+  '____WWWWWWW____',
+  '____WWWWWWW____',
+  '___WWWWWWWWW___',
+  '__WWWWWWWWWWW__',
+  '_WWWWWWWWWWWWW_',
+  'WWWWWWWWWWWWWWW',
+  'DDDDDDDDDDDDDDD',
+];
+
+// Trumpet — ~22 wide × 12 tall, brass instrument with bell, valves, tubing
+// W=brass body, D=dark shadow, L=light highlight, G=silver valves, S=dark outline, _=empty
+const SPRITE_TRUMPET = [
+  '____WWWWWWWWWWWWWWWWDD__',
+  '__WWWGGWGGWGGWWWWWWDDDD_',
+  '_WWWGGGWGGGWGGGWWWWWDDLW',
+  'WWWWGGGWGGGWGGGWWWWWWWWW',
+  'WWWWWWWWWWWWWWWWWWWWWWWW',
+  'DWWWWWWWWWWWWWWWWWWWWWWW',
+  'DDWWWWWWWWWWWWWWWWWWWWWW',
+  '_DDWWWWWWWWWWWWWWWWWDDWW',
+  '__DDDWWWWWWWWWWWWWDDDDWW',
+  '____DDDDDDDDDDDDDDDD____',
+  '______WWWWWWWWWW________',
+  '________DDDDDD__________',
+];
+
+// Clarinet — 10 wide × 26 tall, black cylindrical body with silver keys
+// S=dark body, G=silver keys, L=light highlight, C=key ring, K=black body, _=empty
+const SPRITE_CLARINET = [
+  '___KKKK____', // mouthpiece tip
+  '__KKKKKKK__', // barrel
+  '__KKGKKGK__', // register key
+  '__KKKKKKKK_', // upper joint
+  '__KKGKKGKK_', // tone hole
+  '__KKKKKKKK_', // upper joint
+  '__KKGKKGKK_', // tone hole
+  '__KKKKKKKK_', // upper joint
+  '__KKGKKGKK_', // tone hole
+  '__KKKKKKKK_', // bridge
+  '__KKGKKGKK_', // lower joint
+  '__KKKKKKKK_', // lower joint
+  '__KKGKKGKK_', // tone hole
+  '__KKKKKKKK_', // lower joint
+  '__KKGKKGKK_', // tone hole
+  '__KKKKKKKK_', // lower joint
+  '__KKGKKGKK_', // tone hole
+  '__KKKKKKKK_', // bell joint
+  '__KKKKKKKKK', // bell widening
+  '_KKKKKKKKKK', // bell
+  '_KKKKKKKKKK', // bell
+  '__KKKKKKKKK', // bell taper
+  '___KKKKKKK_', // bell end
+  '____KKKKK__', // bell end
+];
+
+// Flute — 20 wide × 8 tall, horizontal silver tube (drawn at PX=2 → 40×16px)
+// Colors: S=dark outline, G=silver body, L=light highlight, C=key pads, _=empty
+const SPRITE_FLUTE = [
+  '____SSSSSSSSSSSSSSSS__',
+  '__SSGGGGGGGGGGGGGGGGSS',
+  'SSGGLGGCGLGCGLGCGLGGSS',
+  'SSGGGGGGGGGGGGGGGGGGSS',
+  'SSGGGGGGGGGGGGGGGGGGSS',
+  'SSGGLGGCGLGCGLGCGLGGSS',
+  '__SSGGGGGGGGGGGGGGGGSS',
+  '____SSSSSSSSSSSSSSSS__',
+];
 
 // Violin — 10 wide × 22 tall (drawn at PX=2 → 20×44px)
 const SPRITE_VIOLIN = [
@@ -1587,6 +2569,8 @@ function drawMiniStaff(instrument, levelDef, staffCX, staffMidY, LS) {
     'C#5': psl[2]-LS*3.5, 'C5': psl[2]-LS*3.5, 'D5': psl[2]-LS*4,
   };
   const pNoteY_bass = {
+    'Ab2': psl[4]-LS*.5, 'Bb2': psl[3],
+    'Eb3': psl[2]-LS*.5, 'Ab3': psl[2]-LS*2, 'Bb3': psl[2]-LS*2.5,
     'C2': psl[4]+LS*2, 'D2': psl[4]+LS*1.5, 'E2': psl[4]+LS, 'F2': psl[4]+LS*.5,
     'F#2': psl[4]+LS*.5, 'G2': psl[4], 'A2': psl[4]-LS*.5, 'B2': psl[3],
     'C3': psl[3]-LS*.5, 'D3': psl[2], 'E3': psl[2]-LS*.5, 'F3': psl[2]-LS,
@@ -1594,7 +2578,7 @@ function drawMiniStaff(instrument, levelDef, staffCX, staffMidY, LS) {
     'C4': psl[2]-LS*3, 'D4': psl[2]-LS*3.5,
   };
   const pNoteY = instrument === 'Viola' ? pNoteY_alto
-               : (instrument === 'Cello' || instrument === 'Bass') ? pNoteY_bass
+               : (instrument === 'Cello' || instrument === 'Bass' || instrument === 'Baritone' || instrument === 'Trombone') ? pNoteY_bass
                : pNoteY_treble;
 
   // Staff geometry
@@ -1715,6 +2699,51 @@ function drawMiniStaff(instrument, levelDef, staffCX, staffMidY, LS) {
   });
 }
 
+// ─── OCTAVE SELECT SCREEN ────────────────────────────────────────────────────
+function drawOctaveSelectScreen() {
+  ctx.fillStyle = '#0a0a1a';
+  ctx.fillRect(0, 0, W, H);
+  for (let sy = 0; sy < H; sy += 4) {
+    ctx.fillStyle = 'rgba(0,0,0,0.18)';
+    ctx.fillRect(0, sy, W, 2);
+  }
+
+  // Title
+  ctx.fillStyle = '#ffe066';
+  ctx.font = '12px "Press Start 2P"';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('MALLET PERCUSSION', W / 2, H / 2 - 90);
+
+  ctx.fillStyle = '#aaddff';
+  ctx.font = '8px "Press Start 2P"';
+  ctx.fillText('CHOOSE YOUR OCTAVE', W / 2, H / 2 - 58);
+
+  // Two large buttons
+  const btnW = 200, btnH = 64, gap = 32;
+  const totalW = btnW * 2 + gap;
+  const startX = W / 2 - totalW / 2;
+  const btnY = H / 2 - 20;
+
+  drawNesButton('HIGH OCTAVE', startX,          btnY, btnW, btnH, hoveredBtn === 'OCTAVE_HIGH', malletOctave === 'high');
+  drawNesButton('LOW OCTAVE',  startX + btnW + gap, btnY, btnW, btnH, hoveredBtn === 'OCTAVE_LOW',  malletOctave === 'low');
+  octaveHighBtn = { x: startX,          y: btnY, w: btnW, h: btnH };
+  octaveLowBtn  = { x: startX + btnW + gap, y: btnY, w: btnW, h: btnH };
+
+  // Range hint below each button
+  ctx.fillStyle = '#888';
+  ctx.font = '6px "Press Start 2P"';
+  ctx.textAlign = 'center';
+  ctx.fillText('Bb4 – Bb5', startX + btnW / 2,           btnY + btnH + 14);
+  ctx.fillText('Bb3 – Bb4', startX + btnW + gap + btnW / 2, btnY + btnH + 14);
+
+  // Back button
+  const bbW = 120, bbH = 28;
+  const bbX = W / 2 - bbW / 2, bbY = H - 50;
+  drawNesButton('BACK', bbX, bbY, bbW, bbH, hoveredBtn === 'OCTAVE_BACK', false);
+  octaveBackBtn = { x: bbX, y: bbY, w: bbW, h: bbH };
+}
+
 // ─── LEVEL SELECT SCREEN ──────────────────────────────────────────────────────
 function displayPitch(pitch, keySig) {
   // Format a pitch name for display given a key signature
@@ -1786,6 +2815,8 @@ function drawLevelSelectScreen() {
     const keySigName = !levelDef ? '' :
       levelDef.keySig === 'G'  ? 'G Major' :
       levelDef.keySig === 'Bb' ? 'Bb Major' :
+      levelDef.keySig === 'Eb' ? 'Eb Major' :
+      levelDef.keySig === 'F'  ? 'F Major'  :
       levelDef.keySig === 'C'  ? 'C Major' : 'D Major';
 
     // Shadow
@@ -1824,6 +2855,31 @@ function drawLevelSelectScreen() {
 
     levelSelectBtns.push({ level: lvl, x: cx, y: cy, w: cardW, h: cardH });
   });
+
+  // Ultimate Challenge card — shown below regular level cards
+  const ucCardW = 460, ucCardH = 54;
+  const ucCardX = W / 2 - ucCardW / 2;
+  const ucCardY = gridY + rows * (cardH + cardGapY) + 8;
+
+  ctx.fillStyle = '#000';
+  ctx.fillRect(ucCardX + 3, ucCardY + 3, ucCardW, ucCardH);
+  ctx.fillStyle = hoveredBtn === 'UC' ? '#2a1a4a' : '#12082a';
+  ctx.fillRect(ucCardX, ucCardY, ucCardW, ucCardH);
+  ctx.strokeStyle = '#ffe066';
+  ctx.lineWidth = 2;
+  // Gold dashed border for UC
+  ctx.setLineDash([6, 3]);
+  ctx.strokeRect(ucCardX, ucCardY, ucCardW, ucCardH);
+  ctx.setLineDash([]);
+  ctx.fillStyle = '#ffe066';
+  ctx.font = '9px "Press Start 2P"';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('★ ULTIMATE CHALLENGE', ucCardX + 14, ucCardY + ucCardH / 2 - 8);
+  ctx.fillStyle = '#aaddff';
+  ctx.font = '6px "Press Start 2P"';
+  ctx.fillText('all levels · progressive · 100,000 pts to win', ucCardX + 14, ucCardY + ucCardH / 2 + 10);
+  levelSelectBtns.push({ level: UC_LEVEL, x: ucCardX, y: ucCardY, w: ucCardW, h: ucCardH });
 
   // Back button
   const bbW = 120, bbH = 30;
@@ -1868,49 +2924,68 @@ function drawTitleScreen() {
   ctx.font = '10px "Press Start 2P"';
   ctx.fillText('CHOOSE YOUR INSTRUMENT', W / 2, 126);
 
-  // ── Row 1: Violin, Viola, Cello, Bass (with sprites) ───────────────────────
+  // ── Instrument cards: Row 1 = strings, Row 2 = winds (matched width) ───────
   instrBtns = [];
-  const btnW = 140, gap = 18;
+  const btnW = 170, gap = 16;
   const padding = 10;
   const labelH = 20;
-  const spriteMap = { Violin: SPRITE_VIOLIN, Viola: SPRITE_VIOLA, Cello: SPRITE_CELLO, Bass: SPRITE_BASS };
+  const spriteMap = { Violin: SPRITE_VIOLIN, Viola: SPRITE_VIOLA, Cello: SPRITE_CELLO, Bass: SPRITE_BASS, Flute: SPRITE_FLUTE, Clarinet: SPRITE_CLARINET, Trumpet: SPRITE_TRUMPET, Baritone: SPRITE_BARITONE, 'Alto Sax': SPRITE_ALTO_SAX, Trombone: SPRITE_TROMBONE, 'Mallet Perc': SPRITE_MALLET_PERC };
+  const strings = ['Violin','Viola','Cello','Bass'];
+  const winds   = ['Flute','Clarinet','Trumpet','Baritone','Alto Sax','Trombone','Mallet Perc'];
+  const windBtnW = Math.floor((strings.length * btnW + (strings.length - 1) * gap - (winds.length - 1) * gap) / winds.length);
   const maxSpriteH = Math.max(...INSTRUMENTS.map(n => spriteMap[n].length * PX));
   const cardH = padding + labelH + padding + maxSpriteH + padding;
-  const row1TotalW = INSTRUMENTS.length * btnW + (INSTRUMENTS.length - 1) * gap;
-  const row1StartX = (W - row1TotalW) / 2;
-  const row1Y = 145;
 
-  INSTRUMENTS.forEach((name, i) => {
-    const bx = row1StartX + i * (btnW + gap);
+  // Row 1 — strings
+  const row1TotalW = strings.length * btnW + (strings.length - 1) * gap;
+  const row1StartX = (W - row1TotalW) / 2;
+  const row1Y = 140;
+
+  // Row 2 — winds (centred)
+  const row2TotalW = winds.length * windBtnW + (winds.length - 1) * gap;
+  const row2StartX = (W - row2TotalW) / 2;
+  const row2Y = row1Y + cardH + 14;
+
+  const allRows = [
+    ...strings.map((name, i) => ({ name, bx: row1StartX + i*(btnW+gap),      by: row1Y, isWind: false })),
+    ...winds.map((name, i)   => ({ name, bx: row2StartX + i*(windBtnW+gap), by: row2Y, isWind: true  })),
+  ];
+
+  allRows.forEach(({ name, bx, by: rowY, isWind }) => {
+    const cardW = isWind ? windBtnW : btnW;
     const hovered = hoveredBtn === name;
     const selected = selectedInstrument === name;
     const sprite = spriteMap[name];
 
     ctx.fillStyle = '#000';
-    ctx.fillRect(bx + 3, row1Y + 3, btnW, cardH);
+    ctx.fillRect(bx + 3, rowY + 3, cardW, cardH);
     ctx.fillStyle = selected ? '#ffe066' : hovered ? '#1e2a5a' : '#1a1a3a';
-    ctx.fillRect(bx, row1Y, btnW, cardH);
+    ctx.fillRect(bx, rowY, cardW, cardH);
     ctx.strokeStyle = selected ? '#fff' : '#ffe066';
     ctx.lineWidth = 2;
-    ctx.strokeRect(bx, row1Y, btnW, cardH);
+    ctx.strokeRect(bx, rowY, cardW, cardH);
 
     ctx.fillStyle = selected ? '#000' : '#fff';
-    ctx.font = '9px "Press Start 2P"';
+    ctx.font = '8px "Press Start 2P"';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
-    ctx.fillText(name, bx + btnW / 2, row1Y + padding);
+    ctx.fillText(name, bx + cardW / 2, rowY + padding);
 
-    const spriteCX = bx + btnW / 2;
-    const spriteCY = row1Y + padding + labelH + padding;
+    const spriteCX = bx + cardW / 2;
+    const spriteCY = rowY + padding + labelH + padding;
     drawInstrumentSprite(sprite, spriteCX, spriteCY);
 
-    instrBtns.push({ label: name, x: bx, y: row1Y, w: btnW, h: cardH });
+    instrBtns.push({ label: name, x: bx, y: rowY, w: cardW, h: cardH });
   });
 
 
   // Coming soon note under locked instruments — none currently
 
-
+  // Settings gear button (top-right)
+  const gearW = 64, gearH = 28;
+  const gearX = W - gearW - 12, gearY = 8;
+  drawNesButton('SETUP', gearX, gearY, gearW, gearH, false, false);
+  settingsBtn = { x: gearX, y: gearY, w: gearW, h: gearH };
 }
 
 // ─── LEVEL PREVIEW SCREEN ────────────────────────────────────────────────────
@@ -1931,11 +3006,13 @@ function drawLevelPreviewScreen() {
 
   ctx.fillStyle = '#aaddff';
   ctx.font = '7px "Press Start 2P"';
-  const clefName = selectedInstrument === 'Viola' ? 'ALTO CLEF' : (selectedInstrument === 'Cello' || selectedInstrument === 'Bass') ? 'BASS CLEF' : 'TREBLE CLEF';
+  const clefName = selectedInstrument === 'Viola' ? 'ALTO CLEF' : (selectedInstrument === 'Cello' || selectedInstrument === 'Bass' || selectedInstrument === 'Baritone' || selectedInstrument === 'Trombone') ? 'BASS CLEF' : 'TREBLE CLEF';
   const _previewLS = getLevelSet()[currentLevel];
   const _keySigName = !_previewLS ? 'D MAJOR' :
     _previewLS.keySig === 'G'  ? 'G MAJOR' :
     _previewLS.keySig === 'Bb' ? 'Bb MAJOR' :
+    _previewLS.keySig === 'Eb' ? 'Eb MAJOR' :
+    _previewLS.keySig === 'F'  ? 'F MAJOR'  :
     _previewLS.keySig === 'C'  ? 'C MAJOR' : 'D MAJOR';
   ctx.fillText(`${selectedInstrument.toUpperCase()}  ·  ${clefName}  ·  ${_keySigName}`, W / 2, 56);
 
@@ -1952,29 +3029,38 @@ function drawLevelPreviewScreen() {
   // Note Y positions — scaled to preview staff, instrument-aware
   // psl[2] = middle line. Each step = LS/2.
   const pNoteY_treble = {
-    'G3': psl[4] + LS * 2.5,
-    'A3': psl[4] + LS * 2.0,
-    'B3': psl[4] + LS * 1.5,
-    'C4': psl[4] + LS * 1.0,
-    'D4': psl[4] + LS / 2,
-    'E4': psl[4],
-    'F4': psl[4] - LS / 2,
-    'G4': psl[4] - LS,
+    // Low mallet perc / clarinet low register
+    'C3':  psl[4] + LS * 4.5,
+    'D3':  psl[4] + LS * 4.0,
+    'E3':  psl[4] + LS * 3.5,
+    'F3':  psl[4] + LS * 3.0,
+    'Ab3': psl[4] + LS * 2.0, // same as A3
+    'G3':  psl[4] + LS * 2.5,
+    'A3':  psl[4] + LS * 2.0,
+    'Bb3': psl[4] + LS * 1.5, // same as B3
+    'B3':  psl[4] + LS * 1.5,
+    'C4':  psl[4] + LS * 1.0,
+    'D4':  psl[4] + LS / 2,
+    'Eb4': psl[4],             // same as E4
+    'E4':  psl[4],
+    'F4':  psl[4] - LS / 2,
+    'F#4': psl[4] - LS / 2,   // same as F4
+    'G4':  psl[4] - LS,
     'Ab4': psl[4] - LS * 1.5,
-    'A4': psl[4] - LS * 1.5,
+    'A4':  psl[4] - LS * 1.5,
     'Bb4': psl[4] - LS * 2,
-    'B4': psl[4] - LS * 2,
+    'B4':  psl[4] - LS * 2,
     'C#5': psl[4] - LS * 2.5,
     'C5':  psl[4] - LS * 2.5,
-    'D5': psl[4] - LS * 3,
+    'D5':  psl[4] - LS * 3,
     'Eb5': psl[4] - LS * 3.5,
+    'E5':  psl[4] - LS * 3.5,
     'F5':  psl[4] - LS * 4,
+    'F#5': psl[4] - LS * 4,
     'G5':  psl[4] - LS * 4.5,
     'Ab5': psl[4] - LS * 5,
     'A5':  psl[4] - LS * 5,
     'Bb5': psl[4] - LS * 5.5,
-    'E5':  psl[4] - LS * 3.5,
-    'F#5': psl[4] - LS * 4,
   };
   const pNoteY_alto = {
     'C3': psl[4] + LS * 1.5,   // space below 1st ledger below alto staff
@@ -1997,25 +3083,26 @@ function drawLevelPreviewScreen() {
   };
   // Bass clef preview: bottom line psl[4]=G2, psl[3]=B2, psl[2]=D3, psl[1]=F3, psl[0]=A3
   const pNoteY_bass = {
-    'C2':  psl[4] + LS * 2.0,  // 2nd ledger below bass staff
-    'D2':  psl[4] + LS * 1.5,  // space below 1st ledger
-    'E2':  psl[4] + LS * 1.0,  // 1st ledger line below bass staff
-    'F2':  psl[4] + LS * 0.5,  // space below G2 bottom line
-    'F#2': psl[4] + LS * 0.5,  // same position as F2
-    'G2': psl[4],
-    'A2': psl[4] - LS * 0.5,
-    'B2': psl[3],
-    'C3': psl[3] - LS * 0.5,
-    'D3': psl[2],
-    'E3': psl[2] - LS * 0.5,
-    'F3': psl[2] - LS * 1.0,
-    'G3': psl[2] - LS * 1.5,
-    'A3': psl[2] - LS * 2.0,
-    'B3': psl[2] - LS * 2.5,
-    'C4': psl[2] - LS * 3.0,
-    'D4': psl[2] - LS * 3.5,
+    'C2':  psl[4] + LS * 2.0,  'D2':  psl[4] + LS * 1.5,
+    'E2':  psl[4] + LS * 1.0,  'F2':  psl[4] + LS * 0.5,
+    'F#2': psl[4] + LS * 0.5,
+    'Ab2': psl[4] - LS * 0.5,  // same position as A2
+    'G2':  psl[4],              'A2':  psl[4] - LS * 0.5,
+    'Bb2': psl[3],              // same position as B2
+    'B2':  psl[3],
+    'C3':  psl[3] - LS * 0.5,  'D3':  psl[2],
+    'Eb3': psl[2] - LS * 0.5,  // same as E3
+    'E3':  psl[2] - LS * 0.5,  'F3':  psl[2] - LS * 1.0,
+    'G3':  psl[2] - LS * 1.5,
+    'Ab3': psl[2] - LS * 2.0,  // same as A3
+    'A3':  psl[2] - LS * 2.0,
+    'Bb3': psl[2] - LS * 2.5,  // same as B3
+    'B3':  psl[2] - LS * 2.5,
+    'C4':  psl[2] - LS * 3.0,  'D4':  psl[2] - LS * 3.5,
   };
-  const pNoteY = selectedInstrument === 'Viola' ? pNoteY_alto : (selectedInstrument === 'Cello' || selectedInstrument === 'Bass') ? pNoteY_bass : pNoteY_treble;
+  const pNoteY = selectedInstrument === 'Viola' ? pNoteY_alto
+               : (selectedInstrument === 'Cello' || selectedInstrument === 'Bass' || selectedInstrument === 'Baritone' || selectedInstrument === 'Trombone') ? pNoteY_bass
+               : pNoteY_treble;
 
   // Size staff to fit notes — clef+keysig need ~80px on the left, 36px padding on the right
   const _previewLevelSet = getLevelSet();
@@ -2048,7 +3135,7 @@ function drawLevelPreviewScreen() {
     ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
     ctx.fillText('𝄡', staffLeft + 4, psl[2] + 5);
-  } else if (selectedInstrument === 'Cello' || selectedInstrument === 'Bass') {
+  } else if (selectedInstrument === 'Cello' || selectedInstrument === 'Bass' || selectedInstrument === 'Baritone' || selectedInstrument === 'Trombone') {
     ctx.font = `${LS * 4.2 * 1.1576}px serif`;
     ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
@@ -2073,15 +3160,42 @@ function drawLevelPreviewScreen() {
   const _previewKeySig = (_previewLevelSet[currentLevel] && _previewLevelSet[currentLevel].keySig) || 'D';
   if (_previewKeySig === 'C') {
     // C major — no sharps or flats
+  } else if (selectedInstrument === 'Baritone') {
+    // Bass clef flat key signatures for Baritone
+    if (_previewKeySig === 'Bb') {
+      ctx.fillText('♭', kx,      psl[3] + LS * 0.75); // Bb
+      ctx.fillText('♭', kx + 14, psl[1] + LS * 0.75); // Eb
+    } else if (_previewKeySig === 'Eb') {
+      ctx.fillText('♭', kx,      psl[3] + LS * 0.75); // Bb
+      ctx.fillText('♭', kx + 14, psl[1] + LS * 0.75); // Eb
+      ctx.fillText('♭', kx + 28, psl[3] + LS * 0.5);  // Ab
+    } else if (_previewKeySig === 'F') {
+      ctx.fillText('♭', kx,      psl[3] + LS * 0.75); // Bb
+    }
+  } else if (_previewKeySig === 'Eb') {
+    ctx.fillText('♭', kx,      psl[2] + LS * 0.75); // Bb (B4 line)
+    ctx.fillText('♭', kx + 14, psl[0] + LS * 0.5);  // Eb (top space)
+    ctx.fillText('♭', kx + 28, psl[2] + LS * 0.5);  // Ab (2nd space)
   } else if (_previewKeySig === 'Bb') {
     ctx.fillText('♭', kx,      psl[2] + LS * 0.75); // Bb on middle line
     ctx.fillText('♭', kx + 14, psl[0] + LS * 0.75); // Eb on top space
   } else if (selectedInstrument === 'Viola') {
     ctx.fillText('♯', kx,      psl[0] + LS * 0.9);
     if (_previewKeySig !== 'G') ctx.fillText('♯', kx + 14, psl[2] - LS * 0.1 + LS * 0.6);
-  } else if (selectedInstrument === 'Cello' || selectedInstrument === 'Bass') {
-    ctx.fillText('♯', kx,      psl[1] + LS * 0.57); // F# always
-    if (_previewKeySig !== 'G') ctx.fillText('♯', kx + 15, psl[2] + LS * 0.9); // C# only D major
+  } else if (selectedInstrument === 'Cello' || selectedInstrument === 'Bass' || selectedInstrument === 'Baritone' || selectedInstrument === 'Trombone') {
+    if (_previewKeySig === 'Bb') {
+      ctx.fillText('♭', kx,      psl[3] + LS * 0.75); // Bb
+      ctx.fillText('♭', kx + 14, psl[1] + LS * 0.75); // Eb
+    } else if (_previewKeySig === 'Eb') {
+      ctx.fillText('♭', kx,      psl[3] + LS * 0.75); // Bb
+      ctx.fillText('♭', kx + 14, psl[1] + LS * 0.75); // Eb
+      ctx.fillText('♭', kx + 28, psl[3] + LS * 0.25); // Ab
+    } else if (_previewKeySig === 'F') {
+      ctx.fillText('♭', kx,      psl[3] + LS * 0.75); // Bb
+    } else {
+      ctx.fillText('♯', kx,      psl[1] + LS * 0.57); // F# always
+      if (_previewKeySig !== 'G') ctx.fillText('♯', kx + 15, psl[2] + LS * 0.9); // C# only D major
+    }
   } else {
     ctx.fillText('♯', kx,      psl[0] + LS * 0.4);
     if (_previewKeySig !== 'G') ctx.fillText('♯', kx + 14, psl[2] - LS * 0.6 + LS * 0.6);
@@ -2262,12 +3376,85 @@ function arcY(startY, endY, t, arcHeight) {
   return base - arcHeight * Math.sin(Math.PI * t);
 }
 
+// ─── UC BEAT GAME OVERLAY ────────────────────────────────────────────────────
+function drawBeatGameOverlay() {
+  const t = ucBeatAnimT;
+  const fadeIn = Math.min(1, t * 1.5);
+
+  // Dark overlay
+  ctx.fillStyle = `rgba(0,0,10,${0.88 * fadeIn})`;
+  ctx.fillRect(0, 0, W, H);
+
+  // Spinning star burst
+  ctx.save();
+  ctx.translate(W / 2, H / 2 - 60);
+  const rays = 16;
+  for (let i = 0; i < rays; i++) {
+    const angle = (i / rays) * Math.PI * 2 + t * 0.5;
+    const len = 60 + 20 * Math.sin(t * 3 + i);
+    const grad = ctx.createLinearGradient(0, 0, Math.cos(angle)*len, Math.sin(angle)*len);
+    grad.addColorStop(0, `rgba(255,224,102,${fadeIn})`);
+    grad.addColorStop(1, `rgba(255,224,102,0)`);
+    ctx.strokeStyle = grad;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(Math.cos(angle) * 30, Math.sin(angle) * 30);
+    ctx.lineTo(Math.cos(angle) * len, Math.sin(angle) * len);
+    ctx.stroke();
+  }
+
+  // Trophy emoji substitute — big star shape in canvas
+  const s = 24 + 4 * Math.sin(t * 2);
+  ctx.fillStyle = `rgba(255,224,102,${fadeIn})`;
+  ctx.font = `${s}px "Press Start 2P"`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('★', 0, 0);
+  ctx.restore();
+
+  // Title text with bounce-in scale
+  const scale = Math.min(1, t * 2.5);
+  ctx.save();
+  ctx.translate(W / 2, H / 2 - 10);
+  ctx.scale(scale, scale);
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = `rgba(255,224,102,${fadeIn})`;
+  ctx.font = '20px "Press Start 2P"';
+  ctx.fillText('YOU BEAT', 0, -16);
+  ctx.fillText('THE GAME!', 0, 12);
+  ctx.restore();
+
+  if (t > 0.5) {
+    const a2 = Math.min(1, (t - 0.5) * 2);
+    ctx.fillStyle = `rgba(170,255,170,${a2})`;
+    ctx.font = '9px "Press Start 2P"';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(`FINAL SCORE: ${score}`, W / 2, H / 2 + 46);
+    ctx.fillStyle = `rgba(170,221,255,${a2})`;
+    ctx.font = '7px "Press Start 2P"';
+    ctx.fillText(`TIME: ${formatTime(finalTime)}`, W / 2, H / 2 + 66);
+  }
+
+  // "Play again" blink after 3s
+  if (t > 3) {
+    const blinkOn = Math.floor(t * 2) % 2 === 0;
+    if (blinkOn) {
+      ctx.fillStyle = '#fff';
+      ctx.font = '7px "Press Start 2P"';
+      ctx.textAlign = 'center';
+      ctx.fillText('PRESS ENTER OR CLICK TO PLAY AGAIN', W / 2, H - 30);
+    }
+  }
+}
+
 // ─── GAME LOOP ────────────────────────────────────────────────────────────────
 let lastTime = 0;
 
 function update(dt) {
   if (gameState !== 'playing') return;
-  if (gameOver || levelComplete) return;
+  if (gameOver || (levelComplete && !ucBeatGame)) return;
 
   // ── Count-in: Ready / Go ──────────────────────────────────────────────────
   if (countIn) {
@@ -2294,10 +3481,13 @@ function update(dt) {
       hero.state = 'idle';
       hero.x = hero.flipStartX;
       hero.y = hero.flipStartY;
-      finalTime = elapsedTime;
-      levelComplete = true;
-      stopBackingTrack();
-      showSubmitPanel();
+      if (!ucBeatGame) {
+        finalTime = elapsedTime;
+        levelComplete = true;
+        stopBackingTrack();
+        showSubmitPanel();
+      }
+      // ucBeatGame: flip already stopped backing track; beatAnim takes over
     }
   }
 
@@ -2338,6 +3528,9 @@ function update(dt) {
   const targetCam = hero.x - W * 0.35;
   camera = lerp(camera, Math.max(0, targetCam), dt * 6);
 
+  // UC beat-game animation tick
+  if (ucBeatGame && hero.state === 'idle') ucBeatAnimT += dt;
+
   // Particles
   updateParticles(dt);
 }
@@ -2348,6 +3541,7 @@ function draw(dt) {
   ctx.setTransform(1, 0, 0, 1, 0, 0);
 
   if (gameState === 'title') { drawTitleScreen(); return; }
+  if (gameState === 'octaveSelect') { drawOctaveSelectScreen(); return; }
   if (gameState === 'levelSelect') { drawLevelSelectScreen(); return; }
   if (gameState === 'levelPreview') { drawLevelPreviewScreen(); return; }
 
@@ -2401,6 +3595,11 @@ function draw(dt) {
   
   // HUD
   drawHUD();
+
+  // UC Beat-Game overlay
+  if (ucBeatGame && hero.state === 'idle') {
+    drawBeatGameOverlay();
+  }
 
   // Count-in overlay
   if (countIn && countInBeat >= 1) {
@@ -2523,12 +3722,20 @@ canvas.addEventListener('mousemove', (e) => {
   const pos = getCanvasPos(e);
   hoveredBtn = null;
   if (gameState === 'title') {
+    if (settingsBtn && hitTest(pos, settingsBtn)) { hoveredBtn = 'SETTINGS'; }
     for (const btn of instrBtns) {
       if (hitTest(pos, btn)) { hoveredBtn = btn.label; break; }
     }
+  } else if (gameState === 'octaveSelect') {
+    if (octaveHighBtn && hitTest(pos, octaveHighBtn)) hoveredBtn = 'OCTAVE_HIGH';
+    if (octaveLowBtn  && hitTest(pos, octaveLowBtn))  hoveredBtn = 'OCTAVE_LOW';
+    if (octaveBackBtn && hitTest(pos, octaveBackBtn))  hoveredBtn = 'OCTAVE_BACK';
   } else if (gameState === 'levelSelect') {
     for (const btn of levelSelectBtns) {
-      if (hitTest(pos, btn)) { hoveredBtn = `LVLSEL_${btn.level}`; break; }
+      if (hitTest(pos, btn)) {
+        hoveredBtn = btn.level === UC_LEVEL ? 'UC' : `LVLSEL_${btn.level}`;
+        break;
+      }
     }
     if (levelSelectBackBtn && hitTest(pos, levelSelectBackBtn)) hoveredBtn = 'LVLSEL_BACK';
   } else if (gameState === 'levelPreview') {
@@ -2561,18 +3768,39 @@ canvas.addEventListener('mousemove', (e) => {
 canvas.addEventListener('click', (e) => {
   const pos = getCanvasPos(e);
 
+  // UC beat-game dismiss
+  if (ucBeatGame && ucBeatAnimT > 3 && gameState === 'playing') {
+    ucActive = false; ucBeatGame = false;
+    score = 0; gameState = 'levelPreview';
+    return;
+  }
+
   if (gameState === 'title') {
+    ucActive = false; // reset UC on return to title
+    if (settingsBtn && hitTest(pos, settingsBtn)) { openSettings(); return; }
     for (const btn of instrBtns) {
       if (hitTest(pos, btn)) {
-        if (btn.label === 'Violin' || btn.label === 'Viola' || btn.label === 'Cello' || btn.label === 'Bass') {
+        if (['Violin','Viola','Cello','Bass','Flute','Clarinet','Trumpet','Baritone','Alto Sax','Trombone','Mallet Perc'].includes(btn.label)) {
           selectedInstrument = btn.label;
           currentLevel = 1;
-          gameState = 'levelPreview';
+          if (btn.label === 'Mallet Perc') {
+            gameState = 'octaveSelect';
+          } else {
+            gameState = 'levelPreview';
+          }
           hoveredBtn = null;
         }
         return;
       }
     }
+  } else if (gameState === 'octaveSelect') {
+    if (octaveHighBtn && hitTest(pos, octaveHighBtn)) {
+      malletOctave = 'high'; gameState = 'levelPreview'; hoveredBtn = null; return;
+    }
+    if (octaveLowBtn && hitTest(pos, octaveLowBtn)) {
+      malletOctave = 'low'; gameState = 'levelPreview'; hoveredBtn = null; return;
+    }
+    if (octaveBackBtn && hitTest(pos, octaveBackBtn)) { gameState = 'title'; hoveredBtn = null; return; }
   } else if (gameState === 'levelSelect') {
     if (levelSelectBackBtn && hitTest(pos, levelSelectBackBtn)) {
       gameState = 'title';
@@ -2581,8 +3809,17 @@ canvas.addEventListener('click', (e) => {
     }
     for (const btn of levelSelectBtns) {
       if (hitTest(pos, btn)) {
-        currentLevel = btn.level;
-        gameState = 'levelPreview';
+        if (btn.level === UC_LEVEL) {
+          ucActive = true;
+          currentLevel = 1; // UC uses level 1 key sig initially
+          gameState = 'playing';
+          score = 0;
+          startPlaying();
+        } else {
+          ucActive = false;
+          currentLevel = btn.level;
+          gameState = 'levelPreview';
+        }
         hoveredBtn = null;
         return;
       }
@@ -2696,7 +3933,7 @@ function resolveInput(correct, currentNote) {
   let labelColor = "";
 
   if (correct) {
-    playNoteSound(currentNote.pitch, bigHit);
+    if (inputMode === 'noteNames') playNoteSound(currentNote.pitch, bigHit);
     score += (bigHit ? 150 : 100);
     currentNote.answered = true;
     spawnExplosion(currentNote.x, currentNote.y, bigHit);
@@ -2705,24 +3942,59 @@ function resolveInput(correct, currentNote) {
     labelColor = bigHit ? "#fff" : "#ffe066";
 
     currentNoteIdx++;
+    ucNoteCount++;
+
+    // ── UC window tracking ──────────────────────────────────────────────
+    if (ucActive) {
+      ucWindow.push(true);
+      if (ucWindow.length > UC_WINDOW_SIZE) ucWindow.shift();
+      // Every UC_WINDOW_SIZE notes, check if we advance
+      if (ucNoteCount % UC_WINDOW_SIZE === 0 && ucWindow.length === UC_WINDOW_SIZE) {
+        const correctCount = ucWindow.filter(Boolean).length;
+        if (correctCount >= UC_PASS_THRESHOLD && ucStageIdx < ucStages.length - 1) {
+          ucStageIdx++;
+          ucWindow = []; // reset window on advance
+          // Flash stage advance label
+          floatingLabels.push({
+            x: currentNote.x, y: currentNote.y - 40,
+            text: 'LEVEL UP!', color: '#44ffff',
+            vx: 0, vy: -60, life: 2.0,
+          });
+        }
+      }
+      // Check beat-game condition
+      if (score >= UC_TARGET && !ucBeatGame) {
+        ucBeatGame = true;
+        finalTime = elapsedTime;
+        stopBackingTrack();
+      }
+      // Append next note for continuous play (unless beat game)
+      if (!ucBeatGame) {
+        const lastPitch = notes[notes.length - 1].pitch;
+        notes.push(generateUcNote(lastPitch));
+      }
+    }
 
     const nextNote = notes[currentNoteIdx];
-    if (nextNote) {
-      // Bounce to the next note
+    if (nextNote && !ucBeatGame) {
       hero.state = 'bounce';
       hero.bounceStartX = hero.x;
       hero.bounceStartY = hero.y;
       hero.bounceTarget = nextNote;
       hero.bounceT = 0;
       hero.frameTimer = 0;
-    } else {
-      // Last note answered — do the victory flip
+    } else if (!nextNote || ucBeatGame) {
+      // Last note answered or beat game — do the victory flip
       hero.state = 'flip';
       hero.flipStartX = hero.x;
       hero.flipStartY = hero.y;
       hero.flipT = 0;
     }
   } else {
+    if (ucActive) {
+      ucWindow.push(false);
+      if (ucWindow.length > UC_WINDOW_SIZE) ucWindow.shift();
+    }
     hearts--;
     score = Math.max(0, score - 50); // Penalty logic
     // Only switch to shake if not bouncing — if bouncing, shake runs alongside it
@@ -2805,8 +4077,8 @@ function startPlaying() {
   hoveredBtn = null;
   canvas.style.cursor = 'default';
   resetGameState();
-  // Start music immediately and begin count-in
-  startBackingTrack();
+  // Start backing track only in note-names mode
+  startBackingTrack(); // plays pitched in noteNames mode, percussive click in mic mode
   countInStartTime = getAudioCtx().currentTime;
   countIn = true;
   countInBeat = 0;
@@ -2815,7 +4087,25 @@ function startPlaying() {
 // ─── RESET ────────────────────────────────────────────────────────────────────
 function resetGameState() {
   stopBackingTrack();
-  notes = generateLevel();
+  if (ucActive) {
+    // UC mode: initialise stages, generate first 7 notes from stage 0
+    ucStages = getUcStages();
+    ucStageIdx = 0;
+    ucWindow = [];
+    ucNoteCount = 0;
+    ucBeatGame = false;
+    ucBeatAnimT = 0;
+    notes = [];
+    let lastPitch = null;
+    for (let i = 0; i < UC_WINDOW_SIZE; i++) {
+      const n = generateUcNote(lastPitch);
+      lastPitch = n.pitch;
+      notes.push(n);
+    }
+    DOUBLE_BAR_X = Infinity; // no double bar in UC
+  } else {
+    notes = generateLevel();
+  }
   currentNoteIdx = 0;
   camera = 0;
   hearts = 6;
@@ -2827,7 +4117,7 @@ function resetGameState() {
   elapsedTime = 0;
   finalTime = 0;
   particles = [];
-  DOUBLE_BAR_X = notes[notes.length - 1].x + NOTE_SPACING * 0.7;
+  if (!ucActive) DOUBLE_BAR_X = notes[notes.length - 1].x + NOTE_SPACING * 0.7;
   hero.x = notes[0].x;
   hero.y = heroLandingY(notes[0]) - HERO_H - HERO_GAP;
   hero.state = 'idle';
