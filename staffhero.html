@@ -740,16 +740,31 @@ const VIOLIN_LEVELS = {
        tonic: 'G3', keySig: 'G',
        rows: [['E5','F#5','G5','A5'], ['A4','B4','C5','D5'], ['D4','E4','F4','G4'], ['G3','A3','B3','C4']],
        rowLabels: ['E String', 'A String', 'D String', 'G String'], title: 'All Strings' },
-  8: { pitches: ['G#3','A3','B3','C#4','D4','E4','F#4','G#4','A4','B4','C#5','D5','E5','F#5','G#5','A5'],
+    8: { pitches: ['G3','A3','B3','C#4','D4','E4','F#4','G4','A4','B4','C#5','D5','E5','F#5','G5','A5'],
+       staffPos: ['G3','A3','B3','C4','D4','E4','F4','G4','A4','B4','C5','D5','E5','F5','G5','A5'],
+       tonic: 'D4', keySig: 'D',
+       rows: [['E5','F#5','G5','A5'], ['A4','B4','C#5','D5'], ['D4','E4','F#4','G4'], ['G3','A3','B3','C#4']],
+       rowLabels: ['E String', 'A String', 'D String', 'G String'], title: 'All Strings – D Major' },
+  9: { pitches: ['G#3','A3','B3','C#4','D4','E4','F#4','G#4','A4','B4','C#5','D5','E5','F#5','G#5','A5'],
        staffPos: ['G3','A3','B3','C4','D4','E4','F4','G4','A4','B4','C5','D5','E5','F5','G5','A5'],
        tonic: 'A3', keySig: 'A',
        rows: [['E5','F#5','G5','A5'], ['A4','B4','C5','D5'], ['D4','E4','F4','G4'], ['G3','A3','B3','C4']],
        rowLabels: ['E String', 'A String', 'D String', 'G String'], title: 'All Strings – A Major' },
-  9: { pitches: ['G3','A3','Bb3','C4','D4','E4','F4','G4','A4','Bb4','C5','D5','E5','F5','G5','A5'],
+  10: { pitches: ['G3','A3','Bb3','C4','D4','E4','F4','G4','A4','Bb4','C5','D5','E5','F5','G5','A5'],
        staffPos: ['G3','A3','B3','C4','D4','E4','F4','G4','A4','B4','C5','D5','E5','F5','G5','A5'],
        tonic: 'G3', keySig: 'F',
        rows: [['E5','F5','G5','A5'], ['A4','Bb4','C5','D5'], ['D4','E4','F4','G4'], ['G3','A3','Bb3','C4']],
        rowLabels: ['E String', 'A String', 'D String', 'G String'], title: 'All Strings – F Major' },
+  11: { pitches: ['G3','A3','Bb3','C4','D4','Eb4','F4','G4','A4','Bb4','C5','D5','Eb5','F5','G5','A5'],
+       staffPos: ['G3','A3','B3','C4','D4','E4','F4','G4','A4','B4','C5','D5','E5','F5','G5','A5'],
+       tonic: 'Bb3', keySig: 'Bb',
+       rows: [['Eb5','F5','G5','A5'], ['A4','Bb4','C5','D5'], ['D4','Eb4','F4','G4'], ['G3','A3','Bb3','C4']],
+       rowLabels: ['E String','A String','D String','G String'], title: 'All Strings – Bb Major' },
+  12: { pitches: ['G3','Ab3','Bb3','C4','D4','Eb4','F4','G4','Ab4','Bb4','C5','D5','Eb5','F5','G5','Ab5'],
+       staffPos: ['G3','A3','B3','C4','D4','E4','F4','G4','A4','B4','C5','D5','E5','F5','G5','A5'],
+       tonic: 'Eb4', keySig: 'Eb',
+       rows: [['Eb5','F5','G5','Ab5'], ['Ab4','Bb4','C5','D5'], ['D4','Eb4','F4','G4'], ['G3','Ab3','Bb3','C4']],
+       rowLabels: ['E String','A String','D String','G String'], title: 'All Strings – Eb Major' },
 };
 const VIOLA_LEVELS = {
   1: { pitches: ['D4','E4','F#4'],
@@ -781,16 +796,31 @@ const VIOLA_LEVELS = {
        tonic: 'C3', keySig: 'C',
        rows: [['A4','B4','C5','D5'], ['D4','E4','F4','G4'], ['G3','A3','B3','C4'], ['C3','D3','E3','F3']],
        rowLabels: ['A String', 'D String', 'G String', 'C String'], title: 'All Strings' },
-  8: { pitches: ['C#3','D3','E3','F#3','G#3','A3','B3','C#4','D4','E4','F#4','G#4','A4','B4','C#5','D5'],
+    8: { pitches: ['C#3','D3','E3','F#3','G3','A3','B3','C#4','D4','E4','F#4','G4','A4','B4','C#5','D5'],
+       staffPos: ['C3','D3','E3','F3','G3','A3','B3','C4','D4','E4','F4','G4','A4','B4','C5','D5'],
+       tonic: 'D3', keySig: 'D',
+       rows: [['A4','B4','C#5','D5'], ['D4','E4','F#4','G4'], ['G3','A3','B3','C#4'], ['C#3','D3','E3','F#3']],
+       rowLabels: ['A String', 'D String', 'G String', 'C String'], title: 'All Strings – D Major' },
+  9: { pitches: ['C#3','D3','E3','F#3','G#3','A3','B3','C#4','D4','E4','F#4','G#4','A4','B4','C#5','D5'],
        staffPos: ['C3','D3','E3','F3','G3','A3','B3','C4','D4','E4','F4','G4','A4','B4','C5','D5'],
        tonic: 'A3', keySig: 'A',
        rows: [['A4','B4','C5','D5'], ['D4','E4','F4','G4'], ['G3','A3','B3','C4'], ['C3','D3','E3','F3']],
        rowLabels: ['A String', 'D String', 'G String', 'C String'], title: 'All Strings – A Major' },
-  9: { pitches: ['C3','D3','E3','F3','G3','A3','Bb3','C4','D4','E4','F4','G4','A4','Bb4','C5','D5'],
+  10: { pitches: ['C3','D3','E3','F3','G3','A3','Bb3','C4','D4','E4','F4','G4','A4','Bb4','C5','D5'],
        staffPos: ['C3','D3','E3','F3','G3','A3','B3','C4','D4','E4','F4','G4','A4','B4','C5','D5'],
        tonic: 'C3', keySig: 'F',
        rows: [['A4','Bb4','C5','D5'], ['D4','E4','F4','G4'], ['G3','A3','Bb3','C4'], ['C3','D3','E3','F3']],
        rowLabels: ['A String', 'D String', 'G String', 'C String'], title: 'All Strings – F Major' },
+  11: { pitches: ['C3','D3','Eb3','F3','G3','A3','Bb3','C4','D4','Eb4','F4','G4','A4','Bb4','C5','D5'],
+       staffPos: ['C3','D3','E3','F3','G3','A3','B3','C4','D4','E4','F4','G4','A4','B4','C5','D5'],
+       tonic: 'Bb3', keySig: 'Bb',
+       rows: [['A4','Bb4','C5','D5'], ['D4','Eb4','F4','G4'], ['G3','A3','Bb3','C4'], ['C3','D3','Eb3','F3']],
+       rowLabels: ['A String','D String','G String','C String'], title: 'All Strings – Bb Major' },
+  12: { pitches: ['C3','D3','Eb3','F3','G3','Ab3','Bb3','C4','D4','Eb4','F4','G4','Ab4','Bb4','C5','D5'],
+       staffPos: ['C3','D3','E3','F3','G3','A3','B3','C4','D4','E4','F4','G4','A4','B4','C5','D5'],
+       tonic: 'Eb3', keySig: 'Eb',
+       rows: [['Ab4','Bb4','C5','D5'], ['D4','Eb4','F4','G4'], ['G3','Ab3','Bb3','C4'], ['C3','D3','Eb3','F3']],
+       rowLabels: ['A String','D String','G String','C String'], title: 'All Strings – Eb Major' },
 };
 // Keep LEVELS as alias for any legacy references
 const LEVELS = VIOLIN_LEVELS;
@@ -825,16 +855,31 @@ const CELLO_LEVELS = {
        tonic: 'C2', keySig: 'C',
        rows: [['A3','B3','C4','D4'], ['D3','E3','F3','G3'], ['G2','A2','B2','C3'], ['C2','D2','E2','F2']],
        rowLabels: ['A String', 'D String', 'G String', 'C String'], title: 'All Strings' },
-  8: { pitches: ['C#2','D2','E2','F#2','G#2','A2','B2','C#3','D3','E3','F#3','G#3','A3','B3','C#4','D4'],
+    8: { pitches: ['C#2','D2','E2','F#2','G2','A2','B2','C#3','D3','E3','F#3','G3','A3','B3','C#4','D4'],
+       staffPos: ['C2','D2','E2','F2','G2','A2','B2','C3','D3','E3','F3','G3','A3','B3','C4','D4'],
+       tonic: 'D2', keySig: 'D',
+       rows: [['A3','B3','C#4','D4'], ['D3','E3','F#3','G3'], ['G2','A2','B2','C#3'], ['C#2','D2','E2','F#2']],
+       rowLabels: ['A String', 'D String', 'G String', 'C String'], title: 'All Strings – D Major' },
+  9: { pitches: ['C#2','D2','E2','F#2','G#2','A2','B2','C#3','D3','E3','F#3','G#3','A3','B3','C#4','D4'],
        staffPos: ['C2','D2','E2','F2','G2','A2','B2','C3','D3','E3','F3','G3','A3','B3','C4','D4'],
        tonic: 'A2', keySig: 'A',
        rows: [['A3','B3','C4','D4'], ['D3','E3','F3','G3'], ['G2','A2','B2','C3'], ['C2','D2','E2','F2']],
        rowLabels: ['A String', 'D String', 'G String', 'C String'], title: 'All Strings – A Major' },
-  9: { pitches: ['C2','D2','E2','F2','G2','A2','Bb2','C3','D3','E3','F3','G3','A3','Bb3','C4','D4'],
+  10: { pitches: ['C2','D2','E2','F2','G2','A2','Bb2','C3','D3','E3','F3','G3','A3','Bb3','C4','D4'],
        staffPos: ['C2','D2','E2','F2','G2','A2','B2','C3','D3','E3','F3','G3','A3','B3','C4','D4'],
        tonic: 'C2', keySig: 'F',
        rows: [['A3','Bb3','C4','D4'], ['D3','E3','F3','G3'], ['G2','A2','Bb2','C3'], ['C2','D2','E2','F2']],
        rowLabels: ['A String', 'D String', 'G String', 'C String'], title: 'All Strings – F Major' },
+  11: { pitches: ['C2','D2','Eb2','F2','G2','A2','Bb2','C3','D3','Eb3','F3','G3','A3','Bb3','C4','D4'],
+       staffPos: ['C2','D2','E2','F2','G2','A2','B2','C3','D3','E3','F3','G3','A3','B3','C4','D4'],
+       tonic: 'Bb2', keySig: 'Bb',
+       rows: [['A3','Bb3','C4','D4'], ['D3','Eb3','F3','G3'], ['G2','A2','Bb2','C3'], ['C2','D2','Eb2','F2']],
+       rowLabels: ['A String','D String','G String','C String'], title: 'All Strings – Bb Major' },
+  12: { pitches: ['C2','D2','Eb2','F2','G2','Ab2','Bb2','C3','D3','Eb3','F3','G3','Ab3','Bb3','C4','D4'],
+       staffPos: ['C2','D2','E2','F2','G2','A2','B2','C3','D3','E3','F3','G3','A3','B3','C4','D4'],
+       tonic: 'Eb2', keySig: 'Eb',
+       rows: [['Ab3','Bb3','C4','D4'], ['D3','Eb3','F3','G3'], ['G2','Ab2','Bb2','C3'], ['C2','D2','Eb2','F2']],
+       rowLabels: ['A String','D String','G String','C String'], title: 'All Strings – Eb Major' },
 };
 const BASS_LEVELS = {
   // Bass tuned E-A-D-G (low→high). Rows top→bottom: G string, D string, A string, E string.
@@ -867,16 +912,31 @@ const BASS_LEVELS = {
        tonic: 'D3', keySig: 'D',
        rows: [['G3','A3','B3','C4','D4'], ['D3','E3','F3'], ['A2','B2','C3'], ['E2','F#2','G2']],
        rowLabels: ['G String', 'D String', 'A String', 'E String'], title: 'All Strings' },
-  8: { pitches: ['E2','F#2','G#2','A2','B2','C#3','D3','E3','F#3','G#3','A3','B3','C#4','D4'],
+    8: { pitches: ['E2','F#2','G2','A2','B2','C#3','D3','E3','F#3','G3','A3','B3','C#4','D4'],
+       staffPos: ['E2','F2','G2','A2','B2','C3','D3','E3','F3','G3','A3','B3','C4','D4'],
+       tonic: 'D3', keySig: 'D',
+       rows: [['G3','A3','B3','C#4','D4'], ['D3','E3','F#3'], ['A2','B2','C#3'], ['E2','F#2','G2']],
+       rowLabels: ['G String', 'D String', 'A String', 'E String'], title: 'All Strings – D Major' },
+  9: { pitches: ['E2','F#2','G#2','A2','B2','C#3','D3','E3','F#3','G#3','A3','B3','C#4','D4'],
        staffPos: ['E2','F2','G2','A2','B2','C3','D3','E3','F3','G3','A3','B3','C4','D4'],
        tonic: 'A2', keySig: 'A',
        rows: [['G3','A3','B3','C4','D4'], ['D3','E3','F3'], ['A2','B2','C3'], ['E2','F#2','G2']],
        rowLabels: ['G String', 'D String', 'A String', 'E String'], title: 'All Strings – A Major' },
-  9: { pitches: ['E2','F2','G2','A2','Bb2','C3','D3','E3','F3','G3','A3','Bb3','C4','D4'],
+  10: { pitches: ['E2','F2','G2','A2','Bb2','C3','D3','E3','F3','G3','A3','Bb3','C4','D4'],
        staffPos: ['E2','F2','G2','A2','B2','C3','D3','E3','F3','G3','A3','B3','C4','D4'],
        tonic: 'A2', keySig: 'F',
        rows: [['G3','A3','Bb3','C4','D4'], ['D3','E3','F3'], ['A2','Bb2','C3'], ['E2','F2','G2']],
        rowLabels: ['G String', 'D String', 'A String', 'E String'], title: 'All Strings – F Major' },
+  11: { pitches: ['Eb2','F2','G2','A2','Bb2','C3','D3','Eb3','F3','G3','A3','Bb3','C4','D4'],
+       staffPos: ['E2','F2','G2','A2','B2','C3','D3','E3','F3','G3','A3','B3','C4','D4'],
+       tonic: 'Bb2', keySig: 'Bb',
+       rows: [['G3','A3','Bb3','C4','D4'], ['D3','Eb3','F3'], ['A2','Bb2','C3'], ['Eb2','F2','G2']],
+       rowLabels: ['G String','D String','A String','E String'], title: 'All Strings – Bb Major' },
+  12: { pitches: ['Eb2','F2','G2','Ab2','Bb2','C3','D3','Eb3','F3','G3','Ab3','Bb3','C4','D4'],
+       staffPos: ['E2','F2','G2','A2','B2','C3','D3','E3','F3','G3','A3','B3','C4','D4'],
+       tonic: 'Eb2', keySig: 'Eb',
+       rows: [['G3','Ab3','Bb3','C4','D4'], ['D3','Eb3','F3'], ['Ab2','Bb2','C3'], ['Eb2','F2','G2']],
+       rowLabels: ['G String','D String','A String','E String'], title: 'All Strings – Eb Major' },
 };
 const ALTO_SAX_LEVELS = {
   // Alto sax in Eb — sounds major 6th (9 semitones) below written
@@ -2381,21 +2441,19 @@ function drawNesButton(label, x, y, w, h, hovered, selected) {
 }
 
 // ─── INSTRUMENT PIXEL ART SPRITES ────────────────────────────────────────────
-// Each cell = 2px. Colors: W=wood(amber), D=dark wood, S=shadow, L=light, N=neck, G=string, _=empty
-// I=instrument body inner, C=chin rest / tail, B=bow hair, R=rosin/bow stick
 
 const IC = {
-  W: '#d4860a',   // warm wood body
-  D: '#8b4a00',   // dark wood edge / shadow
-  L: '#f5c84a',   // light highlight
-  N: '#c07020',   // neck
-  G: '#cccccc',   // strings (light grey)
-  S: '#3a1a00',   // deep shadow outline
-  I: '#e8a030',   // inner body
-  C: '#222',      // chin rest / tailpiece
-  B: '#f5f5dc',   // bow hair (cream)
-  R: '#8b6914',   // bow stick
-  K: '#1a1a1a',   // clarinet black body
+  W: '#d4860a',   // Orange
+  D: '#8b4a00',   // Brown
+  L: '#f5c84a',   // Yellow
+  N: '#c07020',   // Light Brown
+  G: '#cccccc',   // Gray
+  S: '#3a1a00',   // Dark Brown
+  I: '#e8a030',   // Dark Orange
+  C: '#222',      // Black
+  B: '#f5f5dc',   // Cream
+  R: '#8b6914',   // Gold
+  K: '#414347',   // Black
   _: null,
 };
 
@@ -2429,126 +2487,130 @@ const SPRITE_ALTO_SAX = [
 // Mallet Percussion — ~16 wide × 16 tall, marimba/xylophone bars with mallets
 // W=wood bars, D=dark shadow, L=light, G=resonator tube, M=mallet head, _=empty
 const SPRITE_MALLET_PERC = [
-  '________________',
-  '_MM___MM___MM___',
-  '_MM___MM___MM___',
-  '__WWWWWWWWWWW___',
-  '__WLWLWLWLWLW___',
-  '__WWWWWWWWWWW___',
-  '_GWWWWWWWWWWWG__',
-  '_GGGGGGGGGGGG___',
-  '_GG_GG_GG_GG____',
-  '__WWWWWWWWWWWW__',
-  '__WLWLWLWLWLWW__',
-  '__WWWWWWWWWWWW__',
-  '_GWWWWWWWWWWWWG_',
-  '_GGGGGGGGGGGGG__',
-  '_GG_GG_GG_GG____',
+  '______RMM_______',
+  '_____MMMMM_______',
+  '_____RRMMM______',
+  '____MMMKKKK_____',
+  '____RRRMMMM_____',
+  '____RRRKKKK_____',
+  '___MMMMMMMMM____',
+  '___RRRRKKKKK____',
+  '___MMMMMMMMM____',
+  '___RRRRKKKKKK___',
+  '__RRRRRMMMMMM___',
+  '__MMMMMKKKKKK___',
+  '__RRRRRMMMMMMM__',
+  '_MMMMMMKKKKKKK__',
+  '_RRRRRRMMMMMMM__',
+  '_MMMMMMKKKKKKKK_',
+  'RRRRRRRMMMMMMMM_',
+  'MMMMMMMKKKKKKKK_',
+  'RRRRRRRMMMMMMMM_',
   '________________',
 ];
 
 // Trombone — 22 wide × 11 tall
 // W=brass body, D=dark shadow, L=light highlight, _=empty
 const SPRITE_TROMBONE = [
-  '____WWWWWWWW__________', // Tuning slide (back loop)
-  '__WW________WW________',
-  'WL__________WWWWWWWWWW', // Bell flare top + Upper slide tube
-  'W___________WWWWWWWWWW', 
-  'W_____________________', // Negative space between tubes
-  'W_____________________', 
-  'W___________WWWWWWWWWW', // Lower slide tube
-  'WL__________WWWWWWWWWW',
-  '__WW________WWWWWWWWWW', // Slide curve start
-  '____WWWWWWWWWWWWWWWWWW', // The "U" bend of the slide
-  '______DDDDDDDDDDDDDDDD', // Grounding shadow
+    '_____________________L_________________',
+	'____________________LL_________________', 
+	'__________________LLLL_________________', 
+	'____LLLLLLLLLLLLLLLLLL_________________', 
+	'___LL_____________LLLL_________________', 
+	'___LL_______________LL_________________', 
+	'____LLLLLLLLLLLLLLLLLLLLLLLLLLLLL______', 
+	'____________W___W_______________LL_____', 
+	'_________M__W___W_______________LL_____', 
+	'_________MLLLLLLLLLLLLLLLLLLLLLLL______', 
+    '_________M_____________________________', 
+    '_______________________________________', 
 ];
 
 // Baritone — ~14 wide × 24 tall, upright brass with large bell at top
 // W=brass, D=dark shadow, L=light, G=silver valves, S=outline, _=empty
 const SPRITE_BARITONE = [
-  '__WWWWWWWWWWW__',
-  '_WWWWWWWWWWWWW_',
-  '_WDDDDDDDDDDDW_',
-  '_WWWWWWWWWWWWW_',
-  '__WWWWWWWWWWW__',
-  '___WWWWWWWWW___',
-  '____WWGWGWW____',
-  '____WWGWGWW____',
-  '____WWGWGWW____',
-  '____WWWWWWW____',
-  '____WWWWWWW____',
-  '___WWWWWWWWW___',
-  '___WWWWWWWWW___',
-  '___WWWWWWWWW___',
-  '___WWWWWWWWW___',
-  '___WWWWWWWWW___',
-  '____WWWWWWW____',
-  '____WWWWWWW____',
-  '____WWWWWWW____',
-  '___WWWWWWWWW___',
-  '__WWWWWWWWWWW__',
-  '_WWWWWWWWWWWWW_',
-  'WWWWWWWWWWWWWWW',
-  'DDDDDDDDDDDDDDD',
+  '_WWWWWWWWWWWWWWW___',
+  '__LLLLLLLLLLLLL____',
+  '___LLLLLLLLLL______',
+  '____LLLLLLLL_______',
+  '_____LLLLLL________',
+  '______LLL__LLLLLLL_',
+  '______LLL_LLLLLLLLL',
+  '______LLL_LL____LLL',
+  '______LLL_LL____LLL',
+  '______LLL_LL____LLL',
+  '______LLL_LL____LLL',
+  '______LLL_LL__WWWLL',
+  '______LLL_LL____LLL',
+  '______LLL_LL__WWWLL',
+  '______LLL_LL____LLL',	
+  '______LLL_LL__WWWLL',
+  '______LLL_LL____LLL',
+  '______LLL_LLLLLLLLLL',
+  '______LLL__LLLLLLLL',
+  '_______LLL______LL_',
+  '________LLLLLLLLLL_',	
+  '__________LLLLLL____',	
 ];
 
 // Trumpet — ~22 wide × 12 tall, brass instrument with bell, valves, tubing
 // W=brass body, D=dark shadow, L=light highlight, G=silver valves, S=dark outline, _=empty
 const SPRITE_TRUMPET = [
-  '____WWWWWWWWWWWWWWWWDD__',
-  '__WWWGGWGGWGGWWWWWWDDDD_',
-  '_WWWGGGWGGGWGGGWWWWWDDLW',
-  'WWWWGGGWGGGWGGGWWWWWWWWW',
-  'WWWWWWWWWWWWWWWWWWWWWWWW',
-  'DWWWWWWWWWWWWWWWWWWWWWWW',
-  'DDWWWWWWWWWWWWWWWWWWWWWW',
-  '_DDWWWWWWWWWWWWWWWWWDDWW',
-  '__DDDWWWWWWWWWWWWWDDDDWW',
-  '____DDDDDDDDDDDDDDDD____',
-  '______WWWWWWWWWW________',
-  '________DDDDDD__________',
+  '_____________________________LLL______',
+  '____________________________LLWLL_____',
+  '__W_________L_L_L__________LLWWWLL____',
+  '__WLLLLLLLLLLLLLLLLLLLLLLLLLLWWWLL____',
+  '__W__LL_____L_L_L______LL__LLWWWLL____',
+  '____LL______L_L_L_______LL__LLWLL_____',
+  '____LLL_____L_L_L______LLL___LLL______',
+  '_____LLLLLLLLLLLLLLLLLLLL_____________',
+  '______________________________________',
+  '______________________________________',
+  '______________________________________',
 ];
 
-// Clarinet — 10 wide × 26 tall, black cylindrical body with silver keys
-// S=dark body, G=silver keys, L=light highlight, C=key ring, K=black body, _=empty
+// Clarinet Sprite
 const SPRITE_CLARINET = [
-  '___KKKK____', // mouthpiece tip
-  '__KKKKKKK__', // barrel
-  '__KKGKKGK__', // register key
-  '__KKKKKKKK_', // upper joint
-  '__KKGKKGKK_', // tone hole
-  '__KKKKKKKK_', // upper joint
-  '__KKGKKGKK_', // tone hole
-  '__KKKKKKKK_', // upper joint
-  '__KKGKKGKK_', // tone hole
-  '__KKKKKKKK_', // bridge
-  '__KKGKKGKK_', // lower joint
-  '__KKKKKKKK_', // lower joint
-  '__KKGKKGKK_', // tone hole
-  '__KKKKKKKK_', // lower joint
-  '__KKGKKGKK_', // tone hole
-  '__KKKKKKKK_', // lower joint
-  '__KKGKKGKK_', // tone hole
-  '__KKKKKKKK_', // bell joint
-  '__KKKKKKKKK', // bell widening
-  '_KKKKKKKKKK', // bell
-  '_KKKKKKKKKK', // bell
-  '__KKKKKKKKK', // bell taper
-  '___KKKKKKK_', // bell end
-  '____KKKKK__', // bell end
+  '_____________',
+  '______KK_____', 
+  '______KK_____',
+  '______KK_____', 
+  '______KK_____',
+  '_____KKKK____',
+  '_____KGGG____',
+  '_____KKKK____', 
+  '_____KKKK____',
+  '_____KGGG____', 
+  '_____KKKK____',
+  '_____KKKK____',
+  '_____KGGG____', 
+  '_____KKKK____',
+  '_____KKKK____', 	
+  '_____KGGG____',
+  '_____KKKK____',
+  '_____KKKK____', 
+  '_____KGGG____',
+  '_____KKKK____', 
+  '_____KKKK____',
+  '_____KGGG____',
+  '_____KKKK____', 
+  '_____KKKK____',
+  '_____KKKK____',
+  '____KKKKKK___',
+  '___KKKKKKKK__',
+  '__KKKKKKKKKK_',
 ];
 
 // Flute — 20 wide × 8 tall, horizontal silver tube (drawn at PX=2 → 40×16px)
 // Colors: S=dark outline, G=silver body, L=light highlight, C=key pads, _=empty
 const SPRITE_FLUTE = [
-  '____SSSSSSSSSSSSSSSS__',
-  '__SSGGGGGGGGGGGGGGGGSS',
-  'SSGGLGGCGLGCGLGCGLGGSS',
-  'SSGGGGGGGGGGGGGGGGGGSS',
-  'SSGGGGGGGGGGGGGGGGGGSS',
-  'SSGGLGGCGLGCGLGCGLGGSS',
-  '__SSGGGGGGGGGGGGGGGGSS',
-  '____SSSSSSSSSSSSSSSS__',
+  '_________________________________',
+  '_________________________________',
+  '___GGGG______G___G___G___G___G___',
+  '__GGGGGGGGGGGGGGGGGGGGGGGGGGGGG__', 
+  '__GGGGGGGGGGGGGGGGGGGGGGGGGGGGG__',
+  '_________________________________',
+  '_________________________________',
 ];
 
 // Violin — 10 wide × 22 tall (drawn at PX=2 → 20×44px)
@@ -2608,98 +2670,96 @@ const SPRITE_VIOLA = [
 
 // Cello — 12 wide × 26 tall, notably bigger
 const SPRITE_CELLO = [
-  '______DDD_______', // Peg tips
-  '______DDD_______', // Peg tips
-  '____DDDDDDD_____', // Top pegs
-  '____DDDDDDD_____', // Top pegs
-  '______DDD_______', // Peg box
-  '______DDD_______', // Peg box
-  '____DDDDDDD_____', // Bottom pegs
-  '____DDDDDDD_____', // Bottom pegs
-  '______SSS_______', // Neck top
-  '______SSS_______', // Neck top
-  '______SSS_______', // Neck
-  '______SSS_______', // Neck
-  '______SSS_______', // Neck
-  '______SSS_______', // Neck base
-  '______SSS_______', // Added neck length for scale
-  '____DWSSSWD_____', // Shoulders
-  '___DDWSSSWDD____', // Upper bout (Widened)
-  '___DDWSSSWDD____', // Upper bout (Widened)
-  '___DWWSSSWWD____',
-  '___DWWSSSWWD____',
-  '____DDSSSDD_____', // Waist (C-bouts)
-  '____DDSSSDD_____', // Waist (C-bouts)
-  '____DDSSSDD_____',
-  '____DDSSSDD_____',
-  '___DWWWWWWWWD___', // Lower bout
-  '___DWWWWWWWWD___', // Lower bout
-  '__DWWWSSSWWWD___', // Lower bout widening
-  '__DWWWWWWWWWD___', // Extra body depth row
-  '__DWWWWWWWWWWD__', // Extra body depth row
-  '__DWWWSSSWWWWD__', // F-holes (S)
-  '__DWWWSSSWWWWD__', // F-holes (S)
-  '__DWWWSSSWWWWD__', // Bridge / Tailpiece (C)
-  '__DWWWSSSWWWWD__', // Bridge / Tailpiece (C)
-  '__CDWWWSWWWWWC__', // Chinrest (C)
-  '__CDWWWSWWWWDC__', // Chinrest (C)
-  '___DDWWSWWWDD___', // Bottom curve
-  '____DWWWWWDD____', // Rounded out base
-  '______DDD_______', // End pin
-  '_______W________', // End pin
-  '_______W________', // End pin
-  '_______W________', // End pin
-  '_______W________', // End pin
-  '_______W________', // End pin
-  '_______W________', // End pin
+  '_______DDD_______', 
+  '_______DDD_______', // Peg tips
+  '_____DDDDDDD_____', // Top pegs
+  '_____DDDDDDD_____', // Top pegs
+  '_______DDD_______', // Peg box
+  '_______DDD_______', // Peg box
+  '_____DDDDDDD_____', // Bottom pegs
+  '_____DDDDDDD_____', // Bottom pegs
+  '_______SSS_______', // Neck top
+  '_______SSS_______', // Neck top
+  '_______SSS_______', // Neck
+  '_______SSS_______', // Neck
+  '_______SSS_______', // Neck
+  '_______SSS_______', // Neck base
+  '_______SSS_______', // Added neck length for scale
+  '_____DWSSSWD_____', // Shoulders
+  '____DWWSSSWWD____', // Upper bout (Widened)
+  '____DWWSSSWWD____', // Upper bout (Widened)
+  '___DWWWSSSWWWD___',
+  '___DWWWSSSWWWD___',
+  '____DWWSSSWWD____', // Waist (C-bouts)
+  '____DWWSSSWWD____', // Waist (C-bouts)
+  '_____DWSSSWD_____',
+  '____DWWSSSWWD____',
+  '____DWWWWWWWD____', // Lower bout widening
+  '___DWWWWWWWWWD___', // Extra body depth row
+  '___DWWWSSSWWWD___', // Extra body depth row
+  '___DWWWWWWWWWD___', // F-holes (S)
+  '__DWWWWWWWWWWWD__', // F-holes (S)
+  '__DWWWWSSSWWWWD__', // Bridge / Tailpiece (C)
+  '__DWWWWSSSWWWWD__', // Bridge / Tailpiece (C)
+  '___DWWWSSSWWWD___', // Chinrest (C)
+  '___DWWWSSSWWWD___', // Chinrest (C)
+  '____DWWWSWWWD____', // Bottom curve
+  '_____DWWSWWD_____', // Rounded out base
+  '_______DDD_______', // End pin
+  '________W________', // End pin
+  '________W________', // End pin
+  '________W________', // End pin
+  '________W________', // End pin
+  '________W________', // End pin
+  '________W________', 
 ];
 
 // Double Bass — 13 wide × 28 tall, widest & tallest
 const SPRITE_BASS = [
-  '________DDD_________', // Peg tips
-  '_______DDDDD________', // Top pegs
-  '_______DDDDD________', // Top pegs
-  '________DDD_________', // Peg box
-  '________DDD_________', // Peg box
-  '_______DDDDD________', // Bottom pegs
-  '_______DDDDD________', // Bottom pegs
-  '________SSS_________', // Neck top
-  '________SSS_________', // Neck top
-  '________SSS_________', // Neck
-  '________SSS_________', // Neck
-  '________SSS_________', // Neck
-  '________SSS_________', // Neck
-  '________SSS_________', // Neck base
-  '________SSS_________', // Added neck length for scale
-  '_____DWWSSSWWD______', // Shoulders
-  '_____DWWSSSWWD______', // Shoulders
-  '___DWWWWSSSWWWWD____', 
-  '___DWWWWSSSWWWWD____', 
-  '___DWWWWSSSWWWWD____', 
-  '___DWWWWSSSWWWWD____', 
-  '____DWWWSSSWWWD_____', 
-  '____DWWWSSSWWWD_____', 
-  '____DWWWSSSWWWD_____',
-  '____DWWWSSSWWWD_____',
-  '_____DDWSSSWDD______', // Waist (C-bouts)
-  '_____DDWSSSWDD______', // Waist (C-bouts)
-  '_____DDWSSSWDD______',
-  '____DWWWWWWWWWD_____', // Lower bout
-  '___DWWWWWWWWWWWD____', // Lower bout widening
-  '___DWWWWSSSWWWWD____', // Lower bout widening
-  '___DWWWWWWWWWWWD____', // Extra body depth row
-  '__DWWWWWWWWWWWWWD___', // F-holes (S)
-  '__DWWWWWWWWWWWWWD___', // F-holes (S)
-  '__DWWWWWSSSWWWWWD___', // F-holes (S)
-  '___DWWWWSSSWWWWWD___', // Bridge / Tailpiece (C)
-  '___DWWWWSSSWWWWWD___', // Bridge / Tailpiece (C)
-  '____DWWWSSSWWWWW____', // Chinrest (C)
-  '____DWWWSSSWWDD_____', // Chinrest (C)
-  '____DWWWWSWWWWD_____', // Bottom curve
-  '_____DWWWSWWWD______', // Rounded out base
-  '_______DDDDD________', // End pin
-  '_________W__________', // End pin
-  '_________W__________', // End pin
+  '________DDD________', // Peg tips
+  '_______DDDDD_______', // Top pegs
+  '_______DDDDD_______', // Top pegs
+  '________DDD________', // Peg box
+  '________DDD________', // Peg box
+  '_______DDDDD_______', // Bottom pegs
+  '_______DDDDD_______', // Bottom pegs
+  '________SSS________', // Neck top
+  '________SSS________', // Neck top
+  '________SSS________', // Neck
+  '________SSS________', // Neck
+  '________SSS________', // Neck
+  '________SSS________', // Neck
+  '________SSS________', // Neck base
+  '________SSS________', // Added neck length for scale
+  '_____DWWSSSWWD_____', // Shoulders
+  '_____DWWSSSWWD_____', // Shoulders
+  '___DWWWWSSSWWWWD___', 
+  '___DWWWWSSSWWWWD___', 
+  '___DWWWWSSSWWWWD___', 
+  '___DWWWWSSSWWWWD___', 
+  '____DWWWSSSWWWD____', 
+  '____DWWWSSSWWWD____', 
+  '____DWWWSSSWWWD____',
+  '____DWWWSSSWWWD____',
+  '_____DDWSSSWDD_____', // Waist (C-bouts)
+  '_____DDWSSSWDD_____', // Waist (C-bouts)
+  '_____DDWSSSWDD_____',
+  '____DWWWWWWWWWD____', // Lower bout
+  '___DWWWWWWWWWWWD___', // Lower bout widening
+  '___DWWWWSSSWWWWD___', // Lower bout widening
+  '___DWWWWWWWWWWWD___', // Extra body depth row
+  '__DWWWWWWWWWWWWWD__', // F-holes (S)
+  '__DWWWWWWWWWWWWWD__', // F-holes (S)
+  '__DWWWWWSSSWWWWWD__', // F-holes (S)
+  '___DWWWWSSSWWWWD___', // Bridge / Tailpiece (C)
+  '___DWWWWSSSWWWWD___', // Bridge / Tailpiece (C)
+  '___DWWWWSSSWWWWD___', // Chinrest (C)
+  '____DWWWSSSWWWD____', // Chinrest (C)
+  '____DWWWWSWWWWD____', // Bottom curve
+  '_____DWWWSWWWD_____', // Rounded out base
+  '_______DDDDD_______', // End pin
+  '_________W_________', // End pin
+  '_________W_________', // End pin
 ];
 
 
@@ -2996,7 +3056,17 @@ function drawLevelSelectScreen() {
   const gridW = cols * cardW + (cols - 1) * cardGapX;
   const gridH = rows * cardH + (rows - 1) * cardGapY;
   const gridX = W / 2 - gridW / 2;
-  const gridY = 96 + (H - 96 - 60 - gridH) / 2; // vertically centre between divider and back btn
+  // Total content: grid + gap + ucCard + gap + backBtn
+  const ucCardH_est = 54; // estimated UC card height
+  const bbH_est = 30;     // back button height
+  const totalContentH = gridH + 8 + ucCardH_est + 10 + bbH_est;
+  // Start grid so all content fits between the divider (96px) and bottom of screen
+  const topMargin = 96 + 8;
+  const availH = H - topMargin;
+  const startY = availH > totalContentH
+    ? topMargin + (availH - totalContentH) / 2  // centre if room
+    : topMargin;                                  // pin to top if tight
+  const gridY = startY;
 
   levelSelectBtns = [];
 
@@ -3056,6 +3126,7 @@ function drawLevelSelectScreen() {
   const ucCardW = 460, ucCardH = 54;
   const ucCardX = W / 2 - ucCardW / 2;
   const ucCardY = gridY + rows * (cardH + cardGapY) + 8;
+  const ucCardBottom = ucCardY + ucCardH;
 
   ctx.fillStyle = '#000';
   ctx.fillRect(ucCardX + 3, ucCardY + 3, ucCardW, ucCardH);
@@ -3080,7 +3151,7 @@ function drawLevelSelectScreen() {
   // Back button
   const bbW = 120, bbH = 30;
   const bbX = W / 2 - bbW / 2;
-  const bbY = H - 46;
+  const bbY = ucCardBottom + 10;
   drawNesButton('BACK', bbX, bbY, bbW, bbH, hoveredBtn === 'LVLSEL_BACK', false);
   levelSelectBackBtn = { x: bbX, y: bbY, w: bbW, h: bbH };
 
@@ -3129,8 +3200,10 @@ function drawTitleScreen() {
   const strings = ['Violin','Viola','Cello','Bass'];
   const winds   = ['Flute','Clarinet','Trumpet','Baritone','Alto Sax','Trombone','Mallet Perc'];
   const windBtnW = Math.floor((strings.length * btnW + (strings.length - 1) * gap - (winds.length - 1) * gap) / winds.length);
-  const maxSpriteH = Math.max(...INSTRUMENTS.map(n => spriteMap[n].length * PX));
-  const cardH = padding + labelH + padding + maxSpriteH + padding;
+  const maxStringSpriteH = Math.max(...strings.map(n => spriteMap[n].length * PX));
+  const maxWindSpriteH   = Math.max(...winds.map(n => spriteMap[n].length * PX));
+  const cardH     = padding + labelH + padding + maxStringSpriteH + padding;       // string cards
+  const windCardH = padding + labelH + padding + maxWindSpriteH + 4;               // wind cards — less bottom padding
 
   // Row 1 — strings
   const row1TotalW = strings.length * btnW + (strings.length - 1) * gap;
@@ -3149,29 +3222,38 @@ function drawTitleScreen() {
 
   allRows.forEach(({ name, bx, by: rowY, isWind }) => {
     const cardW = isWind ? windBtnW : btnW;
+    const thisCardH = isWind ? windCardH : cardH;
     const hovered = hoveredBtn === name;
     const selected = selectedInstrument === name;
     const sprite = spriteMap[name];
 
     ctx.fillStyle = '#000';
-    ctx.fillRect(bx + 3, rowY + 3, cardW, cardH);
+    ctx.fillRect(bx + 3, rowY + 3, cardW, thisCardH);
     ctx.fillStyle = selected ? '#ffe066' : hovered ? '#1e2a5a' : '#1a1a3a';
-    ctx.fillRect(bx, rowY, cardW, cardH);
+    ctx.fillRect(bx, rowY, cardW, thisCardH);
     ctx.strokeStyle = selected ? '#fff' : '#ffe066';
     ctx.lineWidth = 2;
-    ctx.strokeRect(bx, rowY, cardW, cardH);
+    ctx.strokeRect(bx, rowY, cardW, thisCardH);
 
     ctx.fillStyle = selected ? '#000' : '#fff';
     ctx.font = '8px "Press Start 2P"';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
-    ctx.fillText(name, bx + cardW / 2, rowY + padding);
+
+    // "Mallet Perc" gets two lines; other names fit on one
+    if (name === 'Mallet Perc') {
+      ctx.fillText('Mallet', bx + cardW / 2, rowY + padding);
+      ctx.fillText('Perc',   bx + cardW / 2, rowY + padding + 12);
+    } else {
+      ctx.fillText(name, bx + cardW / 2, rowY + padding);
+    }
 
     const spriteCX = bx + cardW / 2;
-    const spriteCY = rowY + padding + labelH + padding;
+    const spriteYOffset = name === 'Clarinet' ? -8 : 0;
+    const spriteCY = rowY + padding + labelH + padding + spriteYOffset;
     drawInstrumentSprite(sprite, spriteCX, spriteCY);
 
-    instrBtns.push({ label: name, x: bx, y: rowY, w: cardW, h: cardH });
+    instrBtns.push({ label: name, x: bx, y: rowY, w: cardW, h: thisCardH });
   });
 
 
