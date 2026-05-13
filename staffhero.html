@@ -31,7 +31,7 @@
     display: none;
     position: absolute;
     top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.78);
+    background: rgba(0,0,10,0.88);
     flex-direction: column;
     align-items: center;
     justify-content: center;
@@ -67,10 +67,19 @@
 <div id="canvasWrapper">
   <canvas id="gameCanvas" tabindex="0"></canvas>
   <div id="submitPanel">
-    <span>NAME:</span>
-    <input id="playerName" type="text" maxlength="24" placeholder="Your name" autocomplete="off" />
-    <button id="submitBtn">SUBMIT</button>
-    <span id="submitStatus"></span>
+    <div style="background:#0a0a1a;border:2px solid #ffe066;padding:28px 32px;min-width:360px;max-width:480px;display:flex;flex-direction:column;align-items:center;gap:14px;box-sizing:border-box;">
+      <div style="font-family:'Press Start 2P',monospace;font-size:11px;color:#ffe066;letter-spacing:1px;">SCORE CARD</div>
+      <div id="submitScore"   style="font-family:'Press Start 2P',monospace;font-size:16px;color:#fff;"></div>
+      <div id="submitInstrument" style="font-family:'Press Start 2P',monospace;font-size:7px;color:#aaddff;"></div>
+      <div style="font-family:'Press Start 2P',monospace;font-size:7px;color:#ffe066;">ENTER YOUR NAME</div>
+      <input id="playerName" type="text" maxlength="24" placeholder="Your name" autocomplete="off"
+        style="font-family:'Press Start 2P',monospace;font-size:9px;padding:8px 12px;background:#111;color:#fff;border:1px solid #ffe066;width:100%;box-sizing:border-box;text-align:center;" />
+      <button id="submitBtn"
+        style="font-family:'Press Start 2P',monospace;font-size:8px;padding:10px 20px;background:#ffe066;color:#000;border:none;cursor:pointer;width:100%;">SUBMIT SCORE</button>
+      <span id="submitStatus" style="font-family:'Press Start 2P',monospace;font-size:7px;min-height:14px;"></span>
+      <button onclick="exitToMenu()"
+        style="font-family:'Press Start 2P',monospace;font-size:7px;padding:8px 16px;background:#1a1a3a;color:#ffe066;border:1px solid #ffe066;cursor:pointer;width:100%;">MENU</button>
+    </div>
   </div>
 
   <!-- Settings panel -->
@@ -126,27 +135,28 @@ function exitToMenu() {
   currentLevel = 1;
   score = 0;
   ucActive = false;
+  ucScoreCard = false;
+  gameOver = false;
+  levelComplete = false;
   gameState = 'title';
 }
 
 function showSubmitPanel() {
   if (twoPlayer) return;
+  // Score
   const scoreEl = document.getElementById('submitScore');
   if (scoreEl) scoreEl.textContent = 'SCORE: ' + score;
+  // Instrument + level
   const instrEl = document.getElementById('submitInstrument');
   if (instrEl) {
     const lvlText = ucActive ? 'ULTIMATE CHALLENGE' : ('LEVEL ' + currentLevel);
     instrEl.textContent = selectedInstrument.toUpperCase() + '  ·  ' + lvlText;
   }
-  // Reset submit button state
-  const btn = document.getElementById('submitBtn');
-  if (btn) { btn.disabled = false; btn.textContent = 'SUBMIT SCORE'; }
-  const status = document.getElementById('submitStatus');
-  if (status) { status.textContent = ''; }
-  submitPanel.classList.add('visible');
-  submitStatus.textContent = '';
+  // Reset submit button and status
   submitBtn.disabled = false;
-  submitBtn.textContent = 'SUBMIT';
+  submitBtn.textContent = 'SUBMIT SCORE';
+  submitStatus.textContent = '';
+  submitPanel.classList.add('visible');
   playerNameInput.focus();
 }
 
@@ -182,7 +192,7 @@ submitBtn.addEventListener('click', async () => {
       body: form,
     });
     submitStatus.style.color = '#44ff88';
-    submitStatus.textContent = 'Saved!';
+    submitStatus.textContent = 'SCORE SAVED!';
     submitBtn.textContent = 'DONE';
   } catch (err) {
     submitStatus.style.color = '#ff4444';
@@ -3713,7 +3723,31 @@ function arcY(startY, endY, t, arcHeight) {
 let ucScoreCardNameInput = '';   // player name typed on score card
 let ucScoreCardStatus = '';      // 'idle' | 'sending' | 'sent' | 'error'
 let ucScoreCardSubmitBtn = null;
+let ucScoreCardRetryBtn  = null;
+// Regular level complete score card (canvas-based, same approach as UC)
+let lvlCardNameInput = '';
+let lvlCardStatus    = '';
+let lvlCardSubmitBtn = null;
+let lvlCardMenuBtn   = null;
+let lvlCardNextBtn   = null;
 let ucScoreCardMenuBtn = null;
+
+async function submitLvlScore() {
+  if (!lvlCardNameInput.trim()) return;
+  if (lvlCardStatus === 'sending' || lvlCardStatus === 'sent') return;
+  lvlCardStatus = 'sending';
+  try {
+    const form = new URLSearchParams();
+    form.append('name',       lvlCardNameInput.trim());
+    form.append('score',      score);
+    form.append('level',      currentLevel);
+    form.append('instrument', selectedInstrument);
+    await fetch(APPS_SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: form });
+    lvlCardStatus = 'sent';
+  } catch(e) {
+    lvlCardStatus = 'error';
+  }
+}
 
 async function submitUcScore() {
   if (!ucScoreCardNameInput.trim()) return;
@@ -3733,77 +3767,106 @@ async function submitUcScore() {
 }
 
 function drawUcScoreCard() {
-  // Dark overlay
-  ctx.fillStyle = 'rgba(0,0,10,0.88)';
+  // Full-screen dark overlay
+  ctx.fillStyle = 'rgba(0,0,10,0.92)';
   ctx.fillRect(0, 0, W, H);
 
   // Card
-  const cW = 480, cH = 300;
+  const cW = 500, cH = 340;
   const cX = W/2 - cW/2, cY = H/2 - cH/2;
   ctx.fillStyle = '#000';
   ctx.fillRect(cX+4, cY+4, cW, cH);
   ctx.fillStyle = '#0a0a1a';
   ctx.fillRect(cX, cY, cW, cH);
-  ctx.strokeStyle = '#ffe066';
+  ctx.strokeStyle = gameOver ? '#ff4444' : '#ffe066';
   ctx.lineWidth = 2;
   ctx.strokeRect(cX, cY, cW, cH);
 
-  // Title
-  ctx.fillStyle = '#ffe066';
-  ctx.font = '11px "Press Start 2P"';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText('ULTIMATE CHALLENGE', W/2, cY + 30);
+
+  // Title — GAME OVER or END GAME
+  ctx.fillStyle = gameOver ? '#ff4444' : '#ffe066';
+  ctx.font = '14px "Press Start 2P"';
+  ctx.fillText(gameOver ? 'GAME OVER' : 'END GAME', W/2, cY + 32);
 
   // Score
   ctx.fillStyle = '#fff';
-  ctx.font = '16px "Press Start 2P"';
-  ctx.fillText('SCORE: ' + score, W/2, cY + 72);
+  ctx.font = '13px "Press Start 2P"';
+  ctx.fillText('SCORE: ' + score, W/2, cY + 68);
 
-  // Instrument
+  // Instrument · UC
   ctx.fillStyle = '#aaddff';
   ctx.font = '7px "Press Start 2P"';
-  ctx.fillText(selectedInstrument.toUpperCase(), W/2, cY + 100);
+  ctx.fillText(selectedInstrument.toUpperCase() + '  ·  ULTIMATE CHALLENGE', W/2, cY + 96);
+
+  // Divider
+  ctx.strokeStyle = '#333';
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(cX+20, cY+112); ctx.lineTo(cX+cW-20, cY+112); ctx.stroke();
 
   // Name label
   ctx.fillStyle = '#ffe066';
   ctx.font = '7px "Press Start 2P"';
-  ctx.fillText('ENTER YOUR NAME', W/2, cY + 128);
+  ctx.fillText('ENTER YOUR NAME TO SUBMIT SCORE', W/2, cY + 130);
 
   // Name input box
-  const inpW = 300, inpH = 28;
-  const inpX = W/2 - inpW/2, inpY = cY + 140;
+  const inpW = 340, inpH = 30;
+  const inpX = W/2 - inpW/2, inpY = cY + 144;
   ctx.fillStyle = '#111';
   ctx.fillRect(inpX, inpY, inpW, inpH);
   ctx.strokeStyle = '#ffe066';
   ctx.lineWidth = 1.5;
   ctx.strokeRect(inpX, inpY, inpW, inpH);
-  ctx.fillStyle = '#fff';
-  ctx.font = '9px "Press Start 2P"';
-  ctx.textAlign = 'center';
-  ctx.fillText(ucScoreCardNameInput + (Math.floor(Date.now()/500)%2 ? '|' : ''), W/2, inpY + 16);
+  const cursor = Math.floor(Date.now()/500)%2 ? '|' : ' ';
+  if (ucScoreCardNameInput) {
+    ctx.fillStyle = '#fff';
+    ctx.font = '9px "Press Start 2P"';
+    ctx.fillText(ucScoreCardNameInput + cursor, W/2, inpY + 17);
+  } else {
+    // Show placeholder with blinking cursor
+    ctx.fillStyle = '#555';
+    ctx.font = '9px "Press Start 2P"';
+    ctx.fillText('Your name', W/2, inpY + 17);
+    ctx.fillStyle = '#aaa';
+    ctx.fillText(cursor, W/2 + 52, inpY + 17); // cursor after placeholder
+  }
 
   // Status message
-  const statusCol = ucScoreCardStatus === 'sent' ? '#44ff88' : ucScoreCardStatus === 'error' ? '#ff4444' : '#aaddff';
-  ctx.fillStyle = statusCol;
-  ctx.font = '7px "Press Start 2P"';
-  ctx.fillText(
-    ucScoreCardStatus === 'sending' ? 'SENDING...' :
-    ucScoreCardStatus === 'sent'    ? 'SCORE SAVED!' :
-    ucScoreCardStatus === 'error'   ? 'ERROR - TRY AGAIN' : '',
-    W/2, inpY + inpH + 14);
+  if (ucScoreCardStatus) {
+    const statusCol = ucScoreCardStatus === 'sent' ? '#44ff88' : ucScoreCardStatus === 'error' ? '#ff4444' : '#aaddff';
+    ctx.fillStyle = statusCol;
+    ctx.font = '7px "Press Start 2P"';
+    ctx.fillText(
+      ucScoreCardStatus === 'sending' ? 'SENDING...' :
+      ucScoreCardStatus === 'sent'    ? 'SCORE SAVED!' :
+      ucScoreCardStatus === 'error'   ? 'ERROR - TRY AGAIN' : '',
+      W/2, inpY + inpH + 14);
+  }
 
-  // SUBMIT button
-  const sbW = 160, sbH = 32;
-  const sbX = W/2 - sbW - 8, sbY = cY + cH - 52;
-  drawNesButton('SUBMIT', sbX, sbY, sbW, sbH, hoveredBtn === 'UC_SUBMIT', false);
-  ucScoreCardSubmitBtn = { x: sbX, y: sbY, w: sbW, h: sbH };
+  // Buttons row: SUBMIT  RETRY  MENU
+  const btnW = 140, btnH = 34, btnGap = 12;
+  const showRetry = gameOver;
+  const numBtns = showRetry ? 3 : 2;
+  const totalBW = numBtns * btnW + (numBtns-1) * btnGap;
+  const btnStartX = W/2 - totalBW/2;
+  const btnY = cY + cH - 52;
 
-  // MENU button
-  const mbW = 160, mbH = 32;
-  const mbX = W/2 + 8, mbY = sbY;
-  drawNesButton('MENU', mbX, mbY, mbW, mbH, hoveredBtn === 'UC_MENU', false);
-  ucScoreCardMenuBtn = { x: mbX, y: mbY, w: mbW, h: mbH };
+  let bx = btnStartX;
+  drawNesButton('SUBMIT', bx, btnY, btnW, btnH, hoveredBtn === 'UC_SUBMIT', false);
+  ucScoreCardSubmitBtn = { x: bx, y: btnY, w: btnW, h: btnH };
+  bx += btnW + btnGap;
+
+  if (showRetry) {
+    drawNesButton('RETRY', bx, btnY, btnW, btnH, hoveredBtn === 'UC_RETRY', false);
+    ucScoreCardRetryBtn = { x: bx, y: btnY, w: btnW, h: btnH };
+    bx += btnW + btnGap;
+  } else {
+    ucScoreCardRetryBtn = null;
+  }
+
+  drawNesButton('MENU', bx, btnY, btnW, btnH, hoveredBtn === 'UC_MENU', false);
+  ucScoreCardMenuBtn = { x: bx, y: btnY, w: btnW, h: btnH };
 }
 
 // ─── UC BEAT GAME OVERLAY ────────────────────────────────────────────────────
@@ -3915,7 +3978,7 @@ function update(dt) {
         finalTime = elapsedTime;
         levelComplete = true;
         stopBackingTrack();
-        showSubmitPanel();
+        // Both UC and regular levels use canvas score cards now
       }
       // ucBeatGame: flip already stopped backing track; beatAnim takes over
     }
@@ -4095,7 +4158,8 @@ function draw(dt) {
   }
 
   // Game Over / Level Complete overlays
-  if (gameOver) {
+  if (gameOver && !ucScoreCard) {
+    // Non-UC game over — canvas overlay with retry/menu
     ctx.fillStyle = 'rgba(0,0,0,0.7)';
     ctx.fillRect(0, 0, W, H);
     ctx.fillStyle = '#ff4444';
@@ -4107,8 +4171,6 @@ function draw(dt) {
     ctx.fillText(`SCORE:  ${score}`, W / 2, H / 2 - 2);
     ctx.fillStyle = '#aaffaa';
     ctx.fillText(`TIME:   ${formatTime(finalTime)}`, W / 2, H / 2 + 18);
-
-    // Retry + Menu buttons
     const goBtnW = 160, goBtnH = 38, goBtnGap = 24;
     const goTotalW = goBtnW * 2 + goBtnGap;
     const goBtnY = H / 2 + 40;
@@ -4121,38 +4183,101 @@ function draw(dt) {
   }
 
   if (levelComplete) {
-    ctx.fillStyle = 'rgba(0,0,0,0.82)';
+    // Canvas score card for regular level complete
+    ctx.fillStyle = 'rgba(0,0,10,0.92)';
     ctx.fillRect(0, 0, W, H);
+
+    const cW = 500, cH = 360;
+    const cX = W/2 - cW/2, cY = H/2 - cH/2;
+    ctx.fillStyle = '#000';
+    ctx.fillRect(cX+4, cY+4, cW, cH);
+    ctx.fillStyle = '#0a0a1a';
+    ctx.fillRect(cX, cY, cW, cH);
+    ctx.strokeStyle = '#44ff88';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(cX, cY, cW, cH);
+
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+
+    // Title
     ctx.fillStyle = '#44ff88';
-    ctx.font = '18px "Press Start 2P"';
-    ctx.textAlign = 'center';
-    ctx.fillText('LEVEL CLEAR!', W / 2, H / 2 - 52);
-    ctx.font = '8px "Press Start 2P"';
+    ctx.font = '14px "Press Start 2P"';
+    ctx.fillText('LEVEL CLEAR!', W/2, cY + 32);
+
+    // Score + time
     ctx.fillStyle = '#fff';
-    ctx.fillText(`SCORE:  ${score}`, W / 2, H / 2 - 18);
+    ctx.font = '11px "Press Start 2P"';
+    ctx.fillText('SCORE: ' + score, W/2, cY + 64);
     ctx.fillStyle = '#aaffaa';
-    ctx.fillText(`TIME:   ${formatTime(finalTime)}`, W / 2, H / 2 + 2);
+    ctx.font = '8px "Press Start 2P"';
+    ctx.fillText('TIME: ' + formatTime(finalTime), W/2, cY + 88);
 
-    // Menu button (left) and Next Level button (right)
-    const btnW = 160, btnH = 38, gap = 24;
-    const totalBtnW = btnW * 2 + gap;
-    const btnY = H / 2 + 28;
-    const menuX = W / 2 - totalBtnW / 2;
-    const nextX  = menuX + btnW + gap;
+    // Instrument + level
+    ctx.fillStyle = '#aaddff';
+    ctx.font = '7px "Press Start 2P"';
+    ctx.fillText(selectedInstrument.toUpperCase() + '  ·  LEVEL ' + currentLevel, W/2, cY + 110);
 
-    drawNesButton('MENU',       menuX, btnY, btnW, btnH, hoveredBtn === 'MENU', false);
-    menuBtn = { x: menuX, y: btnY, w: btnW, h: btnH };
+    // Divider
+    ctx.strokeStyle = '#333'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(cX+20, cY+124); ctx.lineTo(cX+cW-20, cY+124); ctx.stroke();
 
+    // Name label
+    ctx.fillStyle = '#ffe066';
+    ctx.font = '7px "Press Start 2P"';
+    ctx.fillText('ENTER YOUR NAME TO SUBMIT SCORE', W/2, cY + 140);
+
+    // Name input box
+    const inpW = 340, inpH = 30;
+    const inpX = W/2 - inpW/2, inpY = cY + 154;
+    ctx.fillStyle = '#111';
+    ctx.fillRect(inpX, inpY, inpW, inpH);
+    ctx.strokeStyle = '#ffe066'; ctx.lineWidth = 1.5;
+    ctx.strokeRect(inpX, inpY, inpW, inpH);
+    const lcursor = Math.floor(Date.now()/500)%2 ? '|' : ' ';
+    if (lvlCardNameInput) {
+      ctx.fillStyle = '#fff'; ctx.font = '9px "Press Start 2P"';
+      ctx.fillText(lvlCardNameInput + lcursor, W/2, inpY + 17);
+    } else {
+      ctx.fillStyle = '#555'; ctx.font = '9px "Press Start 2P"';
+      ctx.fillText('Your name', W/2, inpY + 17);
+      ctx.fillStyle = '#aaa';
+      ctx.fillText(lcursor, W/2 + 52, inpY + 17);
+    }
+
+    // Status
+    if (lvlCardStatus) {
+      const sc = lvlCardStatus === 'sent' ? '#44ff88' : lvlCardStatus === 'error' ? '#ff4444' : '#aaddff';
+      ctx.fillStyle = sc; ctx.font = '7px "Press Start 2P"';
+      ctx.fillText(
+        lvlCardStatus === 'sending' ? 'SENDING...' :
+        lvlCardStatus === 'sent'    ? 'SCORE SAVED!' :
+        lvlCardStatus === 'error'   ? 'ERROR - TRY AGAIN' : '',
+        W/2, inpY + inpH + 14);
+    }
+
+    // Buttons: SUBMIT  MENU  NEXT LEVEL
     const activeLevels = getLevelSet();
     const hasNextLevel = activeLevels[currentLevel + 1] !== undefined;
-    drawNesButton('NEXT LEVEL', nextX, btnY, btnW, btnH, hoveredBtn === 'NEXT', !hasNextLevel);
-    nextLevelBtn = { x: nextX, y: btnY, w: btnW, h: btnH, enabled: hasNextLevel };
+    const btnW2 = 140, btnH2 = 32, btnGap2 = 10;
+    const numB = hasNextLevel ? 3 : 2;
+    const totalBW2 = numB * btnW2 + (numB-1) * btnGap2;
+    const btnStartX2 = W/2 - totalBW2/2;
+    const btnY2 = cY + cH - 48;
 
-    if (!hasNextLevel) {
-      ctx.fillStyle = '#555';
-      ctx.font = '6px "Press Start 2P"';
-      ctx.textAlign = 'center';
-      ctx.fillText('COMING SOON', nextX + btnW / 2, btnY + btnH + 12);
+    let bx2 = btnStartX2;
+    drawNesButton('SUBMIT', bx2, btnY2, btnW2, btnH2, hoveredBtn === 'LVL_SUBMIT', false);
+    lvlCardSubmitBtn = { x: bx2, y: btnY2, w: btnW2, h: btnH2 };
+    bx2 += btnW2 + btnGap2;
+
+    drawNesButton('MENU', bx2, btnY2, btnW2, btnH2, hoveredBtn === 'LVL_MENU', false);
+    lvlCardMenuBtn = { x: bx2, y: btnY2, w: btnW2, h: btnH2 };
+    bx2 += btnW2 + btnGap2;
+
+    if (hasNextLevel) {
+      drawNesButton('NEXT LEVEL', bx2, btnY2, btnW2, btnH2, hoveredBtn === 'LVL_NEXT', false);
+      lvlCardNextBtn = { x: bx2, y: btnY2, w: btnW2, h: btnH2, enabled: true };
+    } else {
+      lvlCardNextBtn = null;
     }
   }
 }
@@ -4243,9 +4368,16 @@ canvas.addEventListener('click', (e) => {
     if (ucScoreCardSubmitBtn && hitTest(pos, ucScoreCardSubmitBtn)) {
       submitUcScore(); return;
     }
+    if (ucScoreCardRetryBtn && hitTest(pos, ucScoreCardRetryBtn)) {
+      ucScoreCard = false; ucScoreCardNameInput = ''; ucScoreCardStatus = '';
+      gameOver = false; score = 0;
+      startPlaying();
+      hoveredBtn = null; return;
+    }
     if (ucScoreCardMenuBtn && hitTest(pos, ucScoreCardMenuBtn)) {
       ucScoreCard = false; ucScoreCardNameInput = ''; ucScoreCardStatus = '';
-      ucActive = false; score = 0; gameState = 'title'; hoveredBtn = null; return;
+      ucActive = false; score = 0; gameOver = false; gameState = 'title';
+      hoveredBtn = null; return;
     }
     return; // block other clicks while card is showing
   }
@@ -4348,17 +4480,18 @@ canvas.addEventListener('click', (e) => {
         return;
       }
     } else if (levelComplete) {
-      if (menuBtn && hitTest(pos, menuBtn)) {
-        currentLevel = 1;
-        score = 0;
-        hideSubmitPanel();
-        gameState = 'levelSelect';
-        hoveredBtn = null;
-      } else if (nextLevelBtn && nextLevelBtn.enabled && hitTest(pos, nextLevelBtn)) {
+      if (lvlCardSubmitBtn && hitTest(pos, lvlCardSubmitBtn)) {
+        submitLvlScore(); return;
+      }
+      if (lvlCardMenuBtn && hitTest(pos, lvlCardMenuBtn)) {
+        currentLevel = 1; score = 0; levelComplete = false;
+        lvlCardNameInput = ''; lvlCardStatus = '';
+        gameState = 'levelSelect'; hoveredBtn = null;
+      } else if (lvlCardNextBtn && lvlCardNextBtn.enabled && hitTest(pos, lvlCardNextBtn)) {
         currentLevel++;
-        hideSubmitPanel();
-        gameState = 'levelPreview';
-        hoveredBtn = null;
+        levelComplete = false;
+        lvlCardNameInput = ''; lvlCardStatus = '';
+        gameState = 'levelPreview'; hoveredBtn = null;
       }
     } else {
       if (inGameMenuBtn && hitTest(pos, inGameMenuBtn)) {
@@ -4524,7 +4657,11 @@ function resolveInput(correct, currentNote) {
       gameOver = true;
       finalTime = elapsedTime;
       stopBackingTrack();
-      showSubmitPanel();
+      if (ucActive) {
+        ucScoreCard = true;  // UC: show canvas score card
+      } else {
+        showSubmitPanel();   // Regular: show HTML submit panel
+      }
     }
   }
 
@@ -4544,15 +4681,17 @@ function resolveInput(correct, currentNote) {
 window.addEventListener('keydown', (e) => {
   // UC score card keyboard input
   if (ucScoreCard) {
-    if (e.key === 'Backspace') {
-      ucScoreCardNameInput = ucScoreCardNameInput.slice(0, -1);
-    } else if (e.key.length === 1 && ucScoreCardNameInput.length < 24) {
-      ucScoreCardNameInput += e.key;
-    } else if (e.key === 'Enter') {
-      submitUcScore();
-    }
-    e.preventDefault();
-    return;
+    if (e.key === 'Backspace') { ucScoreCardNameInput = ucScoreCardNameInput.slice(0,-1); }
+    else if (e.key.length === 1 && ucScoreCardNameInput.length < 24) { ucScoreCardNameInput += e.key; }
+    else if (e.key === 'Enter') { submitUcScore(); }
+    e.preventDefault(); return;
+  }
+  // Level complete score card keyboard input
+  if (levelComplete) {
+    if (e.key === 'Backspace') { lvlCardNameInput = lvlCardNameInput.slice(0,-1); }
+    else if (e.key.length === 1 && lvlCardNameInput.length < 24) { lvlCardNameInput += e.key; }
+    else if (e.key === 'Enter') { submitLvlScore(); }
+    e.preventDefault(); return;
   }
   // Title screen
   if (gameState === 'title') {
