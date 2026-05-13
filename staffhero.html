@@ -30,19 +30,12 @@
   #submitPanel {
     display: none;
     position: absolute;
-    bottom: -62px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: #0a0a1a;
-    border: 2px solid #ffe066;
-    padding: 10px 16px 12px;
-    flex-direction: row;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.78);
+    flex-direction: column;
     align-items: center;
-    gap: 8px;
-    font-family: 'Press Start 2P', monospace;
-    font-size: 9px;
-    color: #ffe066;
-    white-space: nowrap;
+    justify-content: center;
+    z-index: 50;
   }
   #submitPanel.visible { display: flex; }
   #playerName {
@@ -126,7 +119,30 @@ const playerNameInput = document.getElementById('playerName');
 const submitBtn = document.getElementById('submitBtn');
 const submitStatus = document.getElementById('submitStatus');
 
+
+
+function exitToMenu() {
+  hideSubmitPanel();
+  currentLevel = 1;
+  score = 0;
+  ucActive = false;
+  gameState = 'title';
+}
+
 function showSubmitPanel() {
+  if (twoPlayer) return;
+  const scoreEl = document.getElementById('submitScore');
+  if (scoreEl) scoreEl.textContent = 'SCORE: ' + score;
+  const instrEl = document.getElementById('submitInstrument');
+  if (instrEl) {
+    const lvlText = ucActive ? 'ULTIMATE CHALLENGE' : ('LEVEL ' + currentLevel);
+    instrEl.textContent = selectedInstrument.toUpperCase() + '  ·  ' + lvlText;
+  }
+  // Reset submit button state
+  const btn = document.getElementById('submitBtn');
+  if (btn) { btn.disabled = false; btn.textContent = 'SUBMIT SCORE'; }
+  const status = document.getElementById('submitStatus');
+  if (status) { status.textContent = ''; }
   submitPanel.classList.add('visible');
   submitStatus.textContent = '';
   submitBtn.disabled = false;
@@ -152,7 +168,7 @@ submitBtn.addEventListener('click', async () => {
     const payload = {
       name,
       score,
-      level: currentLevel,
+      level: ucActive ? 'UC' : currentLevel,
       instrument: selectedInstrument,
     };
     const form = new URLSearchParams();
@@ -1399,6 +1415,7 @@ const UC_LEVEL = 'UC'; // sentinel key for Ultimate Challenge
 
 // Ultimate Challenge state
 let ucActive = false;          // true when UC mode is running
+let ucScoreCard = false;       // true when UC score card is showing
 let ucPendingKeySig = null;    // { worldX, keySig, barX, crossed } — scrolling key change marker
 let ucXOffset = 0;             // cumulative extra X offset for UC notes (grows after each key change)
 let ucStageIdx = 0;            // index into ucStages[] — controls note generation
@@ -2072,11 +2089,12 @@ function drawHUD() {
     ctx.fillText(detectedNote ? `♪ ${detectedNote}` : '🎤', W / 2, 30);
   }
 
-  // In-game MENU button (below score, top-left)
+  // In-game MENU / END GAME button (below score, top-left)
   if (!gameOver && !levelComplete) {
-    const mbW = 60, mbH = 20;
+    const mbW = ucActive ? 90 : 60, mbH = 20;
     const mbX = 10, mbY = 24;
-    drawNesButton('MENU', mbX, mbY, mbW, mbH, hoveredBtn === 'MENU_INGAME', false);
+    const mbLabel = ucActive ? 'END GAME' : 'MENU';
+    drawNesButton(mbLabel, mbX, mbY, mbW, mbH, hoveredBtn === 'MENU_INGAME', false);
     inGameMenuBtn = { x: mbX, y: mbY, w: mbW, h: mbH };
   }
 
@@ -3691,6 +3709,103 @@ function arcY(startY, endY, t, arcHeight) {
   return base - arcHeight * Math.sin(Math.PI * t);
 }
 
+// ─── UC SCORE CARD ───────────────────────────────────────────────────────────
+let ucScoreCardNameInput = '';   // player name typed on score card
+let ucScoreCardStatus = '';      // 'idle' | 'sending' | 'sent' | 'error'
+let ucScoreCardSubmitBtn = null;
+let ucScoreCardMenuBtn = null;
+
+async function submitUcScore() {
+  if (!ucScoreCardNameInput.trim()) return;
+  if (ucScoreCardStatus === 'sending' || ucScoreCardStatus === 'sent') return;
+  ucScoreCardStatus = 'sending';
+  try {
+    const form = new URLSearchParams();
+    form.append('name',       ucScoreCardNameInput.trim());
+    form.append('score',      score);
+    form.append('level',      'UC');
+    form.append('instrument', selectedInstrument);
+    await fetch(APPS_SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: form });
+    ucScoreCardStatus = 'sent';
+  } catch(e) {
+    ucScoreCardStatus = 'error';
+  }
+}
+
+function drawUcScoreCard() {
+  // Dark overlay
+  ctx.fillStyle = 'rgba(0,0,10,0.88)';
+  ctx.fillRect(0, 0, W, H);
+
+  // Card
+  const cW = 480, cH = 300;
+  const cX = W/2 - cW/2, cY = H/2 - cH/2;
+  ctx.fillStyle = '#000';
+  ctx.fillRect(cX+4, cY+4, cW, cH);
+  ctx.fillStyle = '#0a0a1a';
+  ctx.fillRect(cX, cY, cW, cH);
+  ctx.strokeStyle = '#ffe066';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(cX, cY, cW, cH);
+
+  // Title
+  ctx.fillStyle = '#ffe066';
+  ctx.font = '11px "Press Start 2P"';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('ULTIMATE CHALLENGE', W/2, cY + 30);
+
+  // Score
+  ctx.fillStyle = '#fff';
+  ctx.font = '16px "Press Start 2P"';
+  ctx.fillText('SCORE: ' + score, W/2, cY + 72);
+
+  // Instrument
+  ctx.fillStyle = '#aaddff';
+  ctx.font = '7px "Press Start 2P"';
+  ctx.fillText(selectedInstrument.toUpperCase(), W/2, cY + 100);
+
+  // Name label
+  ctx.fillStyle = '#ffe066';
+  ctx.font = '7px "Press Start 2P"';
+  ctx.fillText('ENTER YOUR NAME', W/2, cY + 128);
+
+  // Name input box
+  const inpW = 300, inpH = 28;
+  const inpX = W/2 - inpW/2, inpY = cY + 140;
+  ctx.fillStyle = '#111';
+  ctx.fillRect(inpX, inpY, inpW, inpH);
+  ctx.strokeStyle = '#ffe066';
+  ctx.lineWidth = 1.5;
+  ctx.strokeRect(inpX, inpY, inpW, inpH);
+  ctx.fillStyle = '#fff';
+  ctx.font = '9px "Press Start 2P"';
+  ctx.textAlign = 'center';
+  ctx.fillText(ucScoreCardNameInput + (Math.floor(Date.now()/500)%2 ? '|' : ''), W/2, inpY + 16);
+
+  // Status message
+  const statusCol = ucScoreCardStatus === 'sent' ? '#44ff88' : ucScoreCardStatus === 'error' ? '#ff4444' : '#aaddff';
+  ctx.fillStyle = statusCol;
+  ctx.font = '7px "Press Start 2P"';
+  ctx.fillText(
+    ucScoreCardStatus === 'sending' ? 'SENDING...' :
+    ucScoreCardStatus === 'sent'    ? 'SCORE SAVED!' :
+    ucScoreCardStatus === 'error'   ? 'ERROR - TRY AGAIN' : '',
+    W/2, inpY + inpH + 14);
+
+  // SUBMIT button
+  const sbW = 160, sbH = 32;
+  const sbX = W/2 - sbW - 8, sbY = cY + cH - 52;
+  drawNesButton('SUBMIT', sbX, sbY, sbW, sbH, hoveredBtn === 'UC_SUBMIT', false);
+  ucScoreCardSubmitBtn = { x: sbX, y: sbY, w: sbW, h: sbH };
+
+  // MENU button
+  const mbW = 160, mbH = 32;
+  const mbX = W/2 + 8, mbY = sbY;
+  drawNesButton('MENU', mbX, mbY, mbW, mbH, hoveredBtn === 'UC_MENU', false);
+  ucScoreCardMenuBtn = { x: mbX, y: mbY, w: mbW, h: mbH };
+}
+
 // ─── UC BEAT GAME OVERLAY ────────────────────────────────────────────────────
 function drawBeatGameOverlay() {
   const t = ucBeatAnimT;
@@ -3948,6 +4063,8 @@ function draw(dt) {
   // HUD
   drawHUD();
 
+  // UC Score Card overlay
+  if (ucScoreCard) { drawUcScoreCard(); }
   // UC Beat-Game overlay
   if (ucBeatGame && hero.state === 'idle') {
     drawBeatGameOverlay();
@@ -4121,6 +4238,17 @@ canvas.addEventListener('mousemove', (e) => {
 canvas.addEventListener('click', (e) => {
   const pos = getCanvasPos(e);
 
+  // UC score card clicks
+  if (ucScoreCard) {
+    if (ucScoreCardSubmitBtn && hitTest(pos, ucScoreCardSubmitBtn)) {
+      submitUcScore(); return;
+    }
+    if (ucScoreCardMenuBtn && hitTest(pos, ucScoreCardMenuBtn)) {
+      ucScoreCard = false; ucScoreCardNameInput = ''; ucScoreCardStatus = '';
+      ucActive = false; score = 0; gameState = 'title'; hoveredBtn = null; return;
+    }
+    return; // block other clicks while card is showing
+  }
   // UC beat-game dismiss
   if (ucBeatGame && ucBeatAnimT > 3 && gameState === 'playing') {
     ucActive = false; ucBeatGame = false;
@@ -4234,11 +4362,16 @@ canvas.addEventListener('click', (e) => {
       }
     } else {
       if (inGameMenuBtn && hitTest(pos, inGameMenuBtn)) {
-        currentLevel = 1;
-        score = 0;
-        stopBackingTrack();
-        hideSubmitPanel();
-        gameState = 'levelSelect';
+        if (ucActive) {
+          stopBackingTrack();
+          ucScoreCard = true;
+        } else {
+          currentLevel = 1;
+          score = 0;
+          stopBackingTrack();
+          hideSubmitPanel();
+          gameState = 'levelSelect';
+        }
         hoveredBtn = null;
         return;
       }
@@ -4409,6 +4542,18 @@ function resolveInput(correct, currentNote) {
 
 
 window.addEventListener('keydown', (e) => {
+  // UC score card keyboard input
+  if (ucScoreCard) {
+    if (e.key === 'Backspace') {
+      ucScoreCardNameInput = ucScoreCardNameInput.slice(0, -1);
+    } else if (e.key.length === 1 && ucScoreCardNameInput.length < 24) {
+      ucScoreCardNameInput += e.key;
+    } else if (e.key === 'Enter') {
+      submitUcScore();
+    }
+    e.preventDefault();
+    return;
+  }
   // Title screen
   if (gameState === 'title') {
     if (e.key === 'Enter' && selectedInstrument) gameState = 'levelPreview';
@@ -4519,6 +4664,7 @@ function resetGame() {
 // Focus canvas on load
 window.addEventListener('load', () => {
   canvas.focus();
+
 
   // Generate favicon from violin sprite
   const fav = document.createElement('canvas');
